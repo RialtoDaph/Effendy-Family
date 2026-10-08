@@ -1,0 +1,9 @@
+{
+  "name": "Effendy Family",
+  "short_name": "Effendy",
+  "start_url": "./Effendy Family v7.dc.html",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0B0D10",
+  "lang": "en"
+}
