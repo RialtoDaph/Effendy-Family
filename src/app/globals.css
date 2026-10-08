@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+/* Design tokens from docs/design/README.md. The <html> element carries
+   data-theme="light|dark" (resolved, see theme-script.ts) and data-palette. */
+
+:root {
+  --bg: #ffffff;
+  --card: #ffffff;
+  --soft: #f7f8fa;
+  --soft2: #eff1f4;
+  --line: #e6e8ec;
+  --line2: #cdd1d8;
+  --ink: #0b0d10;
+  --mut: #5b616e;
+  --mut2: #8e94a0;
+  --inv: #0b0d10;
+  --dot: #e9ebef;
+  --acc: #3355ff;
+  --acc2: #8fa3ff;
+  --acct: #2440e0;
+  --onacc: #ffffff;
+  --tint: #eef1ff;
+  --tint2: #c9d3ff;
+  --ok: #0e9f5b;
+  --okbg: #e7f8ef;
+  --warn: #e0a100;
+  --warnbg: #fff6dc;
+  --warnt: #7a5600;
+  --bad: #e5383b;
+  --badbg: #fdecec;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0a0b0d;
+  --card: #121418;
+  --soft: #16181d;
+  --soft2: #1d2026;
+  --line: #23262d;
+  --line2: #363a43;
+  --ink: #e9ebef;
+  --mut: #a0a6b1;
+  --mut2: #6c727d;
+  --inv: #1a1d23;
+  --dot: #15171b;
+  --acc: #5b7bff;
+  --acc2: #8fa3ff;
+  --acct: #8fa3ff;
+  --tint: rgba(91, 123, 255, 0.14);
+  --tint2: rgba(91, 123, 255, 0.34);
+  --ok: #4ade80;
+  --okbg: rgba(34, 197, 94, 0.13);
+  --warn: #f2c14e;
+  --warnbg: rgba(242, 193, 78, 0.14);
+  --warnt: #f2c14e;
+  --bad: #f87171;
+  --badbg: rgba(239, 68, 68, 0.15);
+  color-scheme: dark;
+}
+
+/* Palettes ---------------------------------------------------------------- */
+:root[data-palette="mono"] {
+  --acc: #0b0d10;
+  --acc2: #b9bec7;
+  --acct: #0b0d10;
+  --tint: #f3f4f6;
+  --tint2: #dde0e5;
+  --onacc: #ffffff;
+  --ok: #4e8a5f;
+  --okbg: #eaf3ec;
+  --bad: #c2453a;
+  --badbg: #f8e9e7;
+  --warn: #d9a520;
+  --warnbg: #fbf3dc;
+  --warnt: #6e5200;
+}
+:root[data-palette="lime"] {
+  --acc: #b8f02a;
+  --acc2: #d4f77a;
+  --acct: #4c6b00;
+  --tint: #f5fce3;
+  --tint2: #e2f6a8;
+  --onacc: #0b0d10;
+}
+:root[data-palette="teal"] {
+  --acc: #0e8c7e;
+  --acc2: #7fd8cc;
+  --acct: #0a6b60;
+  --tint: #e8f6f4;
+  --tint2: #b9e6df;
+  --onacc: #ffffff;
+}
+:root[data-palette="violet"] {
+  --acc: #6246ea;
+  --acc2: #b3a4ff;
+  --acct: #4b30cc;
+  --tint: #f1eeff;
+  --tint2: #d6ceff;
+  --onacc: #ffffff;
+}
+:root[data-theme="dark"][data-palette="mono"] {
+  --acc: #e9ebef;
+  --acc2: #8a909b;
+  --acct: #e9ebef;
+  --tint: #1d2026;
+  --tint2: #2c3038;
+  --onacc: #0a0b0d;
+  --ok: #7fbf8e;
+  --okbg: rgba(127, 191, 142, 0.13);
+  --bad: #e07a6e;
+  --badbg: rgba(224, 122, 110, 0.14);
+  --warn: #e3b341;
+  --warnbg: rgba(227, 179, 65, 0.14);
+  --warnt: #e3b341;
+}
+:root[data-theme="dark"][data-palette="lime"] {
+  --acct: #c6f432;
+  --tint: rgba(184, 240, 42, 0.12);
+  --tint2: rgba(184, 240, 42, 0.3);
+}
+:root[data-theme="dark"][data-palette="teal"] {
+  --acc: #22b3a2;
+  --acct: #5fd3c4;
+  --tint: rgba(34, 179, 162, 0.14);
+  --tint2: rgba(34, 179, 162, 0.34);
+}
+:root[data-theme="dark"][data-palette="violet"] {
+  --acc: #7c64ff;
+  --acct: #b3a4ff;
+  --tint: rgba(124, 100, 255, 0.15);
+  --tint2: rgba(124, 100, 255, 0.35);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-soft: var(--soft);
+  --color-soft2: var(--soft2);
+  --color-line: var(--line);
+  --color-line2: var(--line2);
+  --color-ink: var(--ink);
+  --color-mut: var(--mut);
+  --color-mut2: var(--mut2);
+  --color-inv: var(--inv);
+  --color-acc: var(--acc);
+  --color-acc2: var(--acc2);
+  --color-acct: var(--acct);
+  --color-onacc: var(--onacc);
+  --color-tint: var(--tint);
+  --color-tint2: var(--tint2);
+  --color-ok: var(--ok);
+  --color-okbg: var(--okbg);
+  --color-warn: var(--warn);
+  --color-warnbg: var(--warnbg);
+  --color-warnt: var(--warnt);
+  --color-bad: var(--bad);
+  --color-badbg: var(--badbg);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --breakpoint-wide: 900px;
+}
+
+/* Base ---------------------------------------------------------------------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 200ms;
+}
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  letter-spacing: inherit;
+}
+button {
+  cursor: pointer;
+}
+
+/* Touch: every tappable thing gets at least a 44x44 hit area; inputs use 16px
+   so iOS does not zoom. In the base layer so utilities like `fixed` still win. */
+@layer base {
+  @media (pointer: coarse) {
+    button,
+    a {
+      touch-action: manipulation;
+    }
+    button:not(.no-hit) {
+      position: relative;
+    }
+    button:not(.no-hit)::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 100%;
+      height: 100%;
+      min-width: 44px;
+      min-height: 44px;
+      transform: translate(-50%, -50%);
+    }
+    input:not([type="range"]):not([type="file"]),
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+}
+
+@media print {
+  [data-noprint] {
+    display: none !important;
+  }
+  body {
+    background-image: none !important;
+  }
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mut2);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
