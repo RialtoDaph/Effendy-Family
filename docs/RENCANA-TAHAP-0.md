@@ -1,6 +1,6 @@
 # Rencana Tahap 0 — Fondasi
 
-Status: **rencana, menunggu persetujuan**. Belum ada kode yang ditulis.
+Status: **kode selesai dan sudah online**. Tinggal langkah yang harus diklik sendiri (lihat bagian paling bawah) dan tes di HP.
 
 Acuan: `docs/design/README.md`, `DATA_MODEL.md`, `ROADMAP.md`, dan prototipe
 `docs/design/Effendy Family v7.dc.html` (dibangun ulang, tidak disalin).
@@ -49,3 +49,28 @@ dibangun mulai Tahap 1.
 - **Bahasa tampilan app: Inggris** (sesuai README). Penjelasan ke Anda tetap bahasa Indonesia.
 - **Palet warna default: mono** (hitam-putih), sesuai README.
 - **Data contoh di prototipe tidak dipakai**; app mulai kosong.
+
+## Yang sudah dikerjakan
+
+- Supabase proyek "Effendy Family", region Frankfurt (`eu-central-1`), paket gratis.
+- Tabel `households`, `members`, `member_settings` + aturan privasi (RLS), sudah dites
+  (`supabase/tests/access_rules.sql`, 15 dari 15 cek lolos).
+- Akun baru otomatis masuk ke satu rumah tangga; akun ke-3 ditolak.
+- Login email + password, login passkey (Face ID / sidik jari), lupa password.
+- Rangka app sesuai prototipe: sidebar (laptop), header + tab bawah + tombol + (HP),
+  More, pencarian ⌘K, toast, formulir bottom-sheet.
+- Settings: Your data (Export/Import JSON), Appearance, Sign-in, Offline & install,
+  Members, Language & region.
+- PWA: manifest, ikon, service worker (terbuka saat offline, pill "Offline").
+- Vercel proyek `effendy-family`, region fra1.
+
+## Hasil tes otomatis
+
+| Cek | Hasil |
+|---|---|
+| Tidak ada geser horizontal di 360px | Lolos (juga 390px dan 1280px) |
+| Terbuka saat offline | Lolos (Home, Journal, Settings, pindah tab) |
+| Pengunjung tanpa login dialihkan ke /login | Lolos |
+| Aturan akses database | Lolos 15/15 |
+| Dipasang di Home Screen | Perlu dites di HP Anda |
+| Kalian berdua bisa masuk | Perlu dites setelah akun dibuat |
