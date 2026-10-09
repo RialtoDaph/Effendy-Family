@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { LogOut, ScanFace, Trash } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useAppData, type Member } from "@/components/app-data";
 import { useLock } from "@/components/lock";
 import { useInstall, useOnline, useStorageEstimate } from "@/components/pwa";
@@ -10,6 +10,7 @@ import { FormSheet, Switch } from "@/components/sheet";
 import { Avatar } from "@/components/shell/avatar";
 import { THEME_OPTIONS, useTheme } from "@/components/theme";
 import { useToast } from "@/components/toast";
+import { enablePush, pushState, sendTestPush, type PushState } from "@/lib/push";
 import { supabase } from "@/lib/supabase";
 import { PageHeader } from "./page-header";
 
@@ -64,6 +65,7 @@ export function SettingsScreen() {
         <AppearanceSection />
         <SignInSection />
         <SecuritySection />
+        <RemindersSection />
         <OfflineSection />
 
         <section className="rounded-[10px] border border-line bg-card p-5">
@@ -488,6 +490,128 @@ function SecuritySection() {
           </div>
         </>
       )}
+    </Section>
+  );
+}
+
+/* Reminders: Web Push to this phone ---------------------------------------- */
+
+const NOTIF_ROWS = [
+  ["bills", "Bills & recurring payments", "The day before money goes out"],
+  ["tax", "Tax deadlines", "3 days before"],
+  ["budget", "Budget warnings", "When a category passes your warning level"],
+  ["goals", "Goals", "A short nudge on Sunday evening"],
+] as const;
+
+const PUSH_PILL: Record<PushState, [string, "ok" | "mut"]> = {
+  on: ["On", "ok"],
+  off: ["Off", "mut"],
+  blocked: ["Blocked", "mut"],
+  unsupported: ["Not available", "mut"],
+};
+
+function RemindersSection() {
+  const { userId, settings, reload } = useAppData();
+  const { ios, standalone } = useInstall();
+  const toast = useToast();
+  const [state, setState] = useState<PushState | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [local, setLocal] = useState<Record<string, unknown> | null>(null);
+  const notif = { bills: true, tax: true, budget: true, goals: true, time: "07:00", ...settings?.notif, ...local };
+
+  const refresh = useCallback(() => {
+    pushState().then(setState);
+  }, []);
+  useEffect(refresh, [refresh]);
+
+  async function save(patch: Record<string, unknown>) {
+    const next = { ...notif, ...patch };
+    setLocal(next);
+    const { error } = await supabase().from("member_settings").update({ notif: next }).eq("member_id", userId);
+    if (error) {
+      setLocal(null);
+      return toast("Could not save. Check your internet connection.");
+    }
+    await reload();
+  }
+
+  async function allow() {
+    setBusy(true);
+    const err = await enablePush();
+    setBusy(false);
+    refresh();
+    toast(err ?? "Reminders are on");
+  }
+
+  async function test() {
+    setBusy(true);
+    const err = await sendTestPush();
+    setBusy(false);
+    toast(err ?? "Test sent · it arrives in a few seconds");
+  }
+
+  const [label, tone] = state ? PUSH_PILL[state] : ["…", "mut" as const];
+  const needsHomeScreen = ios && !standalone;
+
+  return (
+    <Section title="Reminders" sub="Sent to this phone, even when the app is closed." pill={<Pill tone={tone}>{label}</Pill>}>
+      {needsHomeScreen ? (
+        <div className="rounded-[10px] bg-soft p-3.5 text-[13px] leading-normal text-mut">
+          iPhone: add the app to your Home Screen first (iOS 16.4 or newer), open it from there, then allow notifications.
+        </div>
+      ) : state === "off" ? (
+        <button onClick={allow} disabled={busy} className="min-h-12 rounded-full border-0 bg-acc text-sm font-extrabold text-onacc disabled:opacity-60">
+          Allow notifications
+        </button>
+      ) : state === "blocked" ? (
+        <div className="rounded-[10px] bg-soft p-3.5 text-[13px] leading-normal text-mut">
+          Notifications are blocked for this app. Turn them on in your phone settings, then come back.
+        </div>
+      ) : state === "unsupported" ? (
+        <div className="rounded-[10px] bg-soft p-3.5 text-[13px] leading-normal text-mut">
+          This browser cannot show reminders. Use the installed app on your phone.
+        </div>
+      ) : null}
+      <div>
+        {NOTIF_ROWS.map(([k, title, sub]) => {
+          const on = !!notif[k];
+          return (
+            <div key={k} className="flex items-center gap-3 border-b border-line py-3">
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-bold">{title}</div>
+                <div className="mt-0.5 text-xs text-mut">{k === "budget" ? `When a category passes ${settings?.warn_pct ?? 80}%` : sub}</div>
+              </div>
+              <button onClick={() => save({ [k]: !on })} aria-label={title} aria-pressed={on} className="flex-none border-0 bg-transparent p-0">
+                <Switch on={on} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <div className="text-[12.5px] font-bold text-mut">Morning summary at</div>
+      <div className="grid grid-cols-3 gap-1 rounded-[10px] bg-soft2 p-1">
+        {["07:00", "08:00", "20:00"].map((t) => {
+          const on = notif.time === t;
+          return (
+            <button
+              key={t}
+              onClick={() => save({ time: t })}
+              aria-pressed={on}
+              className={`min-h-10 rounded-lg border-0 font-mono text-[13px] font-bold ${
+                on ? "bg-card text-ink shadow-[0_1px_3px_rgba(0,0,0,.12)]" : "bg-transparent text-mut"
+              }`}
+            >
+              {t}
+            </button>
+          );
+        })}
+      </div>
+      {state === "on" && (
+        <button onClick={test} disabled={busy} className={`${secondaryBtn} disabled:opacity-60`}>
+          Send a test reminder
+        </button>
+      )}
+      <div className="text-xs text-mut2">Each of you chooses your own reminders. Private items only go to their owner.</div>
     </Section>
   );
 }

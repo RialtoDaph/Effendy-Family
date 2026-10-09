@@ -5,7 +5,7 @@
 // - /_next/static (hashed, never changes): cache first.
 // - Supabase and other origins are never touched here.
 
-const VERSION = "ef-v4";
+const VERSION = "ef-v5";
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
@@ -95,17 +95,32 @@ self.addEventListener("fetch", (e) => {
 
 // Web Push (phase 3) -----------------------------------------------------------
 self.addEventListener("push", (e) => {
-  const d = e.data ? e.data.json() : {};
+  let d = {};
+  try {
+    d = e.data ? e.data.json() : {};
+  } catch {
+    d = { body: e.data ? e.data.text() : "" };
+  }
   e.waitUntil(
     self.registration.showNotification(d.title || "Effendy Family", {
       body: d.body || "",
       icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: d.tag,
       data: { url: d.url || "/" },
     }),
   );
 });
 
+// Tapping a reminder opens its screen, reusing an open app window if there is one.
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
-  e.waitUntil(self.clients.openWindow((e.notification.data && e.notification.data.url) || "/"));
+  const url = (e.notification.data && e.notification.data.url) || "/";
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      const win = list.find((c) => new URL(c.url).origin === self.location.origin);
+      if (win) return win.focus().then((w) => (w || win).navigate(url));
+      return self.clients.openWindow(url);
+    }),
+  );
 });

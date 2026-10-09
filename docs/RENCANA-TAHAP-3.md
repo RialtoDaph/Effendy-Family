@@ -7,7 +7,7 @@ bank = Sparkasse, TF Bank, Revolut, BCA, PayPal, Wise.
 |---|---|
 | A PIN + Face ID | ✅ selesai, dites otomatis (PIN tidak tersimpan polos, jeda 30 dtk setelah 5x salah, terkunci saat dibuka lagi) |
 | C Offline queue | ✅ selesai, dites otomatis (simpan tanpa internet → "Offline · 1" → terkirim otomatis saat online) |
-| B Notifikasi | berikutnya |
+| B Notifikasi | ✅ dibuat; aturan dites di database (12 cek lulus), enkripsi dicek dengan pustaka referensi. **Tes di HP oleh Rialto** |
 | D Bank import CSV | menunggu contoh CSV |
 | E PDF + struk | menunggu API key |
 
@@ -58,8 +58,10 @@ A–C tidak butuh akun baru, jadi dikerjakan dulu. D–E menyusul.
 | `transactions.import_hash` | sidik anti-dobel (kolom sudah ada sejak Tahap 1) |
 | `files` (kind `receipt`, `statement`) | foto struk dan file rekening (bucket privat yang sudah ada) |
 
-Notifikasi dikirim oleh fungsi server Supabase (Edge Function) yang dipanggil `pg_cron`
-tiap 15 menit dan untuk ringkasan pagi. Kunci notifikasi (VAPID) saya buat sendiri dan disimpan sebagai rahasia di server.
+Notifikasi dikirim oleh fungsi server Supabase (Edge Function `push`) yang dipanggil `pg_cron`
+tiap 15 menit. Kunci notifikasi (VAPID) dibuat otomatis oleh fungsi itu dan hanya tersimpan di server.
+Waktu kirim (jam Jerman): ringkasan pada jam pilihan · tagihan & pajak mulai 09:00 · budget 08:00–21:00 ·
+goals Minggu 19:00. Tidak ada notifikasi malam.
 
 Claude API hanya dipanggil dari server (Vercel), kuncinya tidak pernah sampai ke HP.
 
