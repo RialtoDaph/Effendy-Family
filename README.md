@@ -18,13 +18,19 @@ npm run dev
 ## Database
 - Migrations: `supabase/migrations/` (applied to the Supabase project in order).
 - Access-rule checks: run `supabase/tests/access_rules.sql` (members) and
-  `supabase/tests/money_rules.sql` (Private/Family, recurring posting) in the Supabase
+  `supabase/tests/money_rules.sql` (Private/Family, recurring posting) and
+  `supabase/tests/money_complete_rules.sql` (debts, assets, transfers, files) in the Supabase
   SQL editor. Every check must return `ok = true`. Both roll back; nothing is kept.
 - Recurring items are posted by `private.post_recurring()`, run hourly by pg_cron
   (does nothing before 05:00 Europe/Berlin).
 
 ## Tests
-`npm test` runs the money rules in `src/lib/money.test.ts` (Vitest).
+`npm test` runs the money rules in `src/lib/money.test.ts` and `src/lib/finance.test.ts` (Vitest).
+
+## Files
+Business reports live in the private Supabase Storage bucket `files`, path
+`<household_id>/<owner_id>/<name>`. An object can only be read when its `files` row is
+visible to the reader, so Private files stay private.
 - New sign-in accounts join the single household automatically (max 2 members).
   Public sign-up must stay switched off in Supabase → Authentication → Sign In / Providers.
 

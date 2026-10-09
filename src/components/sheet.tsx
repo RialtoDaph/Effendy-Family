@@ -53,7 +53,7 @@ export function Sheet({
   );
 }
 
-export type FieldValue = string | boolean;
+export type FieldValue = string | boolean | File | null;
 export type FormValues = Record<string, FieldValue>;
 
 export type Field =
@@ -68,7 +68,9 @@ export type Field =
       options: { value: string; label: string; icon?: LucideIcon }[];
       required?: boolean;
     }
-  | { kind: "toggle"; key: string; label: string; toggleLabel: string };
+  | { kind: "toggle"; key: string; label: string; toggleLabel: string }
+  | { kind: "file"; key: string; label: string; accept: string; current?: string }
+  | { kind: "note"; key: string; label: string; text: string };
 
 const inputCls =
   "h-[50px] rounded-[10px] border border-line bg-soft px-3.5 text-base text-ink outline-none focus:border-line2";
@@ -98,7 +100,7 @@ export function FormSheet({
 
   async function save() {
     const missing = fields.find(
-      (f) => f.kind !== "toggle" && f.required && !String(values[f.key] ?? "").trim(),
+      (f) => "required" in f && f.required && !String(values[f.key] ?? "").trim(),
     );
     if (missing) {
       setError(`Please fill in: ${missing.label}`);
@@ -177,6 +179,23 @@ export function FormSheet({
                 })}
               </div>
             )}
+            {f.kind === "file" && (
+              <label className="flex min-h-[50px] cursor-pointer items-center gap-3 rounded-[10px] border border-dashed border-line2 bg-soft px-3.5 py-3">
+                <span className="rounded-full bg-card px-3 py-1.5 text-[13px] font-extrabold text-ink shadow-[0_1px_3px_rgba(0,0,0,.12)]">
+                  Choose file
+                </span>
+                <span className="min-w-0 flex-1 truncate text-[13px] text-mut">
+                  {values[f.key] instanceof File ? (values[f.key] as File).name : (f.current ?? "No file yet")}
+                </span>
+                <input
+                  type="file"
+                  accept={f.accept}
+                  className="sr-only"
+                  onChange={(e) => set(f.key, e.target.files?.[0] ?? null)}
+                />
+              </label>
+            )}
+            {f.kind === "note" && <div className="text-[13px] leading-normal text-mut">{f.text}</div>}
             {f.kind === "toggle" && (
               <button
                 type="button"

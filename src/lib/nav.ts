@@ -119,7 +119,7 @@ export function screenInfo(id: string): ScreenInfo | undefined {
 }
 
 /** Screens with their own page under app/(app)/. */
-export const BUILT_SCREENS = ["settings", "budget", "recur", "alerts", "setup"];
+export const BUILT_SCREENS = ["settings", "budget", "recur", "alerts", "setup", "debts", "subs", "remit", "biz", "tax", "invest"];
 
 /** Screens served by app/(app)/[screen]/page.tsx. Keep public/sw.js PAGES in sync. */
 export const PLACEHOLDER_SCREENS = [
@@ -150,20 +150,20 @@ export type QuickAddItem = {
   phase: number;
   href?: string;
   /** Opens this money form (components/money-forms.tsx). */
-  form?: "tx" | "goal" | "recur";
+  form?: "tx" | "goal" | "recur" | "debt" | "sub" | "asset" | "remit";
 };
 
 export const QUICK_ADD: QuickAddItem[] = [
   { key: "scan", label: "Scan receipt", icon: Camera, phase: 3 },
-  { key: "debt", label: "Debt", icon: CreditCard, phase: 2 },
+  { key: "debt", label: "Debt", icon: CreditCard, phase: 2, form: "debt" },
   { key: "tx", label: "Transaction", icon: Receipt, phase: 1, form: "tx" },
   { key: "event", label: "Calendar event", icon: Calendar, phase: 4 },
   { key: "shift", label: "Bar shift", icon: Beer, phase: 4 },
   { key: "goal", label: "Goal", icon: Target, phase: 1, form: "goal" },
-  { key: "sub", label: "Subscription", icon: Repeat, phase: 2 },
-  { key: "asset", label: "Investment value", icon: TrendingUp, phase: 2 },
+  { key: "sub", label: "Subscription", icon: Repeat, phase: 2, form: "sub" },
+  { key: "asset", label: "Investment value", icon: TrendingUp, phase: 2, form: "asset" },
   { key: "gym", label: "Gym session", icon: Dumbbell, phase: 4, href: "/gym" },
   { key: "journal", label: "Journal note", icon: NotebookPen, phase: 4, href: "/journal" },
   { key: "recur", label: "Recurring payment", icon: Repeat, phase: 1, form: "recur" },
-  { key: "remit", label: "Transfer home", icon: Send, phase: 2 },
+  { key: "remit", label: "Transfer home", icon: Send, phase: 2, form: "remit" },
 ];

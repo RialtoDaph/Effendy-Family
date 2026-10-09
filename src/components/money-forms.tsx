@@ -2,13 +2,14 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
+import { FinanceForm, type FinanceFormKind } from "@/components/finance-forms";
 import { useMoney, type MoneyTable } from "@/components/money-data";
 import { FormSheet, type Field, type FormValues } from "@/components/sheet";
 import { useToast } from "@/components/toast";
 import { CATEGORY_ICONS, GOAL_ICONS, iconFor } from "@/lib/icons";
 import { parseAmount, type Category, type Goal, type Income, type Recurring, type Transaction } from "@/lib/money";
 
-type FormKind = "tx" | "cat" | "income" | "recur" | "goal";
+type FormKind = "tx" | "cat" | "income" | "recur" | "goal" | FinanceFormKind;
 type Open = { kind: FormKind; id?: string; preset?: FormValues };
 
 type MoneyForms = {
@@ -42,6 +43,13 @@ export function MoneyFormsProvider({ children }: { children: ReactNode }) {
 }
 
 function MoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
+  if (!["tx", "cat", "income", "recur", "goal"].includes(open.kind)) {
+    return <FinanceForm kind={open.kind as FinanceFormKind} id={open.id} preset={open.preset} onClose={onClose} />;
+  }
+  return <CoreMoneyForm open={open} onClose={onClose} />;
+}
+
+function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
   const { members, settings, userId } = useAppData();
   const money = useMoney();
   const toast = useToast();

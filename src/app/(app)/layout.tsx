@@ -1,4 +1,5 @@
 import { AppDataProvider } from "@/components/app-data";
+import { FinanceProvider } from "@/components/finance-data";
 import { MoneyProvider } from "@/components/money-data";
 import { MoneyFormsProvider } from "@/components/money-forms";
 import { AppShell } from "@/components/shell/app-shell";
@@ -9,9 +10,11 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
     <ToastProvider>
       <AppDataProvider>
         <MoneyProvider>
-          <MoneyFormsProvider>
-            <AppShell>{children}</AppShell>
-          </MoneyFormsProvider>
+          <FinanceProvider>
+            <MoneyFormsProvider>
+              <AppShell>{children}</AppShell>
+            </MoneyFormsProvider>
+          </FinanceProvider>
         </MoneyProvider>
       </AppDataProvider>
     </ToastProvider>

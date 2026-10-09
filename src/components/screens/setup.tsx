@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAppData } from "@/components/app-data";
+import { useFinance } from "@/components/finance-data";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
 import { eur, plural } from "@/lib/money";
@@ -19,6 +20,7 @@ export function useSetupSteps(): Step[] {
   const { members } = useAppData();
   const { incomes, categories, goals, recurring } = useMoney();
   const { openForm } = useMoneyForms();
+  const { assets } = useFinance();
   const incomeTotal = incomes.reduce((a, i) => a + i.monthly_amount, 0);
   const realGoals = goals.filter((g) => !g.is_emergency_fund);
 
@@ -57,7 +59,13 @@ export function useSetupSteps(): Step[] {
       href: "/",
       add: () => openForm("goal"),
     },
-    { title: "Savings & investments", sub: "Accounts and their value, once a month", done: false, href: "/invest", phase: 2 },
+    {
+      title: "Savings & investments",
+      sub: `${plural(assets.length, "account")} · update values once a month`,
+      done: assets.length > 0,
+      href: "/invest",
+      add: () => openForm("asset"),
+    },
     { title: "Bar shift schedule", sub: "Snap the Dienstplan, or add shifts by hand", done: false, href: "/shifts", phase: 4 },
     { title: "Yearly goals", sub: "Each with a weekly step", done: false, href: "/ygoals", phase: 4 },
   ];

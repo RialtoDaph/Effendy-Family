@@ -1,6 +1,6 @@
 # Rencana Tahap 2 — Money complete
 
-Status: **rencana, menunggu jawaban dan persetujuan**. Belum ada kode yang ditulis.
+Status: **kode selesai dan online**. Tinggal tes di HP (upload file sungguhan, dan dua akun).
 
 Catatan: tes dua akun dari Tahap 1 (transaksi "Only me" tidak terlihat di HP Amnah)
 masih menunggu akun Amnah. Tahap 2 bisa dibangun sambil menunggu.
@@ -52,8 +52,24 @@ pasangan dan tidak masuk total mereka.
 
 ## Pengecekan (dari ROADMAP)
 
-- [ ] Hitungan kiriman sama dengan README.
-- [ ] File bisnis bisa dibuka dari barisnya.
-- [ ] Net worth = aset − utang.
+- [x] Hitungan kiriman sama dengan README. (tes hitungan: Wise €200 @18.000 = Rp 3.568.320)
+- [x] File bisnis bisa dibuka dari barisnya. (tes browser dengan data tiruan; perlu dicoba sekali di HP)
+- [x] Net worth = aset − utang. (tes hitungan + tampilan: €31.320 − €4.296 = €27.024)
 
 Cara cek: tes hitungan (Vitest), tes database dua akun (seperti Tahap 1), tes tampilan 360/390/1280px.
+
+## Keputusan dari Rialto (10 Okt 2026)
+
+- Nama bisnis bisa diubah sendiri di app (awal: Rialto Studio, Amnah Atelier).
+- Status pajak: Kleinunternehmer, jadi tidak ada tenggat PPN otomatis. Bisa diubah per bisnis.
+- Perkiraan refund diisi manual.
+- Subscriptions sederhana: hanya aktif / sudah berhenti (tanpa "terakhir dipakai").
+
+## Hasil tes
+
+| Tes | Hasil |
+|---|---|
+| Database (`supabase/tests/money_complete_rules.sql`) | 10/10 lolos |
+| Hitungan (`src/lib/finance.test.ts`) | 11/11 lolos (total semua tes 27/27) |
+| Tampilan 360 / 390 / 1280px | Tidak ada geser horizontal; upload dan buka file berhasil (data tiruan) |
+| Upload file sungguhan ke Supabase Storage | Belum bisa dari container Claude; perlu dicoba di HP |
