@@ -4,8 +4,9 @@ import Link from "next/link";
 import { LogOut, ScanFace, Trash } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useAppData, type Member } from "@/components/app-data";
+import { useLock } from "@/components/lock";
 import { useInstall, useOnline, useStorageEstimate } from "@/components/pwa";
-import { FormSheet } from "@/components/sheet";
+import { FormSheet, Switch } from "@/components/sheet";
 import { Avatar } from "@/components/shell/avatar";
 import { THEME_OPTIONS, useTheme } from "@/components/theme";
 import { useToast } from "@/components/toast";
@@ -62,6 +63,7 @@ export function SettingsScreen() {
         <DataSection />
         <AppearanceSection />
         <SignInSection />
+        <SecuritySection />
         <OfflineSection />
 
         <section className="rounded-[10px] border border-line bg-card p-5">
@@ -339,7 +341,6 @@ function SignInSection() {
         <LogOut size={16} />
         Sign out
       </button>
-      <div className="text-xs text-mut2">The 4-digit PIN lock arrives in phase 3.</div>
     </Section>
   );
 }
@@ -403,6 +404,89 @@ function OfflineSection() {
             )}
           </div>
         </div>
+      )}
+    </Section>
+  );
+}
+
+/* Security: PIN lock + Face ID unlock, per device ---------------------------- */
+
+function SecuritySection() {
+  const lock = useLock();
+  const toast = useToast();
+  const online = useOnline();
+
+  async function toggleFace() {
+    if (lock.prefs.faceId) return lock.setPrefs({ faceId: false });
+    if (!online) return toast("Turning this on needs the internet.");
+    const { data } = await supabase().auth.passkey.list();
+    if (!data?.length) return toast("Add Face ID / fingerprint under Sign-in first.");
+    lock.setPrefs({ faceId: true });
+  }
+
+  const rows = [
+    {
+      label: "PIN lock",
+      sub: lock.hasPin ? "On · asked when the app opens" : "Off · anyone holding this phone can open the app",
+      on: lock.hasPin,
+      toggle: () => (lock.hasPin ? lock.startTurnOff() : lock.startSetup()),
+    },
+    ...(lock.hasPin
+      ? [
+          {
+            label: "Face ID / fingerprint",
+            sub: "Unlock without typing the PIN (needs the internet)",
+            on: lock.prefs.faceId,
+            toggle: toggleFace,
+          },
+        ]
+      : []),
+  ];
+
+  return (
+    <Section title="Security" sub="The PIN is kept on this phone only, as a secure hash.">
+      <div>
+        {rows.map((r) => (
+          <div key={r.label} className="flex items-center gap-3 border-b border-line py-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-bold">{r.label}</div>
+              <div className="mt-0.5 text-xs text-mut">{r.sub}</div>
+            </div>
+            <button onClick={r.toggle} aria-label={r.label} aria-pressed={r.on} className="flex-none border-0 bg-transparent p-0">
+              <Switch on={r.on} />
+            </button>
+          </div>
+        ))}
+      </div>
+      {lock.hasPin && (
+        <>
+          <div className="text-[12.5px] font-bold text-mut">Lock again after leaving the app</div>
+          <div className="grid grid-cols-3 gap-1 rounded-[10px] bg-soft2 p-1">
+            {([0, 1, 5] as const).map((m) => {
+              const on = lock.prefs.autoLockMin === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => lock.setPrefs({ autoLockMin: m })}
+                  aria-pressed={on}
+                  className={`min-h-10 rounded-lg border-0 text-[13px] font-bold ${
+                    on ? "bg-card text-ink shadow-[0_1px_3px_rgba(0,0,0,.12)]" : "bg-transparent text-mut"
+                  }`}
+                >
+                  {m === 0 ? "Right away" : `${m} min`}
+                </button>
+              );
+            })}
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={lock.lockNow} className="min-h-11 rounded-[10px] border-0 bg-inv text-[13.5px] font-extrabold text-white">
+              Lock now
+            </button>
+            <button onClick={lock.startChange} className={secondaryBtn}>
+              Change PIN
+            </button>
+          </div>
+        </>
       )}
     </Section>
   );

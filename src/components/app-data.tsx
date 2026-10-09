@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { clearAllPins } from "@/lib/pin";
 import { supabase } from "@/lib/supabase";
 
 export type Member = {
@@ -134,6 +135,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }, [load, profile.userId]);
 
   const signOut = useCallback(async () => {
+    clearAllPins();
     await supabase().auth.signOut();
   }, []);
 
