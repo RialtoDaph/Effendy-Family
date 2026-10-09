@@ -1,6 +1,6 @@
 # Rencana Tahap 0 — Fondasi
 
-Status: **kode selesai dan sudah online**. Tinggal langkah yang harus diklik sendiri (lihat bagian paling bawah) dan tes di HP.
+Status: **selesai**. App online di https://effendyfamily.vercel.app. Sisa: buat akun Amnah lalu tes login di HP-nya.
 
 Acuan: `docs/design/README.md`, `DATA_MODEL.md`, `ROADMAP.md`, dan prototipe
 `docs/design/Effendy Family v7.dc.html` (dibangun ulang, tidak disalin).
@@ -72,5 +72,5 @@ dibangun mulai Tahap 1.
 | Terbuka saat offline | Lolos (Home, Journal, Settings, pindah tab) |
 | Pengunjung tanpa login dialihkan ke /login | Lolos |
 | Aturan akses database | Lolos 15/15 |
-| Dipasang di Home Screen | Perlu dites di HP Anda |
-| Kalian berdua bisa masuk | Perlu dites setelah akun dibuat |
+| Dipasang di Home Screen | Lolos (dites di HP Rialto) |
+| Kalian berdua bisa masuk | Rialto lolos (login, Face ID, ganti nama, offline). Akun Amnah belum dibuat |
