@@ -1,5 +1,6 @@
 "use client";
 
+import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
 import { useAppData } from "@/components/app-data";
 import { useFinance, type FinanceTable } from "@/components/finance-data";
 import { FormSheet, type Field, type FormValues } from "@/components/sheet";
@@ -46,17 +47,17 @@ export function FinanceForm({
 
   async function finish(table: FinanceTable, values: Record<string, unknown>, rowId: string | undefined, msg: string) {
     const err = await fin.save(table, values, rowId);
-    if (err) return err;
-    toast(msg);
+    if (err && err !== QUEUED) return err;
+    toast(err === QUEUED ? QUEUED_MSG : msg);
     onClose();
   }
 
   async function del(table: FinanceTable, rowId: string, question: string) {
     if (!confirm(question)) return;
     const err = await fin.remove(table, rowId);
-    if (err) toast(err);
+    if (err && err !== QUEUED) toast(err);
     else {
-      toast("Deleted");
+      toast(err === QUEUED ? QUEUED_MSG : "Deleted");
       onClose();
     }
   }

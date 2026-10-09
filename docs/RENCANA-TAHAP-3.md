@@ -1,6 +1,15 @@
 # Rencana Tahap 3 — Capture, security, reminders
 
-Status: **rencana, menunggu jawaban dan persetujuan**. Belum ada kode yang ditulis.
+Status: **sedang dikerjakan.** Jawaban: AI = Claude Opus; API key dibuat Rialto (dipandu);
+bank = Sparkasse, TF Bank, Revolut, BCA, PayPal, Wise.
+
+| Bagian | Status |
+|---|---|
+| A PIN + Face ID | ✅ selesai, dites otomatis (PIN tidak tersimpan polos, jeda 30 dtk setelah 5x salah, terkunci saat dibuka lagi) |
+| C Offline queue | ✅ selesai, dites otomatis (simpan tanpa internet → "Offline · 1" → terkirim otomatis saat online) |
+| B Notifikasi | berikutnya |
+| D Bank import CSV | menunggu contoh CSV |
+| E PDF + struk | menunggu API key |
 
 Tahap 0–2 selesai dan dites di HP dengan dua akun (11 Okt 2026).
 
@@ -41,7 +50,7 @@ A–C tidak butuh akun baru, jadi dikerjakan dulu. D–E menyusul.
 
 | Tabel | Isi |
 |---|---|
-| `security` | hash PIN + salt, jumlah salah, terkunci sampai, auto-lock (0/1/5 menit) — per orang |
+| ~~`security`~~ | diganti: PIN disimpan per HP (hash + salt di perangkat), tanpa tabel — sesuai README "on the device" |
 | `push_subscriptions` | alamat notifikasi per perangkat — per orang |
 | `member_settings.notif` | saklar per jenis + jam ringkasan pagi (sudah ada sejak Tahap 0) |
 | `import_mappings` | pemetaan kolom CSV per bank |
@@ -58,4 +67,4 @@ Claude API hanya dipanggil dari server (Vercel), kuncinya tidak pernah sampai ke
 
 - [ ] Impor CSV Sparkasse sungguhan + satu file bank lain, tanpa dobel.
 - [ ] Notifikasi sampai dengan app tertutup di iPhone (iOS 16.4+, terpasang di layar utama).
-- [ ] Jeda setelah PIN salah berjalan.
+- [x] Jeda setelah PIN salah berjalan (tes otomatis).

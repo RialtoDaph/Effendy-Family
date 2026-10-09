@@ -1,5 +1,6 @@
 "use client";
 
+import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
 import { FinanceForm, type FinanceFormKind } from "@/components/finance-forms";
@@ -64,17 +65,17 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
 
   async function finish(table: MoneyTable, values: Record<string, unknown>, id: string | undefined, msg: string) {
     const err = await money.save(table, values, id);
-    if (err) return err;
-    toast(msg);
+    if (err && err !== QUEUED) return err;
+    toast(err === QUEUED ? QUEUED_MSG : msg);
     onClose();
   }
 
   async function del(table: MoneyTable, id: string, question: string) {
     if (!confirm(question)) return;
     const err = await money.remove(table, id);
-    if (err) toast(err);
+    if (err && err !== QUEUED) toast(err);
     else {
-      toast("Deleted");
+      toast(err === QUEUED ? QUEUED_MSG : "Deleted");
       onClose();
     }
   }

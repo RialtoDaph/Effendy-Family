@@ -1,5 +1,6 @@
 "use client";
 
+import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
 import { Check, FileText } from "lucide-react";
 import { useState } from "react";
 import { useFinance } from "@/components/finance-data";
@@ -40,7 +41,7 @@ export function TaxesScreen() {
 
   async function toggle(table: "tax_deadlines" | "tax_deductions", id: string, patch: Record<string, unknown>) {
     const err = await fin.save(table, patch, id);
-    if (err) toast(err);
+    if (err) toast(err === QUEUED ? QUEUED_MSG : err);
   }
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { QUEUE_EVENT, pending } from "@/lib/offline-queue";
 
 /* Online / offline --------------------------------------------------------- */
 
@@ -19,6 +20,22 @@ export function useOnline() {
     () => navigator.onLine,
     () => true,
   );
+}
+
+/** How many changes made offline still wait to be sent. */
+export function usePendingCount() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    const update = () => pending().then((q) => alive && setCount(q.length));
+    update();
+    window.addEventListener(QUEUE_EVENT, update);
+    return () => {
+      alive = false;
+      window.removeEventListener(QUEUE_EVENT, update);
+    };
+  }, []);
+  return count;
 }
 
 /* Service worker ----------------------------------------------------------- */

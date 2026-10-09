@@ -17,6 +17,8 @@ import {
   type TaxDeadline,
   type TaxDeduction,
 } from "@/lib/finance";
+import { SYNCED_EVENT } from "@/components/money-data";
+import { QUEUED, enqueue, isNetworkError } from "@/lib/offline-queue";
 import { supabase } from "@/lib/supabase";
 
 type FinanceRows = {
@@ -88,6 +90,17 @@ export function useFinance() {
 const cacheKey = (userId: string) => `ef-finance-v1-${userId}`;
 const OFFLINE_MSG = "Could not save. Check your internet connection.";
 
+const ROW_KEY: Record<FinanceTable, keyof FinanceRows> = {
+  debts: "debts",
+  subscriptions: "subscriptions",
+  remittances: "remittances",
+  businesses: "businesses",
+  business_months: "businessMonths",
+  tax_deadlines: "taxDeadlines",
+  tax_deductions: "taxDeductions",
+  assets: "assets",
+};
+
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const { userId, household } = useAppData();
   const toast = useToast();
@@ -152,26 +165,62 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("visibilitychange", onFocus);
   }, [userId, load]);
 
+  const applyLocal = useCallback(
+    (table: FinanceTable, kind: "insert" | "update" | "delete", id: string, values?: Record<string, unknown>) => {
+      const key = ROW_KEY[table];
+      setRows((r) => {
+        const list = r[key] as unknown as Record<string, unknown>[];
+        const next =
+          kind === "insert"
+            ? [{ owner_id: userId, visibility: "family", created_at: new Date().toISOString(), ...values, id }, ...list]
+            : kind === "update"
+              ? list.map((x) => (x.id === id ? { ...x, ...values } : x))
+              : list.filter((x) => x.id !== id);
+        return { ...r, [key]: next };
+      });
+    },
+    [userId],
+  );
+
   const save = useCallback(
     async (table: FinanceTable, values: Record<string, unknown>, id?: string) => {
       const sb = supabase();
-      const { error } = id ? await sb.from(table).update(values).eq("id", id) : await sb.from(table).insert(values);
-      if (error) return navigator.onLine ? `Could not save: ${error.message}` : OFFLINE_MSG;
+      const rowId = id ?? crypto.randomUUID();
+      const { error } = id
+        ? await sb.from(table).update(values).eq("id", id)
+        : await sb.from(table).insert({ ...values, id: rowId });
+      if (error && isNetworkError(error)) {
+        await enqueue({ table, kind: id ? "update" : "insert", id: rowId, values });
+        applyLocal(table, id ? "update" : "insert", rowId, values);
+        return QUEUED;
+      }
+      if (error) return `Could not save: ${error.message}`;
       await load();
       return null;
     },
-    [load],
+    [load, applyLocal],
   );
 
   const remove = useCallback(
     async (table: FinanceTable, id: string) => {
       const { error } = await supabase().from(table).delete().eq("id", id);
-      if (error) return navigator.onLine ? `Could not delete: ${error.message}` : OFFLINE_MSG;
+      if (error && isNetworkError(error)) {
+        await enqueue({ table, kind: "delete", id });
+        applyLocal(table, "delete", id);
+        return QUEUED;
+      }
+      if (error) return `Could not delete: ${error.message}`;
       await load();
       return null;
     },
-    [load],
+    [load, applyLocal],
   );
+
+  useEffect(() => {
+    const onSynced = () => load();
+    window.addEventListener(SYNCED_EVENT, onSynced);
+    return () => window.removeEventListener(SYNCED_EVENT, onSynced);
+  }, [load]);
 
   // The slider fires on every step: show it at once, save once it settles.
   const pendingSettings = useRef<Partial<DebtSettings>>({});

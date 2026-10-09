@@ -8,7 +8,7 @@ import { useAppData } from "@/components/app-data";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
 import { LogoTile } from "@/components/logo";
-import { useOnline, useServiceWorker } from "@/components/pwa";
+import { useOnline, usePendingCount, useServiceWorker } from "@/components/pwa";
 import { THEME_OPTIONS, useTheme } from "@/components/theme";
 import { useToast } from "@/components/toast";
 import {
@@ -248,6 +248,7 @@ function MobileHeader() {
   const { alerts } = useMoney();
   const alertCount = alerts.filter((a) => a.sev !== "info").length;
   const online = useOnline();
+  const waiting = usePendingCount();
   const { pref, cycle } = useTheme();
   const ThemeIcon = THEME_OPTIONS.find((o) => o.value === pref)!.icon;
 
@@ -258,8 +259,11 @@ function MobileHeader() {
     >
       <LogoTile />
       <div className="min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-[-0.01em]">effendy family</div>
-      {!online && (
-        <span className="flex-none rounded-full bg-soft2 px-[9px] py-1 text-[11px] font-extrabold text-mut">Offline</span>
+      {(!online || waiting > 0) && (
+        <span className="flex-none rounded-full bg-soft2 px-[9px] py-1 text-[11px] font-extrabold text-mut">
+          {online ? "Syncing" : "Offline"}
+          {waiting > 0 && ` · ${waiting}`}
+        </span>
       )}
       <button onClick={openCommand} aria-label="Search" className={roundBtn}>
         <Search size={17} strokeWidth={2} />

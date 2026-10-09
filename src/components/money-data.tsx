@@ -18,6 +18,7 @@ import {
   type Today,
   type Transaction,
 } from "@/lib/money";
+import { QUEUED, enqueue, flush, isNetworkError } from "@/lib/offline-queue";
 import { supabase } from "@/lib/supabase";
 
 type AlertState = { alert_key: string; dismissed_at: string | null; done_at: string | null };
@@ -75,6 +76,15 @@ function subscribeDay(cb: () => void) {
 }
 
 const OFFLINE_MSG = "Could not save. Check your internet connection.";
+export const SYNCED_EVENT = "ef-synced";
+
+const ROW_KEY: Record<MoneyTable, keyof MoneyRows> = {
+  categories: "categories",
+  transactions: "transactions",
+  incomes: "incomes",
+  recurring: "recurring",
+  goals: "goals",
+};
 
 export function MoneyProvider({ children }: { children: ReactNode }) {
   const { userId, settings, reload: reloadProfile } = useAppData();
@@ -143,26 +153,76 @@ export function MoneyProvider({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("visibilitychange", onFocus);
   }, [userId, load]);
 
+  /** Shows a queued offline write in the lists right away. */
+  const applyLocal = useCallback(
+    (table: MoneyTable, kind: "insert" | "update" | "delete", id: string, values?: Record<string, unknown>) => {
+      const key = ROW_KEY[table];
+      setRows((r) => {
+        const list = r[key] as unknown as Record<string, unknown>[];
+        const next =
+          kind === "insert"
+            ? [{ owner_id: userId, visibility: "family", created_at: new Date().toISOString(), source: "manual", recurring_id: null, note: null, ...values, id }, ...list]
+            : kind === "update"
+              ? list.map((x) => (x.id === id ? { ...x, ...values } : x))
+              : list.filter((x) => x.id !== id);
+        return { ...r, [key]: next };
+      });
+    },
+    [userId],
+  );
+
   const save = useCallback(
     async (table: MoneyTable, values: Record<string, unknown>, id?: string) => {
       const sb = supabase();
-      const { error } = id ? await sb.from(table).update(values).eq("id", id) : await sb.from(table).insert(values);
-      if (error) return navigator.onLine ? `Could not save: ${error.message}` : OFFLINE_MSG;
+      const rowId = id ?? crypto.randomUUID();
+      const { error } = id
+        ? await sb.from(table).update(values).eq("id", id)
+        : await sb.from(table).insert({ ...values, id: rowId });
+      if (error && isNetworkError(error)) {
+        await enqueue({ table, kind: id ? "update" : "insert", id: rowId, values });
+        applyLocal(table, id ? "update" : "insert", rowId, values);
+        return QUEUED;
+      }
+      if (error) return `Could not save: ${error.message}`;
       await load();
       return null;
     },
-    [load],
+    [load, applyLocal],
   );
 
   const remove = useCallback(
     async (table: MoneyTable, id: string) => {
       const { error } = await supabase().from(table).delete().eq("id", id);
-      if (error) return navigator.onLine ? `Could not delete: ${error.message}` : OFFLINE_MSG;
+      if (error && isNetworkError(error)) {
+        await enqueue({ table, kind: "delete", id });
+        applyLocal(table, "delete", id);
+        return QUEUED;
+      }
+      if (error) return `Could not delete: ${error.message}`;
       await load();
       return null;
     },
-    [load],
+    [load, applyLocal],
   );
+
+  // Send writes made offline as soon as the connection is back.
+  useEffect(() => {
+    if (!userId) return;
+    const sync = async () => {
+      const { saved, refused } = await flush(supabase());
+      if (!saved && !refused) return;
+      toast(
+        refused
+          ? `${saved} change${saved === 1 ? "" : "s"} synced · ${refused} could not be saved`
+          : `${saved} change${saved === 1 ? "" : "s"} synced`,
+      );
+      await load();
+      window.dispatchEvent(new Event(SYNCED_EVENT));
+    };
+    sync();
+    window.addEventListener("online", sync);
+    return () => window.removeEventListener("online", sync);
+  }, [userId, load, toast]);
 
   const closeAlert = useCallback(
     async (key: string, how: "dismissed" | "done") => {
