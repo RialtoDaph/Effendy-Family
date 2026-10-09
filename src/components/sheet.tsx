@@ -163,6 +163,8 @@ export function FormSheet({
                     <button
                       key={o.value}
                       type="button"
+                      aria-label={o.label || o.value}
+                      aria-pressed={on}
                       onClick={() => set(f.key, o.value)}
                       className={`inline-flex min-h-10 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border px-[13px] text-[13px] font-bold ${
                         on ? "border-ink bg-inv text-white" : "border-line bg-card text-ink"

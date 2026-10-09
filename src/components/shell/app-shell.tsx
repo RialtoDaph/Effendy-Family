@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { Bell, Plus, Search } from "lucide-react";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
+import { useMoney } from "@/components/money-data";
+import { useMoneyForms } from "@/components/money-forms";
 import { LogoTile } from "@/components/logo";
 import { useOnline, useServiceWorker } from "@/components/pwa";
 import { THEME_OPTIONS, useTheme } from "@/components/theme";
@@ -46,6 +48,7 @@ export function useScreen() {
 export function AppShell({ children }: { children: ReactNode }) {
   const screen = useScreen();
   const toast = useToast();
+  const { openForm } = useMoneyForms();
   const [quickAdd, setQuickAdd] = useState(false);
   const [command, setCommand] = useState(false);
   useServiceWorker();
@@ -65,9 +68,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const runQuickAdd = useCallback(
     (item: QuickAddItem) => {
       setQuickAdd(false);
-      if (!item.href) toast(`${item.label}: coming in Phase ${item.phase}.`);
+      if (item.form) openForm(item.form);
+      else if (!item.href) toast(`${item.label}: coming in phase ${item.phase}.`);
     },
-    [toast],
+    [toast, openForm],
   );
 
   const ui: ShellUI = {
@@ -100,7 +104,19 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 /* Desktop sidebar ----------------------------------------------------------- */
 
-function NavRow({ href, label, icon: Icon, active }: { href: string; label: string; icon: typeof Bell; active: boolean }) {
+function NavRow({
+  href,
+  label,
+  icon: Icon,
+  active,
+  tag,
+}: {
+  href: string;
+  label: string;
+  icon: typeof Bell;
+  active: boolean;
+  tag?: number;
+}) {
   return (
     <Link
       href={href}
@@ -110,6 +126,11 @@ function NavRow({ href, label, icon: Icon, active }: { href: string; label: stri
     >
       <Icon size={16} strokeWidth={2} />
       <span className="flex-1">{label}</span>
+      {!!tag && (
+        <span className="rounded-full bg-tint px-[7px] py-[3px] text-[11px] font-extrabold uppercase tracking-[.08em] text-acct">
+          {tag}
+        </span>
+      )}
     </Link>
   );
 }
@@ -126,6 +147,8 @@ function Sidebar({ screen }: { screen: string }) {
   const { openCommand, openQuickAdd } = useShell();
   const { me } = useAppData();
   const { pref, setTheme } = useTheme();
+  const { alerts } = useMoney();
+  const alertCount = alerts.filter((a) => a.sev !== "info").length;
   const mod = moduleOf(screen);
 
   return (
@@ -172,7 +195,14 @@ function Sidebar({ screen }: { screen: string }) {
         ))}
         <NavLabel>Tools</NavLabel>
         {TOOLS.map((t) => (
-          <NavRow key={t.id} href={hrefOf(t.id)} label={t.label} icon={t.icon} active={screen === t.id} />
+          <NavRow
+            key={t.id}
+            href={hrefOf(t.id)}
+            label={t.label}
+            icon={t.icon}
+            active={screen === t.id}
+            tag={t.id === "alerts" ? alertCount : undefined}
+          />
         ))}
       </nav>
       <div className="grid grid-cols-3 gap-0.5 rounded-[10px] bg-soft2 p-[3px]">
@@ -215,6 +245,8 @@ const roundBtn =
 function MobileHeader() {
   const { openCommand } = useShell();
   const { me } = useAppData();
+  const { alerts } = useMoney();
+  const alertCount = alerts.filter((a) => a.sev !== "info").length;
   const online = useOnline();
   const { pref, cycle } = useTheme();
   const ThemeIcon = THEME_OPTIONS.find((o) => o.value === pref)!.icon;
@@ -234,6 +266,11 @@ function MobileHeader() {
       </button>
       <Link href="/alerts" aria-label="Alerts" className={`relative ${roundBtn}`}>
         <Bell size={17} strokeWidth={2} />
+        {alertCount > 0 && (
+          <span className="absolute -right-[3px] -top-[3px] flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-bad px-[5px] text-[11px] font-extrabold text-white">
+            {alertCount}
+          </span>
+        )}
       </Link>
       <button onClick={cycle} aria-label={`Theme: ${pref}`} className={roundBtn}>
         <ThemeIcon size={17} strokeWidth={2} />

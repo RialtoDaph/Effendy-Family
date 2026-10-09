@@ -17,8 +17,14 @@ npm run dev
 
 ## Database
 - Migrations: `supabase/migrations/` (applied to the Supabase project in order).
-- Access-rule checks: run `supabase/tests/access_rules.sql` in the Supabase SQL editor
-  once both accounts exist. Every check must return `ok = true`.
+- Access-rule checks: run `supabase/tests/access_rules.sql` (members) and
+  `supabase/tests/money_rules.sql` (Private/Family, recurring posting) in the Supabase
+  SQL editor. Every check must return `ok = true`. Both roll back; nothing is kept.
+- Recurring items are posted by `private.post_recurring()`, run hourly by pg_cron
+  (does nothing before 05:00 Europe/Berlin).
+
+## Tests
+`npm test` runs the money rules in `src/lib/money.test.ts` (Vitest).
 - New sign-in accounts join the single household automatically (max 2 members).
   Public sign-up must stay switched off in Supabase → Authentication → Sign In / Providers.
 

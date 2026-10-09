@@ -1,6 +1,6 @@
 # Rencana Tahap 1 — Money core
 
-Status: **rencana, menunggu persetujuan**. Belum ada kode yang ditulis.
+Status: **kode selesai dan online**. Tinggal tes di HP dengan dua akun (perlu akun Amnah).
 
 Keputusan dari Rialto (9 Okt 2026):
 - Kategori awal: pakai 10 kategori contoh dari prototipe (bisa diubah/dihapus).
@@ -76,8 +76,23 @@ Plus pengaturan `warn_pct` (80%) dan `ef_months` (6) yang sudah ada sejak Tahap 
 
 ## Pengecekan (dari ROADMAP)
 
-- [ ] Transaksi private tidak terlihat oleh pasangan, termasuk di total.
-- [ ] Pembayaran rutin tercatat tepat sekali per bulan.
-- [ ] Status budget sesuai aturan di atas.
+- [x] Transaksi private tidak terlihat oleh pasangan, termasuk di total. (tes database)
+- [x] Pembayaran rutin tercatat tepat sekali per bulan. (tes database: dijalankan 3x, tetap 1 transaksi)
+- [x] Status budget sesuai aturan di atas. (16 tes hitungan, `npm test`)
+- [ ] Tes di HP dengan dua akun sungguhan.
 
 Cara saya mengecek: tes SQL di database dengan dua akun simulasi (seperti Tahap 0), tes hitungan di kode, dan tes tampilan di browser. Tes terakhir di HP sungguhan perlu akun Amnah.
+
+## Hasil tes
+
+| Tes | Hasil |
+|---|---|
+| Database (`supabase/tests/money_rules.sql`) | 14/14 lolos. Satu cek "hapus" tidak bisa dijalankan dari Claude (butuh konfirmasi); aturannya sama dengan cek "ubah" yang lolos. |
+| Hitungan (`src/lib/money.test.ts`) | 16/16 lolos |
+| Tampilan 360 / 390 / 1280px | Tidak ada geser horizontal; tambah transaksi lewat formulir berhasil |
+
+## Catatan
+
+- Kategori tetap (sewa, asuransi) yang belum dibayar bulan ini berstatus **Not yet**, bukan "Paid".
+  Di prototipe statusnya langsung "Paid", yang menyesatkan di awal bulan.
+- Next 7 days dan Net worth di Home disembunyikan sampai datanya ada (Tahap 2 dan 4).

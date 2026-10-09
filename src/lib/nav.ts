@@ -118,11 +118,14 @@ export function screenInfo(id: string): ScreenInfo | undefined {
   return undefined;
 }
 
+/** Screens with their own page under app/(app)/. */
+export const BUILT_SCREENS = ["settings", "budget", "recur", "alerts", "setup"];
+
 /** Screens served by app/(app)/[screen]/page.tsx. Keep public/sw.js PAGES in sync. */
 export const PLACEHOLDER_SCREENS = [
   ...MODULE_ORDER.flatMap((k) => MODULES[k].tabs.map((t) => t.id)),
-  ...TOOLS.filter((t) => t.id !== "settings").map((t) => t.id),
-];
+  ...TOOLS.map((t) => t.id),
+].filter((id) => !BUILT_SCREENS.includes(id));
 
 export const BOTTOM_TABS = [
   { key: "home", label: "Home", icon: House, href: "/" },
@@ -140,19 +143,27 @@ export function bottomTabOf(screen: string): string {
   return "more";
 }
 
-export type QuickAddItem = { key: string; label: string; icon: LucideIcon; phase: number; href?: string };
+export type QuickAddItem = {
+  key: string;
+  label: string;
+  icon: LucideIcon;
+  phase: number;
+  href?: string;
+  /** Opens this money form (components/money-forms.tsx). */
+  form?: "tx" | "goal" | "recur";
+};
 
 export const QUICK_ADD: QuickAddItem[] = [
   { key: "scan", label: "Scan receipt", icon: Camera, phase: 3 },
   { key: "debt", label: "Debt", icon: CreditCard, phase: 2 },
-  { key: "tx", label: "Transaction", icon: Receipt, phase: 1 },
+  { key: "tx", label: "Transaction", icon: Receipt, phase: 1, form: "tx" },
   { key: "event", label: "Calendar event", icon: Calendar, phase: 4 },
   { key: "shift", label: "Bar shift", icon: Beer, phase: 4 },
-  { key: "goal", label: "Goal", icon: Target, phase: 1 },
+  { key: "goal", label: "Goal", icon: Target, phase: 1, form: "goal" },
   { key: "sub", label: "Subscription", icon: Repeat, phase: 2 },
   { key: "asset", label: "Investment value", icon: TrendingUp, phase: 2 },
   { key: "gym", label: "Gym session", icon: Dumbbell, phase: 4, href: "/gym" },
   { key: "journal", label: "Journal note", icon: NotebookPen, phase: 4, href: "/journal" },
-  { key: "recur", label: "Recurring payment", icon: Repeat, phase: 1 },
+  { key: "recur", label: "Recurring payment", icon: Repeat, phase: 1, form: "recur" },
   { key: "remit", label: "Transfer home", icon: Send, phase: 2 },
 ];
