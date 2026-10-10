@@ -65,3 +65,12 @@ sent when the connection is back; the header shows how many wait.
   transactions, then known shop names. Unknown shops are listed under "Needs a category".
 - Money between your own accounts (card bill, PayPal / Wise / Revolut top-ups) is left
   unticked so it does not count twice. BCA Rupiah are converted at the saved rate.
+
+## Reading with AI (receipts, PDF statements)
+- `src/app/api/read/route.ts` sends a receipt photo or a PDF statement to Claude
+  (`claude-opus-5-5`, structured JSON output) and returns what it read. The person's
+  sign-in is checked first; only household members can use it. Nothing is saved on the
+  server; the app shows the result for checking before anything is stored.
+- Needs `ANTHROPIC_API_KEY` in Vercel (Production). The key is never sent to the browser.
+- Receipt photos are shrunk on the phone (1600 px JPEG), kept in the private `files`
+  bucket (kind `receipt`) and linked through `transactions.receipt_file_id`.

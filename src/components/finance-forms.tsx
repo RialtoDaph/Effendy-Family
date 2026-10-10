@@ -342,7 +342,7 @@ export function FinanceForm({
             let fileId = m?.file_id ?? null;
             if (v.file instanceof File) {
               const up = await fin.upload(v.file, "business_report", String(v.visibility));
-              if ("error" in up) return up.error;
+              if (up.error || !up.id) return up.error ?? "Upload failed.";
               fileId = up.id;
             }
             return finish(

@@ -9,7 +9,7 @@ bank = Sparkasse, TF Bank, Revolut, BCA, PayPal, Wise.
 | C Offline queue | ✅ selesai, dites otomatis (simpan tanpa internet → "Offline · 1" → terkirim otomatis saat online) |
 | B Notifikasi | ✅ dibuat; aturan dites di database (12 cek lulus), enkripsi dicek dengan pustaka referensi. **Tes di HP oleh Rialto** |
 | D Bank import CSV | ✅ dibuat untuk Sparkasse, TF Bank, Revolut, BCA (Rupiah → Euro), PayPal, Wise + bank lain. Dites dengan file contoh berbentuk ekspor asli (14 tes) dan 7 cek database. **Perlu dicoba dengan file asli Rialto** |
-| E PDF + struk | menunggu API key |
+| E PDF + struk | ✅ dibuat (Claude Opus, hanya di server). Dites dengan jawaban AI tiruan. **Perlu: nama kunci di Vercel dibetulkan, lalu dicoba dengan struk dan PDF asli** |
 
 Tahap 0–2 selesai dan dites di HP dengan dua akun (11 Okt 2026).
 

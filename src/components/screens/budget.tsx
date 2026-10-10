@@ -4,9 +4,9 @@ import Link from "next/link";
 import { Camera } from "lucide-react";
 import { useState } from "react";
 import { useAppData } from "@/components/app-data";
+import { useFinance } from "@/components/finance-data";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
-import { useToast } from "@/components/toast";
 import {
   AddButton,
   Card,
@@ -345,7 +345,7 @@ function LatestTransactions() {
   const { transactions, categories } = useMoney();
   const { members } = useAppData();
   const { openForm } = useMoneyForms();
-  const toast = useToast();
+  const { openFile } = useFinance();
   const [count, setCount] = useState(12);
   const shown = transactions.slice(0, count);
 
@@ -355,7 +355,7 @@ function LatestTransactions() {
         <H2>Latest transactions</H2>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => toast("Receipt scan: coming in phase 3.")}
+            onClick={() => openForm("scan")}
             aria-label="Scan receipt"
             className="flex min-h-10 items-center gap-1.5 rounded-full border border-line bg-card px-3 text-[12.5px] font-extrabold text-ink"
           >
@@ -369,28 +369,36 @@ function LatestTransactions() {
         const cat = categories.find((c) => c.id === t.category_id);
         const payer = members.find((m) => m.id === t.paid_by);
         return (
-          <button
-            key={t.id}
-            onClick={() => openForm("tx", t.id)}
-            className={`flex w-full items-center gap-3 border-0 border-b border-line bg-transparent py-[11px] text-left ${
-              t.visibility === "private" ? "border-dashed" : ""
-            }`}
-          >
-            <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-xl bg-soft text-ink">
-              <AppIcon name={cat?.icon} size={19} strokeWidth={1.7} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-bold text-ink">{t.payee}</div>
-              <div className="flex flex-wrap items-center gap-x-2 text-xs text-mut2">
-                <span>
-                  {shortDate(t.date)} · {cat?.name ?? (t.amount > 0 ? "Income" : "No category")} · {payer?.display_name ?? "Family"}
-                  {t.source === "recurring" && " · recurring"}
-                </span>
-                {t.visibility === "private" && <PrivateMark />}
+          <div key={t.id} className={`flex items-center gap-1 border-b border-line ${t.visibility === "private" ? "border-dashed" : ""}`}>
+            <button
+              onClick={() => openForm("tx", t.id)}
+              className="flex min-w-0 flex-1 items-center gap-3 border-0 bg-transparent py-[11px] text-left"
+            >
+              <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-xl bg-soft text-ink">
+                <AppIcon name={cat?.icon} size={19} strokeWidth={1.7} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-bold text-ink">{t.payee}</div>
+                <div className="flex flex-wrap items-center gap-x-2 text-xs text-mut2">
+                  <span>
+                    {shortDate(t.date)} · {cat?.name ?? (t.amount > 0 ? "Income" : "No category")} · {payer?.display_name ?? "Family"}
+                    {t.source === "recurring" && " · recurring"}
+                  </span>
+                  {t.visibility === "private" && <PrivateMark />}
+                </div>
               </div>
-            </div>
-            <span className={`text-sm font-black ${t.amount > 0 ? "text-ok" : "text-ink"}`}>{eurSigned(t.amount)}</span>
-          </button>
+              <span className={`text-sm font-black ${t.amount > 0 ? "text-ok" : "text-ink"}`}>{eurSigned(t.amount)}</span>
+            </button>
+            {t.receipt_file_id && (
+              <button
+                onClick={() => openFile(t.receipt_file_id!)}
+                aria-label={`Receipt photo for ${t.payee}`}
+                className="flex h-11 w-11 flex-none items-center justify-center rounded-full border-0 bg-transparent text-mut"
+              >
+                <Camera size={17} strokeWidth={2} />
+              </button>
+            )}
+          </div>
         );
       })}
       {!transactions.length && (

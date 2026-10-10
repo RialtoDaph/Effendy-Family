@@ -24,6 +24,7 @@ export type Transaction = {
   source: "manual" | "recurring" | "import" | "receipt";
   recurring_id: string | null;
   note: string | null;
+  receipt_file_id?: string | null;
   created_at: string;
 };
 

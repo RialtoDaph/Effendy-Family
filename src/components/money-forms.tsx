@@ -1,5 +1,6 @@
 "use client";
 
+import { ReceiptScan } from "@/components/receipt-scan";
 import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
@@ -10,7 +11,7 @@ import { useToast } from "@/components/toast";
 import { CATEGORY_ICONS, GOAL_ICONS, iconFor } from "@/lib/icons";
 import { parseAmount, type Category, type Goal, type Income, type Recurring, type Transaction } from "@/lib/money";
 
-type FormKind = "tx" | "cat" | "income" | "recur" | "goal" | FinanceFormKind;
+type FormKind = "tx" | "cat" | "income" | "recur" | "goal" | "scan" | FinanceFormKind;
 type Open = { kind: FormKind; id?: string; preset?: FormValues };
 
 type MoneyForms = {
@@ -38,7 +39,11 @@ export function MoneyFormsProvider({ children }: { children: ReactNode }) {
   return (
     <MoneyFormsContext value={value}>
       {children}
-      {open && <MoneyForm key={`${open.kind}-${open.id ?? "new"}`} open={open} onClose={() => setOpen(null)} />}
+      {open?.kind === "scan" ? (
+        <ReceiptScan onClose={() => setOpen(null)} onRead={(preset) => setOpen({ kind: "tx", preset })} />
+      ) : (
+        open && <MoneyForm key={`${open.kind}-${open.id ?? "new"}`} open={open} onClose={() => setOpen(null)} />
+      )}
     </MoneyFormsContext>
   );
 }
@@ -130,6 +135,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
                 paid_by: toId(v.paid_by),
                 visibility: v.visibility,
                 note: String(v.note ?? "").trim() || null,
+                ...(!t && v.receipt_file_id ? { receipt_file_id: v.receipt_file_id, source: "receipt" } : {}),
               },
               t?.id,
               t ? "Saved" : "Transaction added",

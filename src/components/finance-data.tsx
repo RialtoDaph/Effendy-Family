@@ -59,7 +59,7 @@ type Finance = FinanceRows & {
   setDebtSettings: (patch: Partial<DebtSettings>) => Promise<void>;
   saveRate: (idrPerEur: number) => Promise<void>;
   setRefund: (year: number, refund: number | null) => Promise<void>;
-  upload: (file: File, kind: "business_report", visibility: string) => Promise<{ id: string } | { error: string }>;
+  upload: (file: File, kind: "business_report" | "receipt" | "statement", visibility: string) => Promise<{ id?: string; error?: string }>;
   openFile: (fileId: string) => Promise<void>;
 };
 
@@ -265,7 +265,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   );
 
   const upload = useCallback(
-    async (file: File, kind: "business_report", visibility: string) => {
+    async (file: File, kind: "business_report" | "receipt" | "statement", visibility: string) => {
       if (!household || !userId) return { error: "Not signed in." };
       if (file.size > 20 * 1024 * 1024) return { error: "The file is larger than 20 MB." };
       const sb = supabase();

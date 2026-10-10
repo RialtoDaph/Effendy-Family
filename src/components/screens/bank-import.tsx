@@ -25,6 +25,7 @@ import {
   type Skipped,
   type Suggestion,
 } from "@/lib/bank-import";
+import { readStatement } from "@/lib/ai-read";
 import { eur, shortDate } from "@/lib/money";
 import { supabase } from "@/lib/supabase";
 import { ModuleTabs } from "./module-tabs";
@@ -73,9 +74,10 @@ export function BankImportScreen() {
   const bankName = BANKS.find((b) => b.id === bank)!.name;
 
   async function onFile(f: File) {
-    if (/\.pdf$/i.test(f.name)) return toast("PDF statements come with the next update. Please use CSV for now.");
-    if (f.size > 5 * 1024 * 1024) return toast("That file is larger than 5 MB.");
     setFileName(f.name);
+    setText("");
+    if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) return readPdf(f);
+    if (f.size > 5 * 1024 * 1024) return toast("That file is larger than 5 MB.");
     const t = decode(await f.arrayBuffer());
     setText(t);
     setBusy(true);
@@ -97,12 +99,46 @@ export function BankImportScreen() {
     if (!data?.length) await sb.from("import_mappings").insert({ bank, mapping: m });
   }
 
+  /** PDF: Claude reads the statement on the server; you check every row as with CSV. */
+  async function readPdf(f: File) {
+    if (f.size > 4 * 1024 * 1024) return toast("That PDF is larger than 4 MB. Download a shorter period.");
+    setBusy(true);
+    const read = await readStatement(new File([f], f.name, { type: "application/pdf" }));
+    if (read.error !== undefined) {
+      setBusy(false);
+      return toast(read.error);
+    }
+    const st = read.result;
+    const currency = (st.currency || BANKS.find((b) => b.id === bank)!.currency).toUpperCase().slice(0, 3);
+    const rows: ParsedRow[] = [];
+    const sk: Skipped[] = [];
+    st.transactions.forEach((t, i) => {
+      const ok = /^\d{4}-\d{2}-\d{2}$/.test(t.date) && Number.isFinite(t.amount) && t.amount !== 0;
+      if (!ok) sk.push({ line: i + 1, reason: `Could not read “${t.payee || t.date}”` });
+      else
+        rows.push({
+          line: i + 1,
+          date: t.date,
+          amount: Math.round(t.amount * 100) / 100,
+          currency,
+          payee: t.payee.trim().slice(0, 80) || "Unknown",
+          purpose: t.purpose.replace(/\s+/g, " ").trim().slice(0, 300),
+        });
+    });
+    for (const w of st.warnings) sk.push({ line: 0, reason: `AI note: ${w}` });
+    await prepareRows(rows, sk);
+  }
+
   /** Reads all rows, finds what is already imported and suggests categories. */
   async function prepare(t: string, m: Mapping) {
+    const { rows, skipped: sk } = readRows(t, m);
+    await prepareRows(rows, sk);
+  }
+
+  async function prepareRows(rows: ParsedRow[], sk: Skipped[]) {
     setBusy(true);
     try {
       const sb = supabase();
-      const { rows, skipped: sk } = readRows(t, m);
       const hashes = await rowHashes(bank, rows);
       const existing = new Set<string>();
       for (const part of chunk(hashes, 150)) {
@@ -227,7 +263,8 @@ export function BankImportScreen() {
           <div>
             <H2>Import a bank statement</H2>
             <div className="mt-1 text-[13px] text-mut">
-              Download a <b>CSV</b> file from your bank’s app or website, then pick it here. Rows you imported before are skipped.
+              Download a <b>CSV</b> (best) or <b>PDF</b> statement from your bank’s app or website, then pick it here. Rows you imported before are
+              skipped.
             </div>
           </div>
           <div>
@@ -279,14 +316,16 @@ export function BankImportScreen() {
           <input
             ref={fileRef}
             type="file"
-            accept=".csv,text/csv,text/comma-separated-values,application/vnd.ms-excel,.txt"
+            accept=".csv,.pdf,text/csv,text/comma-separated-values,application/vnd.ms-excel,application/pdf,.txt"
             className="hidden"
             onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
           />
           <button onClick={() => fileRef.current?.click()} disabled={busy || !online} className={`${primaryBtn} flex items-center justify-center gap-2`}>
-            <FileUp size={18} /> {online ? (busy ? "Reading…" : `Choose ${bankName} CSV file`) : "Importing needs the internet"}
+            <FileUp size={18} /> {online ? (busy ? "Reading… (a PDF takes up to a minute)" : `Choose ${bankName} file (CSV or PDF)`) : "Importing needs the internet"}
           </button>
-          <div className="text-xs text-mut2">PDF statements and receipt photos: coming in the next update (read by AI).</div>
+          <div className="text-xs text-mut2">
+            CSV is read on your phone. A PDF is read by AI (Claude) on our server and not stored there; you check every row before saving.
+          </div>
         </Card>
       )}
 
@@ -315,7 +354,7 @@ export function BankImportScreen() {
           bankName={bankName}
           busy={busy}
           onBack={reset}
-          onColumns={() => setStep("columns")}
+          onColumns={text ? () => setStep("columns") : undefined}
           onImport={importNow}
         />
       )}
@@ -495,7 +534,7 @@ function CheckStep({
   bankName: string;
   busy: boolean;
   onBack: () => void;
-  onColumns: () => void;
+  onColumns?: () => void;
   onImport: () => void;
 }) {
   const { categories } = useMoney();
@@ -532,9 +571,11 @@ function CheckStep({
             Money moving between your own accounts (card bill, PayPal or Wise top-up) is left out so nothing counts twice. Tick a row to include it.
           </div>
         )}
-        <button onClick={onColumns} className="self-start border-0 bg-transparent p-0 text-[13px] font-bold text-acct">
-          Something looks wrong? Check the columns
-        </button>
+        {onColumns && (
+          <button onClick={onColumns} className="self-start border-0 bg-transparent p-0 text-[13px] font-bold text-acct">
+            Something looks wrong? Check the columns
+          </button>
+        )}
         {(skipped.length > 0 || noRate.length > 0) && (
           <button onClick={() => setShowSkipped((v) => !v)} className="self-start border-0 bg-transparent p-0 text-[13px] font-bold text-acct">
             {showSkipped ? "Hide skipped rows" : "Why were rows skipped?"}
@@ -543,8 +584,9 @@ function CheckStep({
         {showSkipped && (
           <div className="rounded-[10px] bg-soft p-3 text-xs text-mut">
             {skipped.map((s) => (
-              <div key={s.line}>
-                Line {s.line}: {s.reason}
+              <div key={`${s.line}-${s.reason}`}>
+                {s.line ? `Line ${s.line}: ` : ""}
+                {s.reason}
               </div>
             ))}
             {noRate.map((x) => (

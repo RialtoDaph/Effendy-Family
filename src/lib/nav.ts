@@ -150,11 +150,11 @@ export type QuickAddItem = {
   phase: number;
   href?: string;
   /** Opens this money form (components/money-forms.tsx). */
-  form?: "tx" | "goal" | "recur" | "debt" | "sub" | "asset" | "remit";
+  form?: "tx" | "scan" | "goal" | "recur" | "debt" | "sub" | "asset" | "remit";
 };
 
 export const QUICK_ADD: QuickAddItem[] = [
-  { key: "scan", label: "Scan receipt", icon: Camera, phase: 3 },
+  { key: "scan", label: "Scan receipt", icon: Camera, phase: 3, form: "scan" },
   { key: "debt", label: "Debt", icon: CreditCard, phase: 2, form: "debt" },
   { key: "tx", label: "Transaction", icon: Receipt, phase: 1, form: "tx" },
   { key: "event", label: "Calendar event", icon: Calendar, phase: 4 },
