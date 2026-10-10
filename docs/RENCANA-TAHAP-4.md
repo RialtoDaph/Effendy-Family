@@ -1,6 +1,10 @@
 # Rencana Tahap 4 — Time & life
 
-Status: **rencana, menunggu jawaban dan persetujuan**. Belum ada kode yang ditulis.
+Status: **sedang dikerjakan.**
+
+Jawaban Rialto: shift hanya Rialto · cukup jumlah shift dan jam (gaji bulanan, tidak dihitung) ·
+roster = screenshot dari app kerja yang sudah difilter, jadi semua shift di gambar milik Rialto ·
+kalender di dalam app saja · ide date night mulai kosong.
 
 Tahap 3 selesai dibuat. Tes di HP (notifikasi, scan struk, PDF, CSV asli) dilakukan Rialto nanti.
 
