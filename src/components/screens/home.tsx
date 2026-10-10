@@ -7,9 +7,12 @@ import { useAppData, type Member } from "@/components/app-data";
 import { useFinance } from "@/components/finance-data";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
+import { useOnline } from "@/components/pwa";
 import { avatarColors } from "@/components/shell/avatar";
 import { AddButton, EmptyNote, ProgressBar } from "@/components/ui";
 import { AppIcon } from "@/lib/icons";
+import { fetchBriefing, loadBriefing, saveBriefing } from "@/lib/ask";
+import type { Answer } from "@/lib/ask-schema";
 import { AI_NAME } from "@/lib/nav";
 import { addMonthsLabel, briefing, eur, goalEta, inScope, plural, type Goal } from "@/lib/money";
 import { PageHeader } from "./page-header";
@@ -50,7 +53,7 @@ export function HomeScreen() {
         {members.length > 0 && <PersonFilter members={members} value={scope} onChange={setScope} />}
       </div>
       <AlertChip />
-      <Briefing />
+      <Briefing scope={scope} />
       <Kpis scope={scope} viewerId={userId} />
       <NetWorthCard />
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">
@@ -116,12 +119,46 @@ function AlertChip() {
   );
 }
 
-function Briefing() {
+function Briefing({ scope }: { scope: string }) {
   const money = useMoney();
+  const { userId } = useAppData();
+  const online = useOnline();
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [ai, setAi] = useState<{ key: string; answer: Answer } | null>(null);
+  const [loading, setLoading] = useState(false);
   const hasData = money.transactions.length > 0 || money.incomes.length > 0;
-  const text = briefing({ budget: money.budget, alerts: money.alerts, ef: money.ef, hasData });
+  const day = money.today.iso;
+  const key = `${scope}-${day}`;
+
+  // Rialna writes the briefing once a day per view (Family / each person); it is kept on this phone.
+  useEffect(() => {
+    if (!userId || !hasData || money.today.y < 2026 || day === "2026-01-01") return;
+    const cached = loadBriefing(userId, scope, day);
+    if (cached) {
+      // Today's briefing saved on this phone.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAi({ key, answer: cached });
+      return;
+    }
+    if (!online) return;
+    let alive = true;
+    setLoading(true);
+    fetchBriefing(scope).then(({ answer }) => {
+      if (!alive) return;
+      setLoading(false);
+      if (answer) {
+        saveBriefing(userId, scope, day, answer);
+        setAi({ key, answer });
+      }
+    });
+    return () => {
+      alive = false;
+    };
+  }, [userId, scope, day, key, hasData, online, money.today.y]);
+
+  const aiAnswer = ai?.key === key ? ai.answer : null;
+  const text = aiAnswer?.text ?? briefing({ budget: money.budget, alerts: money.alerts, ef: money.ef, hasData });
 
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
 
@@ -146,7 +183,9 @@ function Briefing() {
     <section className="flex flex-col gap-2.5 rounded-xl border border-line bg-soft py-2.5 pl-4 pr-2.5">
       <div className="flex min-w-0 items-center gap-3">
         <span className="flex-none font-mono text-[11px] font-bold uppercase tracking-[.12em] text-mut">{AI_NAME}</span>
-        <span className={`min-w-0 flex-1 text-sm font-medium text-ink ${open ? "whitespace-normal leading-normal" : "truncate"}`}>{text}</span>
+        <span className={`min-w-0 flex-1 text-sm font-medium text-ink ${open ? "whitespace-normal leading-normal" : "truncate"}`}>
+          {loading && !aiAnswer ? <span className="text-mut">{text}</span> : text}
+        </span>
         <button
           onClick={() => setOpen((v) => !v)}
           className="flex-none whitespace-nowrap border-0 bg-transparent px-1.5 py-2 text-[12.5px] font-bold text-mut"
@@ -161,6 +200,21 @@ function Briefing() {
           {playing ? <Pause size={13} fill="currentColor" /> : <Play size={13} fill="currentColor" />}
         </button>
       </div>
+      {open && aiAnswer && aiAnswer.nums.length > 0 && (
+        <div className="grid gap-2 pr-1.5 [grid-template-columns:repeat(auto-fit,minmax(110px,1fr))]">
+          {aiAnswer.nums.map((n) => (
+            <div key={n.label} className="rounded-[10px] bg-card px-3 py-2">
+              <div className="text-[11px] font-bold text-mut">{n.label}</div>
+              <div className="font-mono text-[15px] font-black">{n.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      {open && (
+        <Link href="/ask" className="self-start pb-1 text-[12.5px] font-bold text-acct">
+          Ask {AI_NAME} a question →
+        </Link>
+      )}
     </section>
   );
 }

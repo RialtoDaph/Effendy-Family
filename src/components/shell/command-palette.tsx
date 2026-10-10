@@ -1,5 +1,6 @@
 "use client";
 
+import { ASK_EVENT, ASK_HANDOFF } from "@/lib/ask";
 import { useRouter } from "next/navigation";
 import { CircleDot, Search, Settings, Sparkles, type LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -61,7 +62,14 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     const query = q.trim().toLowerCase();
     const f = (xs: Cmd[]) => (query ? xs.filter((x) => x.label.toLowerCase().includes(query)) : xs);
     const out: { label: string; items: Cmd[] }[] = [];
-    if (query) out.push({ label: "Ask", items: [{ label: `Ask ${AI_NAME}: “${q.trim()}”`, icon: Sparkles, hint: "↵", run: go("ask") }] });
+    const ask = () => {
+      try {
+        sessionStorage.setItem(ASK_HANDOFF, q.trim());
+      } catch {}
+      go("ask")();
+      window.dispatchEvent(new Event(ASK_EVENT));
+    };
+    if (query) out.push({ label: "Ask", items: [{ label: `Ask ${AI_NAME}: “${q.trim()}”`, icon: Sparkles, hint: "↵", run: ask }] });
     const sections: [string, Cmd[], number][] = [
       ["Jump to", f(jump), 8],
       ["Quick add", f(add), 9],
@@ -73,6 +81,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     return out;
   }, [q, onClose, router, runQuickAdd, setTheme]);
 
+  // With no match, ↵ asks Rialna (README → Command palette).
   const flat = groups.flatMap((g) => g.items);
 
   function onKey(e: React.KeyboardEvent) {

@@ -47,7 +47,8 @@ export function ReportScreen() {
   const time = useTime();
   const { members, household, settings } = useAppData();
   const options = [prevYm(money.today), money.today.ym];
-  const [ym, setYm] = useState(options[0]);
+  const [picked, setYm] = useState<string | null>(null);
+  const ym = picked && options.includes(picked) ? picked : options[0];
   const t = monthEnd(ym, money.today);
   const label = `${MONTHS_LONG[t.m - 1]} ${t.y}`;
 

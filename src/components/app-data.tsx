@@ -139,6 +139,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     clearAllPins();
+    try {
+      // Rialna's chat and briefings belong to this person, not to the phone.
+      for (const k of Object.keys(localStorage)) if (k.startsWith("ef-ask-") || k.startsWith("ef-brief-")) localStorage.removeItem(k);
+    } catch {}
     await disablePushHere();
     await supabase().auth.signOut();
   }, []);

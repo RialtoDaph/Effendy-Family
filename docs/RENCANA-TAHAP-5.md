@@ -1,6 +1,14 @@
 # Rencana Tahap 5 — Intelligence & reports
 
-Status: **sedang dikerjakan.**
+Status: **selesai dibuat** — tinggal dicoba di HP (Ask Rialna dan briefing dengan Claude sungguhan).
+
+| Bagian | Status |
+|---|---|
+| A What if + simulasi 10 tahun | ✅ dites (hitungan + layar) |
+| B Career | ✅ mulai kosong, diisi sendiri |
+| C Laporan bulanan | ✅ dicetak ke PDF A4 dalam tes: 2 halaman, tidak ada bagian terpotong |
+| D Ask Rialna | ✅ dites dengan jawaban AI tiruan; tes privasi lulus |
+| E Briefing AI di Home + Listen | ✅ sekali sehari per tampilan (Family / per orang), disimpan di HP |
 
 Jawaban Rialto: briefing dibuat AI · laporan belum dikirim email (cukup Save as PDF) · Career diisi sendiri
 (mulai kosong) · pajak di What if: Claude yang tentukan → bawaan 30%, bisa diubah di layar (20 / 30 / 40%) ·
@@ -45,7 +53,13 @@ Tahap 3 dan 4 selesai dibuat; tes di HP dilakukan Rialto belakangan.
 | D | Ask Rialna (server + tes privasi) |
 | E | Briefing di Home + Listen |
 
-## Pertanyaan
+## Pengecekan (dari ROADMAP)
+
+- [x] Rialna tidak pernah menyebut item private pasangan: data diambil dengan login penanya (RLS) dan disaring sekali lagi;
+  tes otomatis memastikan item private pasangan tidak ada di data yang dikirim ke AI.
+- [x] Laporan tercetak di A4 tanpa bagian terpotong (tes PDF A4).
+
+## Pertanyaan (sudah dijawab)
 
 1. **Briefing di Home**: dibuat oleh **AI** sekali sehari per orang (lebih luwes, ada biaya kecil per hari),
    atau **otomatis dari aturan** tanpa AI (gratis, sudah ada versi sederhananya)? Usul saya: aturan dulu,

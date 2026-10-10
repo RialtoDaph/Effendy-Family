@@ -83,3 +83,14 @@ sent when the connection is back; the header shows how many wait.
   checking before it is saved.
 - Reminders: shifts 2 hours before (to the person working), events when a reminder is set.
 - Journal entries are private by default; goal progress follows its goal's visibility.
+
+## Rialna (phase 5)
+- `/api/ask` answers questions and writes the Home briefing. It reads the data with the asker's
+  own login (Row Level Security), then `buildContext()` in `src/lib/ask-context.ts` keeps only
+  family rows and the asker's own private rows; the partner's private items never reach the AI
+  (tested in `src/lib/ask-context.test.ts`).
+- Answers are structured: text, up to 3 number cards, a next step and an app screen to open.
+  Rialna answers in the language of the question. Chat history and the daily briefing stay on the
+  phone and are removed on sign-out.
+- What if, the 10-year simulation (`src/lib/plan.ts`) and the monthly report are plain
+  calculations without AI. The report prints on A4 (`@media print` in `globals.css`).

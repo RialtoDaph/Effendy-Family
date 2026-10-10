@@ -5,7 +5,7 @@
 // - /_next/static (hashed, never changes): cache first.
 // - Supabase and other origins are never touched here.
 
-const VERSION = "ef-v8";
+const VERSION = "ef-v9";
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 

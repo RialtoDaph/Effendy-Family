@@ -118,15 +118,6 @@ export function screenInfo(id: string): ScreenInfo | undefined {
   return undefined;
 }
 
-/** Screens with their own page under app/(app)/. */
-export const BUILT_SCREENS = ["settings", "budget", "recur", "alerts", "setup", "debts", "subs", "remit", "biz", "tax", "invest", "import", "week", "shifts", "ygoals", "learn", "gym", "together", "journal", "whatif", "sim", "career", "report"];
-
-/** Screens served by app/(app)/[screen]/page.tsx. Keep public/sw.js PAGES in sync. */
-export const PLACEHOLDER_SCREENS = [
-  ...MODULE_ORDER.flatMap((k) => MODULES[k].tabs.map((t) => t.id)),
-  ...TOOLS.map((t) => t.id),
-].filter((id) => !BUILT_SCREENS.includes(id));
-
 export const BOTTOM_TABS = [
   { key: "home", label: "Home", icon: House, href: "/" },
   { key: "money", label: "Money", icon: Wallet, href: "/budget" },

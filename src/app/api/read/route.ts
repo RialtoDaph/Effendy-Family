@@ -3,7 +3,7 @@
 // reaches the phone. Only signed-in members of the household may call it.
 
 import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@supabase/supabase-js";
+import { authorize } from "@/lib/server-auth";
 import { RECEIPT_PROMPT, ROSTER_PROMPT, STATEMENT_PROMPT, receiptSchema, rosterSchema, statementSchema } from "@/lib/ai-read-schema";
 
 export const maxDuration = 300;
@@ -18,16 +18,9 @@ export async function POST(req: Request) {
   if (!process.env.ANTHROPIC_API_KEY) return fail("Reading with AI is not set up yet.", 503);
 
   // 1. Who is asking? The person's own sign-in token, checked by Supabase.
-  const token = req.headers.get("authorization")?.replace(/^Bearer /, "");
-  if (!token) return fail("Please sign in again.", 401);
-  const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { data: who } = await sb.auth.getUser(token);
-  if (!who.user) return fail("Please sign in again.", 401);
-  const { data: me } = await sb.from("members").select("id").eq("id", who.user.id).maybeSingle();
-  if (!me) return fail("Only family members can use this.", 403);
+  const auth = await authorize(req);
+  if (auth instanceof Response) return auth;
+  const { sb } = auth;
 
   // 2. The file.
   const form = await req.formData().catch(() => null);
