@@ -10,9 +10,21 @@ import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
 import { parseAmount } from "@/lib/money";
 import { hm, weekStart } from "@/lib/time";
 
-export type TimeFormKind = "event" | "shift" | "prio" | "ygoal" | "progress" | "litem" | "lmin" | "gym" | "journal" | "idea" | "datenight";
+export type TimeFormKind =
+  | "event"
+  | "shift"
+  | "prio"
+  | "ygoal"
+  | "progress"
+  | "litem"
+  | "lmin"
+  | "gym"
+  | "journal"
+  | "idea"
+  | "datenight"
+  | "career";
 
-export const TIME_FORM_KINDS: TimeFormKind[] = ["event", "shift", "prio", "ygoal", "progress", "litem", "lmin", "gym", "journal", "idea", "datenight"];
+export const TIME_FORM_KINDS: TimeFormKind[] = ["event", "shift", "prio", "ygoal", "progress", "litem", "lmin", "gym", "journal", "idea", "datenight", "career"];
 
 const VISIBILITY: Field = {
   kind: "chips",
@@ -399,6 +411,55 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
             if (cost != null && !(cost >= 0)) return "The cost must be a number.";
             return finish("date_ideas", { name: text(v.name), short: text(v.short) || null, cost, icon: v.icon || "heart" }, d?.id, d ? "Saved" : "Idea added");
           }}
+        />
+      );
+    }
+
+    case "career": {
+      const c = time.careerSteps.find((x) => x.id === id);
+      const plans = [...new Set(time.careerSteps.map((x) => x.plan))];
+      return (
+        <FormSheet
+          title={c ? "Edit step" : "Add a step"}
+          editing={!!c}
+          initial={
+            c
+              ? { title: c.title, plan: c.plan, timing: c.timing ?? "", status: c.status, visibility: c.visibility }
+              : { plan: plans[0] ?? "", status: "next", visibility: vis("career"), ...preset }
+          }
+          fields={[
+            { kind: "text", key: "plan", label: "Plan", placeholder: "e.g. RIDEFF Studio", required: true },
+            { kind: "text", key: "title", label: "Step", placeholder: "e.g. Gewerbe registered", required: true },
+            { kind: "text", key: "timing", label: "When (optional)", placeholder: "e.g. July, in progress, 1 of 3" },
+            {
+              kind: "chips",
+              key: "status",
+              label: "Status",
+              options: [
+                { value: "done", label: "Done" },
+                { value: "now", label: "Doing now" },
+                { value: "next", label: "Next" },
+              ],
+            },
+            VISIBILITY,
+          ]}
+          onClose={onClose}
+          onDelete={c ? () => del("career_steps", c.id, `Delete “${c.title}”?`) : undefined}
+          onSave={(v) =>
+            finish(
+              "career_steps",
+              {
+                title: text(v.title),
+                plan: text(v.plan),
+                timing: text(v.timing) || null,
+                status: v.status,
+                visibility: v.visibility,
+                ...(c ? {} : { sort: time.careerSteps.filter((x) => x.plan === text(v.plan)).length }),
+              },
+              c?.id,
+              c ? "Saved" : "Step added",
+            )
+          }
         />
       );
     }

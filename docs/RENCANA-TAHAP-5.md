@@ -1,6 +1,10 @@
 # Rencana Tahap 5 — Intelligence & reports
 
-Status: **rencana, menunggu jawaban**. Belum ada kode yang ditulis.
+Status: **sedang dikerjakan.**
+
+Jawaban Rialto: briefing dibuat AI · laporan belum dikirim email (cukup Save as PDF) · Career diisi sendiri
+(mulai kosong) · pajak di What if: Claude yang tentukan → bawaan 30%, bisa diubah di layar (20 / 30 / 40%) ·
+Rialna menjawab dalam bahasa pertanyaannya.
 
 Tahap 3 dan 4 selesai dibuat; tes di HP dilakukan Rialto belakangan.
 

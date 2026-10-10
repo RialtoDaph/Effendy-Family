@@ -52,6 +52,8 @@ export type DateNight = Owned & {
   event_id: string | null;
 };
 
+export type CareerStep = Owned & { plan: string; title: string; timing: string | null; status: "done" | "now" | "next"; sort: number };
+
 /* Dates ----------------------------------------------------------------------- */
 
 const utc = (iso: string) => new Date(`${iso}T12:00:00Z`);

@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import {
   addDays,
   type CalEvent,
+  type CareerStep,
   type DateIdea,
   type DateNight,
   type GoalProgress,
@@ -30,6 +31,7 @@ type TimeRows = {
   journal: JournalEntry[];
   dateIdeas: DateIdea[];
   dateNights: DateNight[];
+  careerSteps: CareerStep[];
 };
 
 export type TimeTable =
@@ -42,7 +44,8 @@ export type TimeTable =
   | "gym_sessions"
   | "journal_entries"
   | "date_ideas"
-  | "date_nights";
+  | "date_nights"
+  | "career_steps";
 
 const ROW_KEY: Record<TimeTable, keyof TimeRows> = {
   events: "events",
@@ -55,6 +58,7 @@ const ROW_KEY: Record<TimeTable, keyof TimeRows> = {
   journal_entries: "journal",
   date_ideas: "dateIdeas",
   date_nights: "dateNights",
+  career_steps: "careerSteps",
 };
 
 type Time = TimeRows & {
@@ -78,6 +82,7 @@ const EMPTY: TimeRows = {
   journal: [],
   dateIdeas: [],
   dateNights: [],
+  careerSteps: [],
 };
 
 const TimeContext = createContext<Time | null>(null);
@@ -112,9 +117,10 @@ export function TimeProvider({ children }: { children: ReactNode }) {
       sb.from("journal_entries").select("*").order("date", { ascending: false }).order("created_at", { ascending: false }).limit(300),
       sb.from("date_ideas").select("*").order("created_at"),
       sb.from("date_nights").select("*").order("date", { ascending: false }).limit(300),
+      sb.from("career_steps").select("*").order("plan").order("sort").order("created_at"),
     ]);
     if (res.some((r) => r.error)) return; // offline: keep what we have
-    const [events, pr, yg, gp, li, lm, gym, jn, di, dn] = res.map((r) => r.data);
+    const [events, pr, yg, gp, li, lm, gym, jn, di, dn, cs] = res.map((r) => r.data);
     const next: TimeRows = {
       events: events as CalEvent[],
       priorities: pr as WeekPriority[],
@@ -126,6 +132,7 @@ export function TimeProvider({ children }: { children: ReactNode }) {
       journal: jn as JournalEntry[],
       dateIdeas: di as DateIdea[],
       dateNights: dn as DateNight[],
+      careerSteps: cs as CareerStep[],
     };
     setRows(next);
     setLoaded(true);

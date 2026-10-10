@@ -220,11 +220,41 @@ button {
 }
 
 @media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
   [data-noprint] {
     display: none !important;
   }
   body {
     background-image: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Always print in light colours, whatever the screen theme. */
+  :root,
+  :root[data-theme="dark"] {
+    --bg: #ffffff !important;
+    --card: #ffffff !important;
+    --soft: #f7f8fa !important;
+    --soft2: #eff1f4 !important;
+    --line: #e6e8ec !important;
+    --line2: #cdd1d8 !important;
+    --ink: #0b0d10 !important;
+    --mut: #5b616e !important;
+    --mut2: #8e94a0 !important;
+    --inv: #0b0d10 !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  main > div {
+    max-width: none !important;
+  }
+  section,
+  header {
+    break-inside: avoid;
   }
 }
 
