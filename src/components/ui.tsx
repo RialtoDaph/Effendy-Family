@@ -79,11 +79,11 @@ export function Segmented<T extends string | number>({
 }
 
 /** Small owner pill: "Rialto", "Amnah", "Family". */
-export function OwnerPill({ member }: { member: Member | undefined }) {
+export function OwnerPill({ member, fallback = "Family" }: { member: Member | undefined; fallback?: string }) {
   const { bg, fg } = member ? avatarColors(member) : { bg: "var(--acc)", fg: "var(--onacc)" };
   return (
     <span className="whitespace-nowrap rounded-full px-[9px] py-[3px] text-[11px] font-bold" style={{ background: bg, color: fg }}>
-      {member?.display_name ?? "Family"}
+      {member?.display_name ?? fallback}
     </span>
   );
 }

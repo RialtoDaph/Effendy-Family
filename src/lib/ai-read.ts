@@ -1,6 +1,6 @@
-// Sends a receipt photo or a PDF statement to /api/read (Claude, on the server).
+// Sends a receipt photo, a PDF statement or a roster to /api/read (Claude, on the server).
 
-import type { ReceiptResult, StatementResult } from "@/lib/ai-read-schema";
+import type { ReceiptResult, RosterResult, StatementResult } from "@/lib/ai-read-schema";
 import { supabase } from "@/lib/supabase";
 
 /** Phone photos are large; 1600 px JPEG is plenty to read a receipt and uploads fast. */
@@ -23,7 +23,7 @@ export async function shrinkPhoto(file: File, maxSide = 1600): Promise<File> {
 
 type Read<T> = { result: T; error?: undefined } | { result?: undefined; error: string };
 
-async function send<T>(kind: "receipt" | "statement", file: File): Promise<Read<T>> {
+async function send<T>(kind: "receipt" | "statement" | "roster", file: File, extra: Record<string, string> = {}): Promise<Read<T>> {
   if (!navigator.onLine) return { error: "Reading needs the internet." };
   const { data } = await supabase().auth.getSession();
   const token = data.session?.access_token;
@@ -31,6 +31,7 @@ async function send<T>(kind: "receipt" | "statement", file: File): Promise<Read<
   const body = new FormData();
   body.set("kind", kind);
   body.set("file", file);
+  for (const [k, v] of Object.entries(extra)) body.set(k, v);
   try {
     const res = await fetch("/api/read", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body });
     const json = await res.json().catch(() => null);
@@ -43,3 +44,4 @@ async function send<T>(kind: "receipt" | "statement", file: File): Promise<Read<
 
 export const readReceipt = (photo: File) => send<ReceiptResult>("receipt", photo);
 export const readStatement = (pdf: File) => send<StatementResult>("statement", pdf);
+export const readRoster = (file: File, today: string) => send<RosterResult>("roster", file, { today });

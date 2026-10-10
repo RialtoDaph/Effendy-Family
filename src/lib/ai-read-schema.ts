@@ -18,6 +18,43 @@ export type StatementResult = {
   warnings: string[];
 };
 
+export type RosterResult = {
+  shifts: { date: string; start: string; end: string | null; note: string | null }[];
+  warnings: string[];
+};
+
+export const ROSTER_PROMPT = `You read work rosters (screenshots of a scheduling app, photos or PDFs) for one bar worker.
+The roster has already been filtered to his own shifts, so every shift shown is his.
+Return each shift once with its date (YYYY-MM-DD), start and end time (HH:MM, 24-hour). An end after midnight is written as it is printed (e.g. 01:00).
+When the year is not shown, use the year that puts the date closest to today's date given by the user.
+Use note only for short labels printed on the shift (e.g. a role or location). Skip days off, holidays and anything that is not a shift.
+Add a short warning for anything you could not read reliably.`;
+
+export function rosterSchema() {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: ["shifts", "warnings"],
+    properties: {
+      shifts: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["date", "start", "end", "note"],
+          properties: {
+            date: { type: "string", description: "YYYY-MM-DD" },
+            start: { type: "string", description: "HH:MM" },
+            end: { type: ["string", "null"], description: "HH:MM" },
+            note: { type: ["string", "null"] },
+          },
+        },
+      },
+      warnings: { type: "array", items: { type: "string" } },
+    },
+  };
+}
+
 export const RECEIPT_PROMPT = `You read shop receipts for a family budget app in Germany.
 Return the shop name as people say it (e.g. "Rewe", "dm", "Trattoria Roma"), the purchase date, and the total actually paid (after discounts, including tax).
 List the items with their prices as printed; leave the list empty if they are unreadable.

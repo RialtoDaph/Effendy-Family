@@ -1,5 +1,6 @@
 "use client";
 
+import { TIME_FORM_KINDS, TimeForm, type TimeFormKind } from "@/components/time-forms";
 import { ReceiptScan } from "@/components/receipt-scan";
 import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
@@ -11,7 +12,7 @@ import { useToast } from "@/components/toast";
 import { CATEGORY_ICONS, GOAL_ICONS, iconFor } from "@/lib/icons";
 import { parseAmount, type Category, type Goal, type Income, type Recurring, type Transaction } from "@/lib/money";
 
-type FormKind = "tx" | "cat" | "income" | "recur" | "goal" | "scan" | FinanceFormKind;
+type FormKind = "tx" | "cat" | "income" | "recur" | "goal" | "scan" | FinanceFormKind | TimeFormKind;
 type Open = { kind: FormKind; id?: string; preset?: FormValues };
 
 type MoneyForms = {
@@ -49,6 +50,9 @@ export function MoneyFormsProvider({ children }: { children: ReactNode }) {
 }
 
 function MoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
+  if (TIME_FORM_KINDS.includes(open.kind as TimeFormKind)) {
+    return <TimeForm kind={open.kind as TimeFormKind} id={open.id} preset={open.preset} onClose={onClose} />;
+  }
   if (!["tx", "cat", "income", "recur", "goal"].includes(open.kind)) {
     return <FinanceForm kind={open.kind as FinanceFormKind} id={open.id} preset={open.preset} onClose={onClose} />;
   }

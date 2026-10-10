@@ -34,6 +34,8 @@ export type MemberSettings = {
   notif: Record<string, unknown>;
   warn_pct: number;
   ef_months: number;
+  learn_week_min?: number;
+  gym_week_goal?: number;
 };
 
 type Profile = {

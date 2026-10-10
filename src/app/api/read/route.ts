@@ -1,10 +1,10 @@
-// Reads a receipt photo or a PDF bank statement with Claude (README → Bank
-// import: PDF; Scan receipt). Runs on the server only: the API key never
+// Reads a receipt photo, a PDF bank statement or a work roster with Claude
+// (README → Bank import: PDF; Scan receipt; Shifts: Read roster). Runs on the server only: the API key never
 // reaches the phone. Only signed-in members of the household may call it.
 
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
-import { RECEIPT_PROMPT, STATEMENT_PROMPT, receiptSchema, statementSchema } from "@/lib/ai-read-schema";
+import { RECEIPT_PROMPT, ROSTER_PROMPT, STATEMENT_PROMPT, receiptSchema, rosterSchema, statementSchema } from "@/lib/ai-read-schema";
 
 export const maxDuration = 300;
 
@@ -33,56 +33,68 @@ export async function POST(req: Request) {
   const form = await req.formData().catch(() => null);
   const kind = form?.get("kind");
   const file = form?.get("file");
-  if ((kind !== "receipt" && kind !== "statement") || !(file instanceof File)) return fail("No file was sent.", 400);
+  if ((kind !== "receipt" && kind !== "statement" && kind !== "roster") || !(file instanceof File)) return fail("No file was sent.", 400);
   if (file.size > MAX_BYTES) return fail("The file is larger than 4 MB.", 413);
   const data = Buffer.from(await file.arrayBuffer()).toString("base64");
 
   let source: Anthropic.Beta.BetaContentBlockParam;
-  if (kind === "statement") {
-    if (file.type !== "application/pdf") return fail("Please choose a PDF file.", 415);
+  if (file.type === "application/pdf" && kind !== "receipt") {
     source = { type: "document", source: { type: "base64", media_type: "application/pdf", data } };
+  } else if (kind === "statement") {
+    return fail("Please choose a PDF file.", 415);
   } else {
     const type = IMAGE_TYPES.find((t) => t === file.type);
-    if (!type) return fail("Please choose a photo (JPEG or PNG).", 415);
+    if (!type) return fail("Please choose a photo or screenshot (JPEG or PNG).", 415);
     source = { type: "image", source: { type: "base64", media_type: type, data } };
   }
 
-  // 3. Categories of this household, so receipts get one of yours.
-  const { data: cats } = await sb.from("categories").select("name").order("sort");
-  const names = (cats ?? []).map((c) => c.name as string);
+  // 3. What to ask for each kind.
+  let task: { system: string; schema: Record<string, unknown>; text: string; maxTokens: number; effort: "low" | "medium" };
+  if (kind === "receipt") {
+    // Categories of this household, so receipts get one of yours.
+    const { data: cats } = await sb.from("categories").select("name").order("sort");
+    const names = (cats ?? []).map((c) => c.name as string);
+    task = {
+      system: RECEIPT_PROMPT,
+      schema: receiptSchema(names),
+      text: `Read this receipt. Categories to choose from: ${names.join(", ") || "(none)"}.`,
+      maxTokens: 8000,
+      effort: "low",
+    };
+  } else if (kind === "roster") {
+    const today = String(form?.get("today") ?? "").match(/^\d{4}-\d{2}-\d{2}$/)?.[0] ?? new Date().toISOString().slice(0, 10);
+    task = {
+      system: ROSTER_PROMPT,
+      schema: rosterSchema(),
+      text: `Today is ${today}. Read every shift shown.`,
+      maxTokens: 16000,
+      effort: "low",
+    };
+  } else {
+    task = {
+      system: STATEMENT_PROMPT,
+      schema: statementSchema(),
+      text: "Read every booked transaction in this bank statement.",
+      maxTokens: 64000,
+      effort: "medium",
+    };
+  }
 
   const client = new Anthropic();
   try {
     const stream = client.beta.messages.stream({
       model: MODEL,
-      max_tokens: kind === "statement" ? 64000 : 8000,
+      max_tokens: task.maxTokens,
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
       thinking: { type: "adaptive" },
-      output_config: {
-        effort: kind === "statement" ? "medium" : "low",
-        format: { type: "json_schema", schema: kind === "statement" ? statementSchema() : receiptSchema(names) },
-      },
-      system: kind === "statement" ? STATEMENT_PROMPT : RECEIPT_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: [
-            source,
-            {
-              type: "text",
-              text:
-                kind === "statement"
-                  ? "Read every booked transaction in this bank statement."
-                  : `Read this receipt. Categories to choose from: ${names.join(", ") || "(none)"}.`,
-            },
-          ],
-        },
-      ],
+      output_config: { effort: task.effort, format: { type: "json_schema", schema: task.schema } },
+      system: task.system,
+      messages: [{ role: "user", content: [source, { type: "text", text: task.text }] }],
     });
     const msg = await stream.finalMessage();
     if (msg.stop_reason === "refusal") return fail("The AI could not read this file.", 422);
-    if (msg.stop_reason === "max_tokens") return fail("The statement is too long. Split it into shorter months.", 422);
+    if (msg.stop_reason === "max_tokens") return fail(kind === "statement" ? "The statement is too long. Split it into shorter months." : "The file is too long to read at once.", 422);
     const text = msg.content.find((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")?.text;
     if (!text) return fail("The AI gave no answer. Try again.", 502);
     return Response.json({ kind, result: JSON.parse(text) });

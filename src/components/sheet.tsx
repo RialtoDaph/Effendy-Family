@@ -61,6 +61,8 @@ export type Field =
   | { kind: "amount"; key: string; label: string; prefix?: "€" | "Rp"; placeholder?: string; required?: boolean }
   | { kind: "number"; key: string; label: string; placeholder?: string; required?: boolean }
   | { kind: "date"; key: string; label: string; required?: boolean }
+  | { kind: "time"; key: string; label: string; required?: boolean }
+  | { kind: "textarea"; key: string; label: string; placeholder?: string; required?: boolean; rows?: number }
   | {
       kind: "chips";
       key: string;
@@ -141,6 +143,23 @@ export function FormSheet({
                 type="date"
                 className={inputCls}
                 value={String(values[f.key] ?? "")}
+                onChange={(e) => set(f.key, e.target.value)}
+              />
+            )}
+            {f.kind === "time" && (
+              <input
+                type="time"
+                className={inputCls}
+                value={String(values[f.key] ?? "").slice(0, 5)}
+                onChange={(e) => set(f.key, e.target.value)}
+              />
+            )}
+            {f.kind === "textarea" && (
+              <textarea
+                className="min-h-[120px] rounded-[10px] border border-line bg-soft px-3.5 py-3 text-base leading-normal text-ink outline-none focus:border-line2"
+                rows={f.rows ?? 5}
+                value={String(values[f.key] ?? "")}
+                placeholder={f.placeholder}
                 onChange={(e) => set(f.key, e.target.value)}
               />
             )}

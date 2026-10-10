@@ -499,6 +499,7 @@ function SecuritySection() {
 const NOTIF_ROWS = [
   ["bills", "Bills & recurring payments", "The day before money goes out"],
   ["tax", "Tax deadlines", "3 days before"],
+  ["shifts", "Bar shifts", "2 hours before each shift"],
   ["budget", "Budget warnings", "When a category passes your warning level"],
   ["goals", "Goals", "A short nudge on Sunday evening"],
 ] as const;
@@ -517,7 +518,7 @@ function RemindersSection() {
   const [state, setState] = useState<PushState | null>(null);
   const [busy, setBusy] = useState(false);
   const [local, setLocal] = useState<Record<string, unknown> | null>(null);
-  const notif = { bills: true, tax: true, budget: true, goals: true, time: "07:00", ...settings?.notif, ...local };
+  const notif = { bills: true, tax: true, shifts: true, budget: true, goals: true, time: "07:00", ...settings?.notif, ...local };
 
   const refresh = useCallback(() => {
     pushState().then(setState);

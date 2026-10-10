@@ -1,6 +1,14 @@
 # Rencana Tahap 4 — Time & life
 
-Status: **sedang dikerjakan.**
+Status: **selesai dibuat** — tinggal dites di HP oleh Rialto.
+
+| Bagian | Status |
+|---|---|
+| A This week + acara | ✅ papan 7 hari, 3 prioritas, acara dengan pengingat |
+| B Shifts + notifikasi 2 jam sebelum | ✅ dites di database (10 cek lulus) |
+| C Read roster (Claude) | ✅ dites dengan jawaban AI tiruan; **perlu dicoba dengan screenshot asli** |
+| D Yearly goals + Learning | ✅ |
+| E Gym + Journal + Date nights | ✅ journal Private bawaan, dites di database |
 
 Jawaban Rialto: shift hanya Rialto · cukup jumlah shift dan jam (gaji bulanan, tidak dihitung) ·
 roster = screenshot dari app kerja yang sudah difilter, jadi semua shift di gambar milik Rialto ·
@@ -54,8 +62,8 @@ Bawaan privasi (README): Journal → Private; Gym, Learning, Yearly goals → Fa
 
 ## Pengecekan (dari ROADMAP)
 
-- [ ] Notifikasi shift datang 2 jam sebelum mulai.
-- [ ] Journal milik satu orang tidak terlihat oleh pasangannya.
+- [x] Notifikasi shift datang 2 jam sebelum mulai (tes database; perlu dicoba di HP).
+- [x] Journal milik satu orang tidak terlihat oleh pasangannya (tes database).
 
 ## Pertanyaan
 

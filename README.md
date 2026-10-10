@@ -21,7 +21,8 @@ npm run dev
   `supabase/tests/money_rules.sql` (Private/Family, recurring posting) and
   `supabase/tests/money_complete_rules.sql` (debts, assets, transfers, files) and
   `supabase/tests/reminders_rules.sql` (what reminders go out, to whom, once) and
-  `supabase/tests/import_rules.sql` (bank import: no duplicates, shared column choices) in the Supabase
+  `supabase/tests/import_rules.sql` (bank import: no duplicates, shared column choices) and
+  `supabase/tests/time_life_rules.sql` (shift reminders, private journal, goal progress) in the Supabase
   SQL editor. Every check must return `ok = true`. All of them roll back; nothing is kept.
 - Recurring items are posted by `private.post_recurring()`, run hourly by pg_cron
   (does nothing before 05:00 Europe/Berlin).
@@ -74,3 +75,11 @@ sent when the connection is back; the header shows how many wait.
 - Needs `ANTHROPIC_API_KEY` in Vercel (Production). The key is never sent to the browser.
 - Receipt photos are shrunk on the phone (1600 px JPEG), kept in the private `files`
   bucket (kind `receipt`) and linked through `transactions.receipt_file_id`.
+
+## Time & life (phase 4)
+- Calendar items and bar shifts share the `events` table (`kind` = event / shift). A shift is
+  saved once per person, date and start time, so reading a roster twice is safe.
+- Read roster: a screenshot or PDF goes to `/api/read` (kind `roster`); every shift is shown for
+  checking before it is saved.
+- Reminders: shifts 2 hours before (to the person working), events when a reminder is set.
+- Journal entries are private by default; goal progress follows its goal's visibility.
