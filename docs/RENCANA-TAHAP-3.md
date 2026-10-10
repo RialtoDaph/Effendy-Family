@@ -8,7 +8,7 @@ bank = Sparkasse, TF Bank, Revolut, BCA, PayPal, Wise.
 | A PIN + Face ID | ✅ selesai, dites otomatis (PIN tidak tersimpan polos, jeda 30 dtk setelah 5x salah, terkunci saat dibuka lagi) |
 | C Offline queue | ✅ selesai, dites otomatis (simpan tanpa internet → "Offline · 1" → terkirim otomatis saat online) |
 | B Notifikasi | ✅ dibuat; aturan dites di database (12 cek lulus), enkripsi dicek dengan pustaka referensi. **Tes di HP oleh Rialto** |
-| D Bank import CSV | menunggu contoh CSV |
+| D Bank import CSV | ✅ dibuat untuk Sparkasse, TF Bank, Revolut, BCA (Rupiah → Euro), PayPal, Wise + bank lain. Dites dengan file contoh berbentuk ekspor asli (14 tes) dan 7 cek database. **Perlu dicoba dengan file asli Rialto** |
 | E PDF + struk | menunggu API key |
 
 Tahap 0–2 selesai dan dites di HP dengan dua akun (11 Okt 2026).
@@ -67,6 +67,6 @@ Claude API hanya dipanggil dari server (Vercel), kuncinya tidak pernah sampai ke
 
 ## Pengecekan (dari ROADMAP)
 
-- [ ] Impor CSV Sparkasse sungguhan + satu file bank lain, tanpa dobel.
+- [ ] Impor CSV Sparkasse sungguhan + satu file bank lain, tanpa dobel. (Tes otomatis lulus; menunggu file asli.)
 - [ ] Notifikasi sampai dengan app tertutup di iPhone (iOS 16.4+, terpasang di layar utama).
 - [x] Jeda setelah PIN salah berjalan (tes otomatis).

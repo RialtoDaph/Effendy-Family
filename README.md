@@ -20,7 +20,8 @@ npm run dev
 - Access-rule checks: run `supabase/tests/access_rules.sql` (members) and
   `supabase/tests/money_rules.sql` (Private/Family, recurring posting) and
   `supabase/tests/money_complete_rules.sql` (debts, assets, transfers, files) and
-  `supabase/tests/reminders_rules.sql` (what reminders go out, to whom, once) in the Supabase
+  `supabase/tests/reminders_rules.sql` (what reminders go out, to whom, once) and
+  `supabase/tests/import_rules.sql` (bank import: no duplicates, shared column choices) in the Supabase
   SQL editor. Every check must return `ok = true`. All of them roll back; nothing is kept.
 - Recurring items are posted by `private.post_recurring()`, run hourly by pg_cron
   (does nothing before 05:00 Europe/Berlin).
@@ -52,3 +53,15 @@ sent when the connection is back; the header shows how many wait.
 - Each phone's subscription is in `push_subscriptions`, saved through
   `save_push_subscription()`. Signing out removes this phone's subscription.
 - iPhone: iOS 16.4+ and the app opened from the Home Screen.
+
+## Bank import
+- `src/lib/bank-import.ts` reads CSV files (delimiter and encoding detected, columns guessed
+  and confirmed once per bank in `import_mappings`). Tests use files shaped like the real
+  exports of Sparkasse, TF Bank, Revolut, BCA, PayPal and Wise.
+- Each row gets a SHA-256 fingerprint of bank + date + amount + payee + purpose (plus a
+  running number for identical rows in one file) in `transactions.import_hash`; inserts use
+  `ON CONFLICT DO NOTHING`, so a file can be imported again safely.
+- Categories: `merchant_rules` (learned when you change a suggestion), then your past
+  transactions, then known shop names. Unknown shops are listed under "Needs a category".
+- Money between your own accounts (card bill, PayPal / Wise / Revolut top-ups) is left
+  unticked so it does not count twice. BCA Rupiah are converted at the saved rate.

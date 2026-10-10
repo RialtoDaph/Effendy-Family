@@ -119,7 +119,7 @@ export function screenInfo(id: string): ScreenInfo | undefined {
 }
 
 /** Screens with their own page under app/(app)/. */
-export const BUILT_SCREENS = ["settings", "budget", "recur", "alerts", "setup", "debts", "subs", "remit", "biz", "tax", "invest"];
+export const BUILT_SCREENS = ["settings", "budget", "recur", "alerts", "setup", "debts", "subs", "remit", "biz", "tax", "invest", "import"];
 
 /** Screens served by app/(app)/[screen]/page.tsx. Keep public/sw.js PAGES in sync. */
 export const PLACEHOLDER_SCREENS = [
