@@ -25,6 +25,7 @@ import {
 import { Avatar } from "./avatar";
 import { CommandPalette } from "./command-palette";
 import { QuickAddSheet } from "./quick-add";
+import { FeedbackButton } from "@/components/feedback-button";
 
 type ShellUI = {
   openQuickAdd: () => void;
@@ -96,6 +97,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         <Plus size={26} strokeWidth={2.5} />
       </button>
+      <FeedbackButton />
       {quickAdd && <QuickAddSheet onClose={() => setQuickAdd(false)} />}
       {command && <CommandPalette onClose={() => setCommand(false)} />}
     </ShellContext>

@@ -1,6 +1,7 @@
 import {
   Bell,
   Beer,
+  Bug,
   Calendar,
   CalendarDays,
   Camera,
@@ -84,6 +85,7 @@ export const TOOLS: Tool[] = [
   { id: "report", label: "Monthly report", icon: FileText, phase: 5, blurb: "A print-ready summary of the month, saved as PDF." },
   { id: "ask", label: `Ask ${AI_NAME}`, icon: Sparkles, phase: 5, blurb: "Ask about your money and plans. Answers come with numbers and a next step." },
   { id: "whatif", label: "What if", icon: SlidersHorizontal, phase: 5, blurb: "Move a slider and see what changes for your goals." },
+  { id: "reports", label: "Bug reports", icon: Bug, phase: 5, blurb: "Problems and ideas you reported, on a To do · Doing · Done board." },
   { id: "settings", label: "Settings", icon: Settings, phase: 0, blurb: "" },
   { id: "setup", label: "Setup & data", icon: ListChecks, phase: 1, blurb: "Put your real data in, step by step." },
 ];

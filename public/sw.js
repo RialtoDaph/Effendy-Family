@@ -5,7 +5,7 @@
 // - /_next/static (hashed, never changes): cache first.
 // - Supabase and other origins are never touched here.
 
-const VERSION = "ef-v11";
+const VERSION = "ef-v12";
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
@@ -15,7 +15,7 @@ const PAGES = [
   "/week", "/shifts", "/ygoals", "/learn",
   "/invest", "/sim", "/career",
   "/gym", "/together", "/journal",
-  "/alerts", "/report", "/ask", "/whatif", "/setup",
+  "/alerts", "/report", "/reports", "/ask", "/whatif", "/setup",
 ];
 const EXTRA = ["/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png"];
 
