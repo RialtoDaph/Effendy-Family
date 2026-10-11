@@ -2,18 +2,62 @@
 
 import { ASK_EVENT, ASK_HANDOFF } from "@/lib/ask";
 import { useRouter } from "next/navigation";
-import { CircleDot, Search, Settings, Sparkles, type LucideIcon } from "lucide-react";
+import {
+  BookOpen,
+  CalendarDays,
+  CircleDot,
+  CreditCard,
+  Heart,
+  NotebookPen,
+  Receipt,
+  Repeat,
+  Search,
+  Settings,
+  Sparkles,
+  Tag,
+  Target,
+  TrendingUp,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useAppData } from "@/components/app-data";
+import { useFinance } from "@/components/finance-data";
+import { useMoney } from "@/components/money-data";
+import { useMoneyForms } from "@/components/money-forms";
+import { useTime } from "@/components/time-data";
 import { useTheme } from "@/components/theme";
+import { searchData, type HitKind } from "@/lib/search";
 import { AI_NAME, HOME, MODULE_ORDER, MODULES, QUICK_ADD, TOOLS, hrefOf } from "@/lib/nav";
 import { useShell } from "./app-shell";
 
-type Cmd = { label: string; icon: LucideIcon; hint: string; run: () => void };
+type Cmd = { label: string; icon: LucideIcon; hint: string; detail?: string; run: () => void };
+
+const HIT_ICON: Record<HitKind, LucideIcon> = {
+  transaction: Receipt,
+  recurring: Repeat,
+  income: Wallet,
+  goal: Target,
+  category: Tag,
+  subscription: Repeat,
+  debt: CreditCard,
+  asset: TrendingUp,
+  event: CalendarDays,
+  ygoal: Target,
+  learning: BookOpen,
+  idea: Heart,
+  journal: NotebookPen,
+};
 
 export function CommandPalette({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const { runQuickAdd } = useShell();
   const { setTheme } = useTheme();
+  const { userId } = useAppData();
+  const money = useMoney();
+  const fin = useFinance();
+  const time = useTime();
+  const { openForm } = useMoneyForms();
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,17 +113,44 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       go("ask")();
       window.dispatchEvent(new Event(ASK_EVENT));
     };
-    if (query) out.push({ label: "Ask", items: [{ label: `Ask ${AI_NAME}: “${q.trim()}”`, icon: Sparkles, hint: "↵", run: ask }] });
+    // Your own data first (works offline and without Rialna), then pages, then Ask.
+    const hits: Cmd[] = searchData(q, {
+      viewerId: userId,
+      transactions: money.transactions,
+      recurring: money.recurring,
+      incomes: money.incomes,
+      goals: money.goals,
+      categories: money.categories,
+      subscriptions: fin.subscriptions,
+      debts: fin.debts,
+      assets: fin.assets,
+      events: time.events,
+      yearlyGoals: time.yearlyGoals,
+      learningItems: time.learningItems,
+      dateIdeas: time.dateIdeas,
+      journal: time.journal,
+    }).map((h) => ({
+      label: h.label,
+      detail: h.detail,
+      icon: HIT_ICON[h.kind],
+      hint: "Open",
+      run: () => {
+        onClose();
+        openForm(h.form as Parameters<typeof openForm>[0], h.id);
+      },
+    }));
+    if (hits.length) out.push({ label: "In your data", items: hits });
     const sections: [string, Cmd[], number][] = [
       ["Jump to", f(jump), 8],
       ["Quick add", f(add), 9],
       ["Settings", f(prefs), 9],
     ];
     for (const [label, items, max] of sections) {
-      if (items.length) out.push({ label, items: query ? items : items.slice(0, max) });
+      if (items.length) out.push({ label, items: query ? items.slice(0, 6) : items.slice(0, max) });
     }
+    if (query) out.push({ label: "Ask", items: [{ label: `Ask ${AI_NAME}: “${q.trim()}”`, icon: Sparkles, hint: "Ask", run: ask }] });
     return out;
-  }, [q, onClose, router, runQuickAdd, setTheme]);
+  }, [q, onClose, router, runQuickAdd, setTheme, userId, money, fin, time, openForm]);
 
   // With no match, ↵ asks Rialna (README → Command palette).
   const flat = groups.flatMap((g) => g.items);
@@ -120,7 +191,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               setSel(0);
             }}
             onKeyDown={onKey}
-            placeholder={`Search, jump, add, or ask ${AI_NAME}…`}
+            placeholder={`Search your data, pages, or ask ${AI_NAME}…`}
             className="h-14 min-w-0 flex-1 border-0 bg-transparent text-base text-ink outline-none"
           />
           <button
@@ -150,7 +221,10 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
                     <span className="flex h-7 w-7 flex-none items-center justify-center rounded-[7px] bg-soft2">
                       <c.icon size={15} strokeWidth={1.9} />
                     </span>
-                    <span className="min-w-0 flex-1 truncate">{c.label}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate">{c.label}</span>
+                      {c.detail && <span className="block truncate text-xs font-medium text-mut2">{c.detail}</span>}
+                    </span>
                     <span className="font-mono text-[11.5px] text-mut2">{c.hint}</span>
                   </button>
                 );
@@ -158,7 +232,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
             </div>
           ))}
           {!groups.length && (
-            <div className="px-3 py-6 text-center text-[13.5px] text-mut">No matches. Press ↵ to ask {AI_NAME}.</div>
+            <div className="px-3 py-6 text-center text-[13.5px] text-mut">Type to search your data and pages, or ask {AI_NAME}.</div>
           )}
         </div>
         <div className="hidden gap-4 border-t border-line bg-soft px-4 py-2.5 font-mono text-[11.5px] text-mut2 wide:flex">

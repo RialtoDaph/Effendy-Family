@@ -56,6 +56,7 @@ export function ReportScreen() {
   const txs = money.transactions.filter((x) => x.visibility === "family" && x.date.startsWith(ym));
   const income = txs.filter((x) => x.amount > 0).reduce((a, x) => a + x.amount, 0);
   const spent = -txs.filter((x) => x.amount < 0).reduce((a, x) => a + x.amount, 0);
+  const plannedIncome = money.incomes.filter((i) => i.visibility === "family").reduce((a, i) => a + i.monthly_amount, 0);
   const budget = budgetSummary(money.categories, txs, t, settings?.warn_pct ?? 80);
   const ef = emergencyFund(money.goals.filter((g) => g.visibility === "family"), money.categories, settings?.ef_months ?? 6);
   const payees = new Map<string, number>();
@@ -98,7 +99,7 @@ export function ReportScreen() {
 
       <div className="grid grid-cols-3 gap-2 print:gap-2">
         {[
-          ["Money in", eur(income)],
+          ["Money in (booked)", eur(income)],
           ["Money out", eur(spent)],
           ["Left over", eur(income - spent)],
         ].map(([k, v]) => (
@@ -108,6 +109,15 @@ export function ReportScreen() {
           </div>
         ))}
       </div>
+
+      {plannedIncome > 0 && (
+        <div className="rounded-[10px] border border-line bg-soft px-4 py-3 text-[13px] leading-normal text-mut">
+          Planned income: <b className="text-ink">{eur(plannedIncome)} a month</b> (Budget → Incomes). Booked as money in:{" "}
+          <b className="text-ink">{eur(income)}</b>.
+          {income < plannedIncome * 0.9 &&
+            ` ${eur(plannedIncome - income)} is not booked yet, so “Left over” looks lower than it will be. Post income automatically under Money → Recurring.`}
+        </div>
+      )}
 
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))] print:grid-cols-2">
         <Section title="Budget">

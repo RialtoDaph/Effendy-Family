@@ -72,6 +72,8 @@ export function WhatIfScreen() {
   const investMonthly = w.investDelta + (goalId === "invest" ? freed : 0);
   const tenYears = futureValue(investMonthly, ret, 10);
   const touched = freed !== 0 || w.investDelta !== 0;
+  const targets = [...familyGoals.map((g) => ({ id: g.id, name: g.name })), { id: "invest", name: "Investing (ETF)" }];
+  const targetName = targets.find((t) => t.id === goalId)?.name ?? "Investing (ETF)";
 
   const expenses = [
     ...subscriptions.filter((s) => s.status === "active").map((s) => ({ id: `s-${s.id}`, name: s.name, amount: s.monthly_price, kind: "subscription" })),
@@ -86,16 +88,32 @@ export function WhatIfScreen() {
         <div className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white/60">Every month, with these changes</div>
         <div className="mt-2 text-[44px] font-black leading-none tracking-[-0.03em]">{signed(freed)}</div>
         <div className="mt-2 text-[13px] text-white/70">
-          {signed(freed * 12)} a year
-          {investMonthly !== 0 && ` · investing ${signed(investMonthly)} a month adds about ${eur(tenYears)} in 10 years at ${ret}%`}
+          {signed(freed * 12)} a year · goes to <b className="text-white">{targetName}</b>
+          {goalId !== "invest" && w.investDelta !== 0 && ` · investing ${signed(w.investDelta)} a month`}
+          {investMonthly > 0 && ` · about ${eur(tenYears)} after 10 years at ${ret}%`}
         </div>
       </div>
 
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))]">
         <Card className="flex flex-col gap-4">
           <H2>Change something</H2>
+          <div>
+            <div className="mb-1.5 text-[12.5px] font-bold text-mut">Extra money goes to</div>
+            <div className="flex flex-wrap gap-1.5">
+              {targets.map((g) => (
+                <button
+                  key={g.id}
+                  onClick={() => setTarget(g.id)}
+                  aria-pressed={goalId === g.id}
+                  className={`min-h-10 rounded-full border px-3 text-[13px] font-bold ${goalId === g.id ? "border-ink bg-inv text-white" : "border-line bg-card text-ink"}`}
+                >
+                  {g.name}
+                </button>
+              ))}
+            </div>
+          </div>
           <Slider
-            label="Move unplanned money into a goal"
+            label={`Move unplanned money to ${targetName}`}
             value={w.extra}
             min={0}
             max={Math.max(0, unplanned, w.extra)}
@@ -123,17 +141,17 @@ export function WhatIfScreen() {
             />
           </div>
           <Slider
-            label="Invest more (or less) each month"
+            label="Change monthly investing (ETF)"
             value={w.investDelta}
             min={-500}
             max={1000}
             step={25}
             display={`${signed(w.investDelta)}/mo`}
-            hint="Comes out of the money above."
+            hint={goalId === "invest" ? "Already counted: the extra money above goes into investing." : `Taken from the extra money before it goes to ${targetName}.`}
             onChange={(investDelta) => setW((s) => ({ ...s, investDelta }))}
           />
           <Slider
-            label="Yearly return (for investing)"
+            label="Yearly return on investing"
             value={ret}
             min={2}
             max={9}
@@ -169,19 +187,6 @@ export function WhatIfScreen() {
                 </button>
               );
             })}
-          </div>
-          <div className="mt-1 text-[12.5px] font-bold text-mut">Freed money goes to</div>
-          <div className="flex flex-wrap gap-1.5">
-            {[...familyGoals.map((g) => ({ id: g.id, name: g.name })), { id: "invest", name: "Investing" }].map((g) => (
-              <button
-                key={g.id}
-                onClick={() => setTarget(g.id)}
-                aria-pressed={goalId === g.id}
-                className={`min-h-10 rounded-full border px-3 text-[13px] font-bold ${goalId === g.id ? "border-ink bg-inv text-white" : "border-line bg-card text-ink"}`}
-              >
-                {g.name}
-              </button>
-            ))}
           </div>
         </Card>
       </div>

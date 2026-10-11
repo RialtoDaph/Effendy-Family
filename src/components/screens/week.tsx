@@ -93,7 +93,8 @@ export function WeekScreen() {
             <OwnerPill member={undefined} fallback="Together" />
           </div>
         </div>
-        <div className="grid gap-2 wide:grid-cols-7">
+        {/* Days at least 200 px wide: 7 in a row on big screens, otherwise two rows (e.g. Mon–Thu, Fri–Sun); one column on phones. */}
+        <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr))]">
           {days.map((d) => {
             const list = dayEvents(time.events, d);
             const isToday = d === today.iso;
@@ -134,7 +135,9 @@ function BoardItem({ e, members, onOpen }: { e: CalEvent; members: Member[]; onO
       style={{ borderLeft: `4px solid ${c.bg}` }}
     >
       <div className="min-w-0 flex-1">
-        <div className="text-[13px] font-bold leading-snug text-ink">{e.title}</div>
+        <div className="text-[13px] font-bold leading-snug text-ink [overflow-wrap:break-word]">
+          {e.title}
+        </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 font-mono text-[11px] text-mut">
           <span>{timeRange(e)}</span>
           {e.remind_min != null && <span>· reminder</span>}

@@ -18,7 +18,7 @@ const STATE_STYLE: Record<RecurringState, string> = {
 };
 
 export function RecurringScreen() {
-  const { recurring, categories, today, save } = useMoney();
+  const { recurring, categories, incomes, today, save } = useMoney();
   const { members } = useAppData();
   const { openForm } = useMoneyForms();
   const toast = useToast();
@@ -26,6 +26,10 @@ export function RecurringScreen() {
   const active = recurring.filter((r) => r.active);
   const out = active.filter((r) => r.amount < 0);
   const inc = active.filter((r) => r.amount > 0);
+  // Planned income (Budget → Incomes) that is not posted automatically yet.
+  const posted = new Set(recurring.filter((r) => r.amount > 0).map((r) => r.name.trim().toLowerCase()));
+  const notPosted = incomes.filter((i) => !posted.has(i.name.trim().toLowerCase()));
+  const plannedIncome = incomes.reduce((a, i) => a + i.monthly_amount, 0);
   const upcoming = active
     .filter((r) => r.last_posted_month !== today.ym)
     .map((r) => ({ r, date: recurringDate(r, today) }))
@@ -51,8 +55,16 @@ export function RecurringScreen() {
         </div>
         <div className="rounded-xl border border-line bg-card p-[18px]">
           <div className="text-[12.5px] text-mut">Comes in every month</div>
-          <div className="text-[34px] font-black tracking-[-0.02em] text-ok">{eur(inc.reduce((a, r) => a + r.amount, 0), 0)}</div>
-          <div className="text-xs text-mut2">{plural(inc.length, "income")}</div>
+          <div className="text-[34px] font-black tracking-[-0.02em] text-ok">
+            {eur(inc.length ? inc.reduce((a, r) => a + r.amount, 0) : plannedIncome, 0)}
+          </div>
+          <div className="text-xs text-mut2">
+            {inc.length
+              ? `${plural(inc.length, "income")} posted automatically`
+              : incomes.length
+                ? `${plural(incomes.length, "income source")} · planned, not posted automatically`
+                : "No income added yet"}
+          </div>
         </div>
         <div className="rounded-xl bg-inv p-[18px] text-white">
           <div className="text-[12.5px] text-white/60">Next up</div>
@@ -124,6 +136,44 @@ export function RecurringScreen() {
           </div>
         )}
       </section>
+      {notPosted.length > 0 && (
+        <section className="rounded-[10px] border border-line bg-card px-5 pb-1 pt-2">
+          <div className="pb-2 pt-3">
+            <h2 className="m-0 text-lg font-extrabold">Income not posted automatically</h2>
+            <div className="mt-[3px] text-[12.5px] text-mut">
+              These are in your income list (Budget), so the plan counts them, but they only show up as money in once a transaction is added.
+              Post them here to have them added on their day each month.
+            </div>
+          </div>
+          {notPosted.map((i) => (
+            <div key={i.id} className="flex items-center gap-3 border-t border-line py-3.5">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[14.5px] font-extrabold text-ink">{i.name}</div>
+                <div className="mt-0.5 text-xs text-mut2">
+                  {i.kind} · {members.find((m) => m.id === i.member_id)?.display_name ?? "Family"}
+                </div>
+              </div>
+              <span className="whitespace-nowrap text-[15px] font-black text-ok">{eurSigned(i.monthly_amount)}</span>
+              <button
+                onClick={() =>
+                  openForm("recur", undefined, {
+                    kind: "in",
+                    name: i.name,
+                    amount: String(i.monthly_amount),
+                    day: "1",
+                    paid_by: i.member_id ?? "family",
+                    category: "",
+                    visibility: i.visibility,
+                  })
+                }
+                className="min-h-10 whitespace-nowrap rounded-full border-0 bg-tint px-3.5 text-[12.5px] font-extrabold text-acct"
+              >
+                Post monthly
+              </button>
+            </div>
+          ))}
+        </section>
+      )}
       <p className="m-0 text-[12.5px] text-mut2">
         Nothing is paid for you — this only records what your bank already does, so the budget stays right without typing it
         every month.
