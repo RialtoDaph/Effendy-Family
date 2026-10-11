@@ -100,6 +100,24 @@ export function weekLabel(monday: string) {
   return `${left} – ${b.getUTCDate()} ${MON[b.getUTCMonth()]}`;
 }
 
+/** "2026-10" → the 42 days (6 weeks, Monday first) shown in a month grid. */
+export function monthGrid(ym: string) {
+  const first = weekStart(`${ym}-01`);
+  return Array.from({ length: 42 }, (_, i) => addDays(first, i));
+}
+
+export function addMonths(ym: string, n: number) {
+  const [y, m] = ym.split("-").map(Number);
+  const t = y * 12 + (m - 1) + n;
+  return `${Math.floor(t / 12)}-${String((t % 12) + 1).padStart(2, "0")}`;
+}
+
+/** "October 2026". */
+export function monthLabel(ym: string) {
+  const [y, m] = ym.split("-").map(Number);
+  return `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][m - 1]} ${y}`;
+}
+
 /* Times and shifts ------------------------------------------------------------ */
 
 /** "18:00:00" → "18:00". */

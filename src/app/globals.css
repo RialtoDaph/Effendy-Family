@@ -28,6 +28,10 @@
   --warnt: #7a5600;
   --bad: #e5383b;
   --badbg: #fdecec;
+  /* Calendar: who a plan is for (validated categorical set, light). */
+  --who-1: #2a78d6;
+  --who-2: #eb6834;
+  --who-t: #1baf7a;
   color-scheme: light;
 }
 
@@ -55,6 +59,9 @@
   --warnt: #f2c14e;
   --bad: #f87171;
   --badbg: rgba(239, 68, 68, 0.15);
+  --who-1: #3987e5;
+  --who-2: #d95926;
+  --who-t: #199e70;
   color-scheme: dark;
 }
 

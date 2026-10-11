@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  addMonths,
   clashes,
+  monthGrid,
+  monthLabel,
   dayLabel,
   goalStatus,
   goalTip,
@@ -40,6 +43,23 @@ describe("weeks", () => {
     expect(weekLabel("2026-10-12")).toBe("12 – 18 Oct");
     expect(nextFriday("2026-10-14")).toBe("2026-10-16");
     expect(nextFriday("2026-10-16")).toBe("2026-10-16");
+  });
+});
+
+describe("month grid", () => {
+  it("shows six weeks starting on the Monday before the 1st", () => {
+    const g = monthGrid("2026-10"); // 1 Oct 2026 is a Thursday
+    expect(g).toHaveLength(42);
+    expect(g[0]).toBe("2026-09-28");
+    expect(g[3]).toBe("2026-10-01");
+    expect(g[41]).toBe("2026-11-08");
+    expect(monthGrid("2026-06")[0]).toBe("2026-06-01"); // starts on a Monday
+  });
+
+  it("moves between months and names them", () => {
+    expect(addMonths("2026-12", 1)).toBe("2027-01");
+    expect(addMonths("2026-01", -1)).toBe("2025-12");
+    expect(monthLabel("2026-10")).toBe("October 2026");
   });
 });
 
