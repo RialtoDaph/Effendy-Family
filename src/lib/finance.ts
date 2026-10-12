@@ -223,3 +223,19 @@ export function subscriptionTotals(subs: Subscription[]) {
     savedYearly: cancelled.reduce((a, s) => a + s.monthly_price, 0) * 12,
   };
 }
+
+/**
+ * Change of net worth "this month": today's value against the last saved day
+ * before the 1st (or, in the first month, the first day saved this month).
+ * Null when there is nothing to compare with yet.
+ */
+export function worthChange(history: { day: string; net: number }[], todayIso: string) {
+  const now = history.at(-1);
+  if (!now || history.length < 2) return null;
+  const first = `${todayIso.slice(0, 7)}-01`;
+  const before = history.filter((h) => h.day < first).at(-1) ?? history.find((h) => h.day >= first && h.day < now.day);
+  if (!before || before.day === now.day) return null;
+  const delta = now.net - before.net;
+  const pct = before.net !== 0 ? (delta / Math.abs(before.net)) * 100 : null;
+  return { delta, pct, since: before.day };
+}

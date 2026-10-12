@@ -8,6 +8,7 @@ import {
   remittanceQuotes,
   subscriptionTotals,
   taxPot,
+  worthChange,
   type Asset,
   type BusinessMonth,
   type Debt,
@@ -92,5 +93,27 @@ describe("subscriptions", () => {
     expect(t.monthly).toBe(15);
     expect(t.yearly).toBe(180);
     expect(t.savedYearly).toBe(420);
+  });
+});
+
+describe("net worth change this month", () => {
+  const h = [
+    { day: "2026-09-20", net: 36000 },
+    { day: "2026-09-30", net: 36761 },
+    { day: "2026-10-05", net: 37500 },
+    { day: "2026-10-12", net: 37958 },
+  ];
+  it("compares with the last day before the 1st", () => {
+    const c = worthChange(h, "2026-10-12")!;
+    expect(c.delta).toBe(1197);
+    expect(c.pct).toBeCloseTo(3.26, 2);
+    expect(c.since).toBe("2026-09-30");
+  });
+  it("in the first month compares with the first day saved", () => {
+    expect(worthChange(h.slice(2), "2026-10-12")!.delta).toBe(458);
+  });
+  it("needs two days", () => {
+    expect(worthChange(h.slice(3), "2026-10-12")).toBeNull();
+    expect(worthChange([], "2026-10-12")).toBeNull();
   });
 });

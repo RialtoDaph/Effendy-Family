@@ -35,7 +35,11 @@ type FinanceRows = {
   assets: Asset[];
   fxRate: number | null; // latest saved IDR per EUR
   fxDate: string | null;
+  /** One family net-worth point per day, oldest first (networth_history). */
+  worthHistory: WorthPoint[];
 };
+
+export type WorthPoint = { day: string; assets: number; debts: number; net: number };
 
 export type FinanceTable =
   | "debts"
@@ -76,6 +80,7 @@ const EMPTY: FinanceRows = {
   taxYears: [],
   assets: [],
   fxRate: null,
+  worthHistory: [],
   fxDate: null,
 };
 
@@ -101,6 +106,27 @@ const ROW_KEY: Record<FinanceTable, keyof FinanceRows> = {
   assets: "assets",
 };
 
+/** Today in Eichstätt (YYYY-MM-DD), shifted by `offsetDays`. */
+function berlinDay(offsetDays = 0) {
+  const d = new Date(Date.now() + offsetDays * 86_400_000);
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+}
+
+/** Saves today's family net worth once a day (and again when it changed), so Home can draw the line. */
+async function saveTodayWorth(rows: FinanceRows): Promise<WorthPoint[]> {
+  const fam = <T extends { visibility: string }>(xs: T[]) => xs.filter((x) => x.visibility === "family");
+  if (!rows.assets.length && !rows.debts.length) return rows.worthHistory;
+  const w = netWorth(fam(rows.assets), fam(rows.debts), rows.fxRate ?? DEFAULT_IDR_PER_EUR);
+  const point: WorthPoint = { day: berlinDay(), assets: Math.round(w.assets * 100) / 100, debts: Math.round(w.debts * 100) / 100, net: Math.round(w.net * 100) / 100 };
+  const last = rows.worthHistory.at(-1);
+  if (last && last.day === point.day && last.net === point.net && last.assets === point.assets) return rows.worthHistory;
+  const { error } = await supabase()
+    .from("networth_history")
+    .upsert({ ...point, updated_at: new Date().toISOString() }, { onConflict: "household_id,day" });
+  if (error) return rows.worthHistory;
+  return [...rows.worthHistory.filter((h) => h.day !== point.day), point];
+}
+
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const { userId, household } = useAppData();
   const toast = useToast();
@@ -123,9 +149,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       sb.from("tax_years").select("year,refund_estimate,note"),
       sb.from("assets").select("*").order("created_at"),
       sb.from("fx_rates").select("idr_per_eur,date").order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      sb.from("networth_history").select("day,assets,debts,net").gte("day", berlinDay(-400)).order("day"),
     ]);
     if (res.some((r) => r.error)) return; // offline: keep what we have
-    const [debts, ds, subs, rem, biz, bm, files, dl, ded, ty, assets, fx] = res.map((r) => r.data);
+    const [debts, ds, subs, rem, biz, bm, files, dl, ded, ty, assets, fx, hist] = res.map((r) => r.data);
     const next: FinanceRows = {
       debts: debts as Debt[],
       debtSettings: (ds as DebtSettings | null) ?? EMPTY.debtSettings,
@@ -140,7 +167,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       assets: assets as Asset[],
       fxRate: (fx as { idr_per_eur: number } | null)?.idr_per_eur ?? null,
       fxDate: (fx as { date: string } | null)?.date ?? null,
+      worthHistory: ((hist ?? []) as WorthPoint[]).map((h) => ({ day: h.day, assets: Number(h.assets), debts: Number(h.debts), net: Number(h.net) })),
     };
+    next.worthHistory = await saveTodayWorth(next);
     setRows(next);
     setLoaded(true);
     try {

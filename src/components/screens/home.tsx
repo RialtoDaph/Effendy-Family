@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Check, Lock, Pause, Play } from "lucide-react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useAppData, type Member } from "@/components/app-data";
-import { useFinance } from "@/components/finance-data";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
 import { useOnline } from "@/components/pwa";
@@ -16,6 +15,7 @@ import type { Answer } from "@/lib/ask-schema";
 import { AI_NAME } from "@/lib/nav";
 import { addMonthsLabel, briefing, eur, goalEta, inScope, plural, type Goal } from "@/lib/money";
 import { PageHeader } from "./page-header";
+import { NetWorthCard } from "./networth-card";
 import { useSetupSteps } from "./setup";
 
 const noop = () => () => {};
@@ -55,10 +55,10 @@ export function HomeScreen() {
       <AlertChip />
       <Briefing scope={scope} />
       <Kpis scope={scope} viewerId={userId} />
-      <NetWorthCard />
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">
         <ThreeThings />
         <Goals scope={scope} viewerId={userId} />
+        <NetWorthCard />
       </div>
       {!money.loaded && <div className="text-center text-[13px] text-mut2">Loading…</div>}
     </>
@@ -382,25 +382,3 @@ function GoalRow({ goal, onClick, todayLabel }: { goal: Goal; onClick: () => voi
   );
 }
 
-function NetWorthCard() {
-  const { worth, assets, debts } = useFinance();
-  if (!assets.length && !debts.length) return null;
-  const total = worth.assets + worth.debts || 1;
-  return (
-    <Link href="/invest" className="flex flex-col gap-2 rounded-xl border border-line bg-card px-5 py-[18px] text-ink hover:border-line2">
-      <div className="flex items-baseline justify-between gap-3">
-        <span className="text-xs font-semibold text-mut">Net worth</span>
-        <span className="text-xs font-bold text-mut2">{plural(assets.filter((a) => a.visibility === "family").length, "account")} →</span>
-      </div>
-      <div className="text-[30px] font-extrabold tracking-[-0.03em]">{eur(worth.net, 0)}</div>
-      <div className="flex h-2 gap-0.5 overflow-hidden rounded-full">
-        <div className="bg-acc" style={{ flex: worth.assets / total }} />
-        {worth.debts > 0 && <div className="bg-bad" style={{ flex: worth.debts / total }} />}
-      </div>
-      <div className="flex justify-between font-mono text-xs text-mut">
-        <span>Saved {eur(worth.assets, 0)}</span>
-        <span>Debts {worth.debts ? `−${eur(worth.debts, 0)}` : "€0"}</span>
-      </div>
-    </Link>
-  );
-}
