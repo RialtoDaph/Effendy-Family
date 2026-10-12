@@ -33,7 +33,7 @@ export function whoColors(members: Member[], who: string | null) {
   return { bg: i === 0 ? "var(--who-1)" : i === 1 ? "var(--who-2)" : "var(--who-t)", fg: "#ffffff" };
 }
 
-function WhoLegend({ members }: { members: Member[] }) {
+export function WhoLegend({ members }: { members: Member[] }) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-bold text-mut">
       {[...members.map((m) => ({ key: m.id, label: m.display_name, color: whoColors(members, m.id).bg })), { key: "t", label: "Together", color: "var(--who-t)" }].map((l) => (

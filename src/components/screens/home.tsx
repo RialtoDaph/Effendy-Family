@@ -16,6 +16,7 @@ import { AI_NAME } from "@/lib/nav";
 import { addMonthsLabel, briefing, eur, goalEta, inScope, plural, type Goal } from "@/lib/money";
 import { PageHeader } from "./page-header";
 import { NetWorthCard } from "./networth-card";
+import { NextDays } from "./next-days";
 import { useSetupSteps } from "./setup";
 
 const noop = () => () => {};
@@ -55,10 +56,17 @@ export function HomeScreen() {
       <AlertChip />
       <Briefing scope={scope} />
       <Kpis scope={scope} viewerId={userId} />
+      <div className="flex flex-wrap items-start gap-4">
+        <div className="min-w-0 flex-[2_1_480px]">
+          <NextDays scope={scope} />
+        </div>
+        <div className="min-w-0 flex-[1_1_300px] empty:hidden">
+          <NetWorthCard />
+        </div>
+      </div>
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">
         <ThreeThings />
         <Goals scope={scope} viewerId={userId} />
-        <NetWorthCard />
       </div>
       {!money.loaded && <div className="text-center text-[13px] text-mut2">Loading…</div>}
     </>
