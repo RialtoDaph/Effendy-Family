@@ -18,7 +18,7 @@ export type InboxAction = {
 
 export type InboxItem = { id: string; thread: string; from: string; subject: string; group: InboxGroup; title: string; why: string; action: InboxAction };
 
-export type InboxDigest = { day: string; account: string | null; summary: string; items: InboxItem[]; mail_count: number; created_at: string };
+export type InboxDigest = { day: string; account: string | null; summary: string; items: InboxItem[]; mail_count: number; created_at: string; dismissed?: boolean };
 
 export const MAX_MAILS = 60;
 export const MAX_BODY = 1500;

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ExternalLink, Mail } from "lucide-react";
+import { ChevronDown, ExternalLink, Mail, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAppData } from "@/components/app-data";
@@ -30,7 +30,7 @@ export function InboxCard() {
     } catch {}
     supabase()
       .from("inbox_digests")
-      .select("day,account,summary,items,mail_count,created_at")
+      .select("day,account,summary,items,mail_count,created_at,dismissed")
       .eq("owner_id", userId)
       .order("day", { ascending: false })
       .limit(1)
@@ -45,7 +45,17 @@ export function InboxCard() {
       });
   }, [userId]);
 
-  if (!digest || today.y < 2026 || digest.day < addDays(today.iso, -2)) return null;
+  async function dismiss() {
+    if (!digest) return;
+    const hidden = { ...digest, dismissed: true };
+    setDigest(hidden);
+    try {
+      localStorage.setItem(cacheKey(userId), JSON.stringify(hidden));
+    } catch {}
+    await supabase().from("inbox_digests").update({ dismissed: true }).eq("owner_id", userId).eq("day", digest.day);
+  }
+
+  if (!digest || digest.dismissed || today.y < 2026 || digest.day < addDays(today.iso, -2)) return null;
   const important = digest.items.filter((i) => i.group === "important");
   const dated = digest.items.filter((i) => i.group === "dated");
   const rest = digest.items.filter((i) => i.group === "rest");
@@ -57,9 +67,19 @@ export function InboxCard() {
         <h2 className="m-0 flex items-center gap-2 text-lg font-extrabold tracking-[-0.01em]">
           <Mail size={18} strokeWidth={2.2} /> Inbox
         </h2>
-        <span className="font-mono text-xs text-mut">
-          {digest.mail_count} new · {dayLabel}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs text-mut">
+            {digest.mail_count} new · {dayLabel}
+          </span>
+          <button
+            onClick={dismiss}
+            aria-label="Hide until tomorrow's digest"
+            title="Hide until tomorrow's digest"
+            className="-mr-2 flex h-9 w-9 items-center justify-center rounded-full border-0 bg-transparent text-mut hover:bg-soft2 hover:text-ink"
+          >
+            <X size={17} strokeWidth={2.4} />
+          </button>
+        </div>
       </div>
       <p className="m-0 text-[14.5px] leading-normal text-ink">{digest.summary}</p>
 
