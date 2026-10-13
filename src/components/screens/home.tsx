@@ -15,6 +15,7 @@ import type { Answer } from "@/lib/ask-schema";
 import { AI_NAME } from "@/lib/nav";
 import { addMonthsLabel, briefing, eur, goalEta, inScope, plural, type Goal } from "@/lib/money";
 import { PageHeader } from "./page-header";
+import { InboxCard } from "./inbox-card";
 import { NetWorthCard } from "./networth-card";
 import { NextDays } from "./next-days";
 import { useSetupSteps } from "./setup";
@@ -55,6 +56,7 @@ export function HomeScreen() {
       </div>
       <AlertChip />
       <Briefing scope={scope} />
+      {(scope === "family" || scope === userId) && <InboxCard />}
       <Kpis scope={scope} viewerId={userId} />
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0 flex-[2_1_480px]">

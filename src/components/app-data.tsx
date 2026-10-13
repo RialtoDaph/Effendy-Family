@@ -141,7 +141,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     clearAllPins();
     try {
       // Rialna's chat and briefings belong to this person, not to the phone.
-      for (const k of Object.keys(localStorage)) if (k.startsWith("ef-ask-") || k.startsWith("ef-brief-")) localStorage.removeItem(k);
+      for (const k of Object.keys(localStorage)) if (k.startsWith("ef-ask-") || k.startsWith("ef-brief-") || k.startsWith("ef-inbox-")) localStorage.removeItem(k);
     } catch {}
     await disablePushHere();
     await supabase().auth.signOut();

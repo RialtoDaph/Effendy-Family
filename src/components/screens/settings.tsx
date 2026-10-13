@@ -12,6 +12,7 @@ import { THEME_OPTIONS, useTheme } from "@/components/theme";
 import { useToast } from "@/components/toast";
 import { enablePush, pushState, sendTestPush, type PushState } from "@/lib/push";
 import { supabase } from "@/lib/supabase";
+import { InboxSection } from "./inbox-settings";
 import { PageHeader } from "./page-header";
 
 function Section({ title, sub, pill, children }: { title: string; sub?: string; pill?: ReactNode; children: ReactNode }) {
@@ -66,6 +67,7 @@ export function SettingsScreen() {
         <SignInSection />
         <SecuritySection />
         <RemindersSection />
+        <InboxSection Section={Section} Pill={Pill} />
         <OfflineSection />
 
         <section className="rounded-[10px] border border-line bg-card p-5">
