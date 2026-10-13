@@ -18,10 +18,12 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
   const [script, setScript] = useState("");
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   const load = useCallback(async () => {
     const { data, error } = await supabase().rpc("inbox_key_status");
-    if (!error) setStatus(((data as Status[] | null) ?? [])[0] ?? null);
+    // On an error the button still works; making a key shows the real problem.
+    setStatus(error ? null : (((data as Status[] | null) ?? [])[0] ?? null));
   }, []);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -31,9 +33,13 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
   async function makeKey() {
     if (status && !confirm("Make a new key? The script you set up before stops working until you paste the new one.")) return;
     setBusy(true);
+    setError("");
     const { data, error } = await supabase().rpc("create_inbox_key");
     setBusy(false);
-    if (error || typeof data !== "string") return toast(navigator.onLine ? "Could not make a key. Try again." : "This needs the internet.");
+    if (error || typeof data !== "string") {
+      setError(!navigator.onLine ? "This needs the internet." : `Could not make a key: ${error?.message ?? "no answer"}. Please send a screenshot of this.`);
+      return;
+    }
     setScript(inboxScript(window.location.origin, data));
     setCopied(false);
     void load();
@@ -71,6 +77,11 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
         </div>
       )}
 
+      {error && (
+        <div className="rounded-[10px] bg-badbg p-3 text-[13px] font-bold text-bad" role="alert">
+          {error}
+        </div>
+      )}
       {script ? (
         <div className="flex flex-col gap-3">
           <ol className="m-0 flex list-decimal flex-col gap-1.5 pl-5 text-[13px] leading-normal text-ink">
@@ -112,12 +123,12 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
       ) : (
         <button
           onClick={makeKey}
-          disabled={busy || status === undefined}
+          disabled={busy}
           className={`min-h-12 rounded-full text-sm font-extrabold disabled:opacity-60 ${
             status ? "border border-line bg-card text-ink" : "border-0 bg-acc text-onacc"
           }`}
         >
-          {status ? "Make a new key and script" : "Connect my Gmail"}
+          {busy ? "Making your key…" : status ? "Make a new key and script" : "Connect my Gmail"}
         </button>
       )}
       {status && (
