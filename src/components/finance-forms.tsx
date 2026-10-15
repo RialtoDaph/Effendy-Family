@@ -3,6 +3,7 @@
 import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
 import { useAppData } from "@/components/app-data";
 import { useFinance, type FinanceTable } from "@/components/finance-data";
+import { useMoney } from "@/components/money-data";
 import { FormSheet, type Field, type FormValues } from "@/components/sheet";
 import { useToast } from "@/components/toast";
 import { received, rpFull } from "@/lib/finance";
@@ -38,6 +39,7 @@ export function FinanceForm({
 }) {
   const { members, userId } = useAppData();
   const fin = useFinance();
+  const money = useMoney();
   const toast = useToast();
 
   const who = [...members.map((m) => ({ value: m.id, label: m.display_name })), { value: "family", label: "Family" }];
@@ -48,6 +50,8 @@ export function FinanceForm({
   async function finish(table: FinanceTable, values: Record<string, unknown>, rowId: string | undefined, msg: string) {
     const err = await fin.save(table, values, rowId);
     if (err && err !== QUEUED) return err;
+    // A subscription keeps its recurring payment in step in the database: refresh Recurring/Budget.
+    if (table === "subscriptions" && !err) void money.reload();
     toast(err === QUEUED ? QUEUED_MSG : msg);
     onClose();
   }
@@ -55,6 +59,7 @@ export function FinanceForm({
   async function del(table: FinanceTable, rowId: string, question: string) {
     if (!confirm(question)) return;
     const err = await fin.remove(table, rowId);
+    if (table === "subscriptions" && !err) void money.reload();
     if (err && err !== QUEUED) toast(err);
     else {
       toast(err === QUEUED ? QUEUED_MSG : "Deleted");
@@ -129,12 +134,27 @@ export function FinanceForm({
           editing={!!s}
           initial={
             s
-              ? { name: s.name, price: String(s.monthly_price), for: s.for_whom ?? "family", status: s.status, visibility: s.visibility }
-              : { for: "family", status: "active", visibility: "family", ...preset }
+              ? {
+                  name: s.name,
+                  price: String(s.monthly_price),
+                  day: String(s.day_of_month),
+                  category: s.category_id ?? "",
+                  for: s.for_whom ?? "family",
+                  status: s.status,
+                  visibility: s.visibility,
+                }
+              : { for: "family", status: "active", visibility: "family", day: String(money.today.d > 28 ? 28 : money.today.d), ...preset }
           }
           fields={[
             { kind: "text", key: "name", label: "Name", placeholder: "e.g. Netflix", required: true },
             { kind: "amount", key: "price", label: "Price per month", placeholder: "0.00", required: true },
+            { kind: "number", key: "day", label: "Charged on day of the month (1–28)", placeholder: "1", required: true },
+            {
+              kind: "chips",
+              key: "category",
+              label: "Budget category",
+              options: money.categories.map((c) => ({ value: c.id, label: c.name, icon: iconFor(c.icon) })),
+            },
             { kind: "chips", key: "for", label: "For", options: who },
             {
               kind: "chips",
@@ -148,21 +168,25 @@ export function FinanceForm({
             VISIBILITY,
           ]}
           onClose={onClose}
-          onDelete={s ? () => del("subscriptions", s.id, `Delete “${s.name}”?`) : undefined}
+          onDelete={s ? () => del("subscriptions", s.id, `Delete “${s.name}”? Its monthly payment stops too; past transactions stay.`) : undefined}
           onSave={(v) => {
             if (bad(v.price)) return "Price must be a number.";
+            const day = Number(String(v.day ?? "").trim());
+            if (!Number.isInteger(day) || day < 1 || day > 28) return "Day must be a whole number from 1 to 28.";
             return finish(
               "subscriptions",
               {
                 name: String(v.name).trim(),
                 monthly_price: num(v.price),
+                day_of_month: day,
+                category_id: v.category || null,
                 for_whom: toId(v.for),
                 status: v.status,
                 cancelled_on: v.status === "cancelled" ? (s?.cancelled_on ?? new Date().toISOString().slice(0, 10)) : null,
                 visibility: v.visibility,
               },
               s?.id,
-              s ? "Saved" : "Subscription added",
+              s ? "Saved · its monthly payment is updated too" : "Subscription added · it is booked every month on its day",
             );
           }}
         />

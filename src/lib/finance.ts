@@ -22,6 +22,11 @@ export type Subscription = Owned & {
   for_whom: string | null;
   status: "active" | "cancelled";
   cancelled_on: string | null;
+  /** Day of the month it is charged; the linked recurring payment books it then. */
+  day_of_month: number;
+  category_id: string | null;
+  /** The recurring payment kept in step by the database (see migration subscription_recurring). */
+  recurring_id: string | null;
 };
 
 export type Remittance = Owned & {

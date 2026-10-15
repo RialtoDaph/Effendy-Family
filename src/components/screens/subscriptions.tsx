@@ -7,11 +7,15 @@ import { useToast } from "@/components/toast";
 import { EmptyNote, OwnerPill, PrivateMark } from "@/components/ui";
 import { subscriptionTotals, type Subscription } from "@/lib/finance";
 import { eur } from "@/lib/money";
+import { useMoney } from "@/components/money-data";
 import { ModuleTabs } from "./module-tabs";
 import { PageHeader } from "./page-header";
 
+const ordinal = (n: number) => `${n}${n % 10 === 1 && n !== 11 ? "st" : n % 10 === 2 && n !== 12 ? "nd" : n % 10 === 3 && n !== 13 ? "rd" : "th"}`;
+
 export function SubscriptionsScreen() {
   const { subscriptions, save } = useFinance();
+  const money = useMoney();
   const { members, userId } = useAppData();
   const { openForm } = useMoneyForms();
   const toast = useToast();
@@ -29,7 +33,8 @@ export function SubscriptionsScreen() {
       s.id,
     );
     if (err) toast(err);
-    else toast(status === "cancelled" ? `${s.name} marked as stopped · saves ${eur(s.monthly_price * 12)} a year` : `${s.name} is active again`);
+    else void money.reload();
+    if (!err) toast(status === "cancelled" ? `${s.name} marked as stopped · saves ${eur(s.monthly_price * 12)} a year` : `${s.name} is active again`);
   }
 
   const row = (s: Subscription) => (
@@ -42,6 +47,10 @@ export function SubscriptionsScreen() {
         <div className={`truncate text-[14.5px] font-extrabold text-ink ${s.status === "cancelled" ? "line-through" : ""}`}>{s.name}</div>
         <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-mut2">
           <OwnerPill member={members.find((m) => m.id === s.for_whom)} />
+          {s.status === "active" && s.recurring_id && <span>booked on the {ordinal(s.day_of_month)} · {money.categories.find((c) => c.id === s.category_id)?.name ?? "no category"}</span>}
+          {s.status === "active" && !s.recurring_id && s.monthly_price > 0 && (
+            <span className="font-bold text-warnt">Not booked yet · tap to check the day and save</span>
+          )}
           {s.status === "cancelled" && s.cancelled_on && <span>stopped {s.cancelled_on}</span>}
           {s.visibility === "private" && <PrivateMark />}
         </div>
@@ -92,7 +101,9 @@ export function SubscriptionsScreen() {
         <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2 pt-3">
           <div>
             <h2 className="m-0 text-lg font-extrabold">Active</h2>
-            <div className="mt-[3px] text-[12.5px] text-mut">Tap “Stopped” after you cancel one with the provider.</div>
+            <div className="mt-[3px] text-[12.5px] text-mut">
+              Each one is booked in the budget on its day, like Recurring. Tap “Stopped” after you cancel one with the provider.
+            </div>
           </div>
           <button
             onClick={() => openForm("sub")}
@@ -115,7 +126,9 @@ export function SubscriptionsScreen() {
           {stopped.map(row)}
         </section>
       )}
-      <p className="m-0 text-[12.5px] text-mut2">Nothing is cancelled for you — this only keeps track of what is still running.</p>
+      <p className="m-0 text-[12.5px] text-mut2">
+        Nothing is cancelled with the provider for you. “Stopped” only stops booking it here.
+      </p>
     </>
   );
 }

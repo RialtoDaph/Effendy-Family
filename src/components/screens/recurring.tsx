@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppData } from "@/components/app-data";
+import { useFinance } from "@/components/finance-data";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
 import { Switch } from "@/components/sheet";
@@ -18,7 +19,10 @@ const STATE_STYLE: Record<RecurringState, string> = {
 };
 
 export function RecurringScreen() {
-  const { recurring, categories, incomes, today, save } = useMoney();
+  const { recurring, categories, incomes, today, save, reload } = useMoney();
+  const fin = useFinance();
+  // Recurring payments that belong to a subscription are edited there (they stay in step).
+  const subOf = (id: string) => fin.subscriptions.find((x) => x.recurring_id === id);
   const { members } = useAppData();
   const { openForm } = useMoneyForms();
   const toast = useToast();
@@ -36,8 +40,12 @@ export function RecurringScreen() {
     .sort((a, b) => a.date.localeCompare(b.date))[0];
 
   async function toggle(id: string, on: boolean) {
-    const err = await save("recurring", { active: on }, id);
+    const sub = subOf(id);
+    const err = sub
+      ? await fin.save("subscriptions", { status: on ? "active" : "cancelled", cancelled_on: on ? null : today.iso }, sub.id)
+      : await save("recurring", { active: on }, id);
     if (err) toast(err);
+    else if (sub) void reload();
   }
 
   return (
@@ -106,13 +114,17 @@ export function RecurringScreen() {
                 <span className="text-lg font-black">{r.day_of_month}</span>
                 <span className="mt-[3px] font-mono text-[10.5px] font-bold text-mut">EACH</span>
               </div>
-              <button onClick={() => openForm("recur", r.id)} className="min-w-0 flex-1 border-0 bg-transparent p-0 text-left">
+              <button
+                onClick={() => (subOf(r.id) ? openForm("sub", subOf(r.id)!.id) : openForm("recur", r.id))}
+                className="min-w-0 flex-1 border-0 bg-transparent p-0 text-left"
+              >
                 <div className="truncate text-[14.5px] font-extrabold text-ink">{r.name}</div>
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   <span className={`rounded-full px-2 py-0.5 text-[11.5px] font-bold ${STATE_STYLE[state]}`}>{label}</span>
                   <span className="text-xs text-mut2">
                     {cat?.name ?? (r.amount > 0 ? "Income" : "No category")} · {payer?.display_name ?? "Family"}
                   </span>
+                  {subOf(r.id) && <span className="rounded-full bg-tint px-2 py-0.5 text-[11px] font-extrabold text-acct">Subscription</span>}
                   {r.visibility === "private" && <PrivateMark />}
                 </div>
               </button>
