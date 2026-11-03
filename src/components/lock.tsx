@@ -169,7 +169,7 @@ function LockScreen({
   }, [waitMs]);
 
   const titles: Record<Mode, [string, string]> = {
-    unlock: ["Enter your PIN", "Effendy Family is locked"],
+    unlock: ["Enter your PIN", "RIDEFF LIFE is locked"],
     setup1: ["Choose a PIN", `${PIN_LENGTH} digits, for this phone`],
     setup2: ["Enter it once more", "To make sure it is right"],
     "verify-change": ["Current PIN", "Before you choose a new one"],

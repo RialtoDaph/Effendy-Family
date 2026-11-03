@@ -80,7 +80,7 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthCard title="Sign in" sub="Effendy Family · for Rialto and Amnah">
+    <AuthCard title="Sign in" sub="RIDEFF LIFE · for Rialto and Amnah">
       <form onSubmit={signIn} className="flex flex-col gap-3">
         <label className="flex flex-col gap-2">
           <span className="text-[12.5px] font-bold text-mut">Email</span>

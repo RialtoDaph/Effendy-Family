@@ -7,10 +7,10 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Effendy Family",
+  title: "RIDEFF LIFE",
   description: "Money, time and life together, for Rialto and Amnah.",
-  applicationName: "Effendy Family",
-  appleWebApp: { capable: true, title: "Effendy", statusBarStyle: "default" },
+  applicationName: "RIDEFF LIFE",
+  appleWebApp: { capable: true, title: "RIDEFF LIFE", statusBarStyle: "default" },
   icons: {
     icon: [
       { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },

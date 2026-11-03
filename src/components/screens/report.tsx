@@ -90,7 +90,7 @@ export function ReportScreen() {
       </div>
 
       <header>
-        <div className="eyebrow">{household?.name ?? "Effendy Family"} · Monthly report</div>
+        <div className="eyebrow">{household?.name ?? "RIDEFF LIFE"} · Monthly report</div>
         <h1 className="m-0 mt-1.5 text-[30px] font-extrabold tracking-[-0.02em]">{label}</h1>
         <div className="mt-1 text-[13px] text-mut">
           {ym === money.today.ym ? `So far, up to ${money.today.d} ${MONTHS_LONG[t.m - 1]}` : "Whole month"} · family view
@@ -192,7 +192,7 @@ export function ReportScreen() {
       </div>
 
       <footer className="text-xs text-mut2">
-        Made by Effendy Family on {money.today.iso}. Amounts in euro; Rupiah at the saved rate.
+        Made by RIDEFF LIFE on {money.today.iso}. Amounts in euro; Rupiah at the saved rate.
       </footer>
     </div>
   );
