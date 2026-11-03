@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "Effendy Family",
-    short_name: "Effendy",
+    name: "RIDEFF LIFE",
+    short_name: "RIDEFF LIFE",
     description: "Money, time and life together, for Rialto and Amnah.",
     start_url: "/",
     scope: "/",

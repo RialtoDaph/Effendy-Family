@@ -1,4 +1,4 @@
-# Effendy Family
+# RIDEFF LIFE
 
 Private family app (PWA) for Rialto and Amnah: money, time, goals and life in one place.
 

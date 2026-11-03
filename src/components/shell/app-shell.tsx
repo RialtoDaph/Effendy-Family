@@ -161,8 +161,8 @@ function Sidebar({ screen }: { screen: string }) {
       <div className="flex items-center gap-2.5 px-2">
         <LogoTile />
         <div>
-          <div className="text-[14.5px] font-extrabold leading-none tracking-[-0.01em]">effendy family</div>
-          <div className="mt-1 text-[11px] text-mut2">RIDEFF Life · Life Together</div>
+          <div className="text-[14.5px] font-extrabold leading-none tracking-[-0.01em]">rideff life</div>
+          <div className="mt-1 text-[11px] text-mut2">Effendy Family · Life Together</div>
         </div>
       </div>
       <div className="flex gap-1.5">
@@ -260,7 +260,7 @@ function MobileHeader() {
       className="sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-bg px-3 pb-2.5 pt-[calc(10px+env(safe-area-inset-top))] wide:hidden"
     >
       <LogoTile />
-      <div className="min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-[-0.01em]">effendy family</div>
+      <div className="min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-[-0.01em]">rideff life</div>
       {(!online || waiting > 0) && (
         <span className="flex-none rounded-full bg-soft2 px-[9px] py-1 text-[11px] font-extrabold text-mut">
           {online ? "Syncing" : "Offline"}

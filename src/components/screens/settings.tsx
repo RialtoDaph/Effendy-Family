@@ -158,7 +158,7 @@ function DataSection() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `effendy-family-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `rideff-life-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     toast("Backup downloaded");

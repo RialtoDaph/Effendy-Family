@@ -3,7 +3,7 @@
 // without Promotions and Social, and sends it to /api/inbox with their key.
 
 export function inboxScript(appUrl: string, key: string) {
-  return `// Effendy Family · inbox digest
+  return `// RIDEFF LIFE · inbox digest
 // Runs every morning in your own Gmail and sends the new mails to the app,
 // where Rialna sums them up. Only you see your digest.
 // To stop: delete this project, or press "Disconnect" in the app's Settings.

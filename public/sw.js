@@ -1,4 +1,4 @@
-// Effendy Family service worker.
+// RIDEFF LIFE service worker.
 // - App shell: every page's HTML plus its /_next/static files are cached on install,
 //   so the app opens offline from the Home Screen.
 // - Pages and RSC data: network first, cached copy when offline.
@@ -102,7 +102,7 @@ self.addEventListener("push", (e) => {
     d = { body: e.data ? e.data.text() : "" };
   }
   e.waitUntil(
-    self.registration.showNotification(d.title || "Effendy Family", {
+    self.registration.showNotification(d.title || "RIDEFF LIFE", {
       body: d.body || "",
       icon: "/icons/icon-192.png",
       badge: "/icons/icon-192.png",
