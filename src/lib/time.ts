@@ -137,8 +137,8 @@ export function shiftHours(start: string | null, end: string | null) {
 }
 
 /** "18:00 – 01:00". */
-export function timeRange(e: Pick<CalEvent, "start_time" | "end_time">) {
-  if (!e.start_time) return "All day";
+export function timeRange(e: Pick<CalEvent, "start_time" | "end_time">, allDay = "All day") {
+  if (!e.start_time) return allDay;
   return e.end_time ? `${hm(e.start_time)} – ${hm(e.end_time)}` : hm(e.start_time);
 }
 
@@ -180,6 +180,45 @@ export function monthShifts(events: CalEvent[], ym: string) {
   return { count: list.length, hours: list.reduce((h, e) => h + shiftHours(e.start_time, e.end_time), 0) };
 }
 
+/** Hours worked after midnight, for "9 of them after midnight". */
+export function afterMidnightHours(e: Pick<CalEvent, "start_time" | "end_time">) {
+  const s = span(e);
+  return s ? Math.max(0, s[1] - Math.max(s[0], 24 * 60)) / 60 : 0;
+}
+
+/**
+ * Tax-free bonus a shift can carry under §3b EStG, in euro, on an hourly wage
+ * (capped at €50): 25% from 20:00 to 06:00, 40% from 00:00 to 04:00 when the
+ * shift began before midnight, 50% on Sundays until 04:00 Monday. They add up.
+ */
+export function shiftBonus(e: Pick<CalEvent, "date" | "start_time" | "end_time">, wage: number) {
+  const s = e.end_time ? span(e) : null;
+  if (!s || wage <= 0) return 0;
+  let rateMinutes = 0;
+  for (let t = s[0]; t < s[1]; t++) {
+    const nextDay = t >= 24 * 60;
+    const h = (t % (24 * 60)) / 60;
+    const dow = isoDow(addDays(e.date, nextDay ? 1 : 0));
+    if (h < 4 && nextDay) rateMinutes += 0.4;
+    else if (h >= 20 || h < 6) rateMinutes += 0.25;
+    if (dow === 7 || (nextDay && h < 4 && isoDow(e.date) === 7)) rateMinutes += 0.5;
+  }
+  return (rateMinutes / 60) * Math.min(wage, 50);
+}
+
+/** Days whose evening (17:00–23:00) nobody in `people` has a plan or a shift. All-day items do not block an evening. */
+export function freeEvenings(events: CalEvent[], people: string[], days: string[]) {
+  return days.filter(
+    (d) =>
+      !events.some((e) => {
+        const who = e.kind === "shift" ? e.owner_id : e.who;
+        if (e.date !== d || (who && !people.includes(who))) return false;
+        const b = span(e);
+        return !!b && b[0] < 23 * 60 && 17 * 60 < b[1];
+      }),
+  );
+}
+
 /** Events for one day, earliest first; all-day items on top. */
 export function dayEvents(events: CalEvent[], day: string) {
   return events
@@ -218,27 +257,34 @@ export const GOAL_STATUS_LABEL: Record<GoalStatus, string> = {
   done: "Done",
 };
 
-const fmt = (n: number) => (Math.round(n * 10) / 10).toLocaleString("en-GB");
+const tenth = (n: number) => Math.round(n * 10) / 10;
 
-/** One sentence with the pace needed or the date it could be reached. */
-export function goalTip(goal: Pick<YearlyGoal, "done" | "target" | "year" | "unit">, today: string) {
+export type GoalTip =
+  | { key: "tip_done" }
+  | { key: "tip_behind" | "tip_start"; rate: number }
+  | { key: "tip_pace"; rate: number; byEnd: number }
+  | { key: "tip_ahead" | "tip_on_pace"; date: string };
+
+/** The pace needed or the date it could be reached, as a message key and its values. */
+export function goalTip(goal: Pick<YearlyGoal, "done" | "target" | "year">, today: string): GoalTip {
   const { status } = goalStatus(goal, today);
   const y = goal.year;
   const doy = Number(today.slice(0, 4)) === y ? dayOfYear(today) : 1;
   const left = goal.target - goal.done;
   const weeksLeft = Math.max(1, (daysInYear(y) - doy) / 7);
-  const unit = goal.unit ? ` ${goal.unit}` : "";
-  if (status === "done") return "Reached. Well done!";
-  if (status === "behind") return `To catch up: ${fmt(left / weeksLeft)}${unit} a week until 31 Dec.`;
+  const rate = tenth(left / weeksLeft);
+  if (status === "done") return { key: "tip_done" };
+  if (status === "behind") return { key: "tip_behind", rate };
   const perDay = goal.done / Math.max(1, doy);
-  if (perDay <= 0) return `${fmt(left / weeksLeft)}${unit} a week reaches it by 31 Dec.`;
-  const finish = addDays(today, Math.ceil(left / perDay));
-  if (Number(finish.slice(0, 4)) > y) {
-    const byEnd = goal.done + perDay * (daysInYear(y) - doy);
-    return `At this pace about ${fmt(byEnd)}${unit} by 31 Dec. ${fmt(left / weeksLeft)}${unit} a week reaches ${fmt(goal.target)}.`;
-  }
-  const when = `by ${dayLabel(finish).slice(4)}`;
-  return status === "ahead" ? `Ahead: it could be reached ${when}.` : `On pace: reached ${when}.`;
+  if (perDay <= 0) return { key: "tip_start", rate };
+  const date = addDays(today, Math.ceil(left / perDay));
+  if (Number(date.slice(0, 4)) > y) return { key: "tip_pace", rate, byEnd: tenth(goal.done + perDay * (daysInYear(y) - doy)) };
+  return { key: status === "ahead" ? "tip_ahead" : "tip_on_pace", date };
+}
+
+/** ISO week number, 1–53. */
+export function weekOfYear(day: string) {
+  return Math.floor((dayOfYear(addDays(weekStart(day), 3)) - 1) / 7) + 1;
 }
 
 /** 52 squares: 0 = nothing logged, 1 = some, 2 = a full week's share; `future` after this week. */
@@ -271,6 +317,30 @@ export function sessionsThisWeek(rows: GymSession[], monday: string) {
   for (const r of rows) if (r.date >= monday && r.date < end) out.set(r.owner_id, (out.get(r.owner_id) ?? 0) + 1);
   return out;
 }
+
+/** The last `n` weeks, oldest first, ending with the week of `monday`: one total per week. */
+export function weekTotals<T extends { date: string }>(rows: T[], monday: string, n: number, value: (row: T) => number) {
+  const out = new Array<number>(n).fill(0);
+  const first = addDays(monday, -7 * (n - 1));
+  const end = addDays(monday, 7);
+  for (const r of rows) {
+    if (r.date < first || r.date >= end) continue;
+    out[Math.floor((utc(r.date).getTime() - utc(first).getTime()) / (7 * 864e5))] += value(r);
+  }
+  return out;
+}
+
+/** Weeks in a row at or above the goal. This week counts once it is met, and never breaks the run. */
+export function weekStreak(totals: number[], goal: number) {
+  if (goal <= 0) return 0;
+  const past = totals.slice(0, -1);
+  let n = 0;
+  for (let i = past.length - 1; i >= 0 && past[i] >= goal; i--) n++;
+  return n + ((totals.at(-1) ?? 0) >= goal ? 1 : 0);
+}
+
+/** A recurring payment that looks like a gym membership. */
+export const isGymName = (name: string) => /\b(gym|fitness|fit\w*|mcfit|sport\w*|clever fit|urban sports)\b/i.test(name);
 
 /** The coming Friday (today if it is Friday). */
 export function nextFriday(today: string) {

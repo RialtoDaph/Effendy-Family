@@ -1,31 +1,36 @@
 "use client";
 
 import { Check, ChevronLeft, ChevronRight, Landmark, Plus, Receipt } from "lucide-react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useFinance } from "@/components/finance-data";
 import { useAppData, type Member } from "@/components/app-data";
+import { ScreenEmpty } from "@/components/empty-state";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
+import { useLabel } from "@/components/nav-label";
 import { useTime } from "@/components/time-data";
 import { useToast } from "@/components/toast";
 import { AddButton, Card, EmptyNote, H2, OwnerPill, PrivateMark, Segmented } from "@/components/ui";
 import { eurSigned } from "@/lib/money";
+import { QUEUED } from "@/lib/offline-queue";
 import {
   addDays,
   addMonths,
   dayEvents,
-  dayLabel,
-  dowShort,
+  freeEvenings,
+  minutesThisWeek,
   monthGrid,
-  monthLabel,
+  shiftHours,
   timeRange,
   weekDays,
-  weekLabel,
+  weekOfYear,
   weekStart,
   type CalEvent,
 } from "@/lib/time";
-import { ModuleTabs } from "./module-tabs";
-import { PageHeader } from "./page-header";
+import { useDates } from "@/lib/use-dates";
+import { ModuleHeader } from "./module-tabs";
 
 /** Calendar colour: first person blue, second orange, Together green (same in every theme palette). */
 export function whoColors(members: Member[], who: string | null) {
@@ -34,9 +39,10 @@ export function whoColors(members: Member[], who: string | null) {
 }
 
 export function WhoLegend({ members }: { members: Member[] }) {
+  const tt = useTranslations("time");
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-bold text-mut">
-      {[...members.map((m) => ({ key: m.id, label: m.display_name, color: whoColors(members, m.id).bg })), { key: "t", label: "Together", color: "var(--who-t)" }].map((l) => (
+      {[...members.map((m) => ({ key: m.id, label: m.display_name, color: whoColors(members, m.id).bg })), { key: "t", label: tt("together"), color: "var(--who-t)" }].map((l) => (
         <span key={l.key} className="inline-flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full" style={{ background: l.color }} />
           {l.label}
@@ -49,6 +55,11 @@ export function WhoLegend({ members }: { members: Member[] }) {
 const VIEW_KEY = "ef-cal-view";
 
 export function WeekScreen() {
+  const tt = useTranslations("time");
+  const t = useTranslations("t");
+  const label = useLabel();
+  const time = useTime();
+  const { openForm } = useMoneyForms();
   const [view, setView] = useState<"week" | "month">("week");
 
   // Remember Week / Month on this phone.
@@ -65,17 +76,23 @@ export function WeekScreen() {
     } catch {}
   }
 
+  if (time.loaded && !time.events.length && !time.priorities.length) {
+    return (
+      <>
+        <ModuleHeader module="time" active="week" />
+        <ScreenEmpty eyebrow={label("nav.this_week")} title={t("e_week")} action={t("b_event")} onAction={() => openForm("event")} />
+      </>
+    );
+  }
+
   return (
     <>
-      <div className="flex flex-col gap-3">
-        <PageHeader eyebrow="Time & goals" title={view === "week" ? "This week" : "This month"} />
-        <ModuleTabs module="time" active="week" />
-      </div>
+      <ModuleHeader module="time" active="week" />
       <div className="flex justify-center">
         <Segmented
           options={[
-            { value: "week", label: "Week" },
-            { value: "month", label: "Month" },
+            { value: "week", label: tt("week") },
+            { value: "month", label: tt("month") },
           ]}
           value={view}
           onChange={pick}
@@ -87,8 +104,10 @@ export function WeekScreen() {
 }
 
 function WeekView() {
+  const tt = useTranslations("time");
+  const dates = useDates();
   const { today } = useMoney();
-  const { members } = useAppData();
+  const { members, userId, settings } = useAppData();
   const time = useTime();
   const { openForm } = useMoneyForms();
   const toast = useToast();
@@ -96,75 +115,117 @@ function WeekView() {
   const week = monday ?? weekStart(today.iso);
   const days = weekDays(week);
   const isThisWeek = week === weekStart(today.iso);
+  const range = dates.weekRange(days[0], days[6]);
 
   const priorities = time.priorities.filter((p) => p.week_start === week).sort((a, b) => a.sort - b.sort);
 
+  const shifts = time.events.filter((e) => e.kind === "shift" && days.includes(e.date));
+  const shiftH = shifts.reduce((h, e) => h + shiftHours(e.start_time, e.end_time), 0);
+  const studied = (minutesThisWeek(time.learningMinutes, week).get(userId) ?? 0) / 60;
+  const studyGoal = (settings?.learn_week_min ?? 180) / 60;
+  const free = freeEvenings(
+    time.events,
+    members.map((m) => m.id),
+    days.filter((d) => d >= today.iso),
+  );
+  const shared = members.length > 1;
+
   async function toggle(id: string, done: boolean) {
     const err = await time.save("week_priorities", { done }, id);
-    if (err && err !== "queued") toast(err);
+    if (err && err !== QUEUED) toast(err);
   }
 
   return (
     <>
       <div className="flex items-center gap-2">
-        <button onClick={() => setMonday(addDays(week, -7))} aria-label="Previous week" className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-card text-ink">
+        <button onClick={() => setMonday(addDays(week, -7))} aria-label={tt("previous_week")} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-card text-ink">
           <ChevronLeft size={18} />
         </button>
         <div className="min-w-0 flex-1 text-center">
-          <div className="text-[15px] font-extrabold">{weekLabel(week)}</div>
-          <div className="text-xs text-mut2">{isThisWeek ? "This week" : week < weekStart(today.iso) ? "Past week" : "Coming week"}</div>
+          <div className="text-[15px] font-extrabold">{range}</div>
+          <div className="text-xs text-mut2">{isThisWeek ? tt("this_week") : week < weekStart(today.iso) ? tt("past_week") : tt("coming_week")}</div>
         </div>
-        <button onClick={() => setMonday(addDays(week, 7))} aria-label="Next week" className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-card text-ink">
+        <button onClick={() => setMonday(addDays(week, 7))} aria-label={tt("next_week")} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-card text-ink">
           <ChevronRight size={18} />
         </button>
       </div>
 
-      <Card className="flex flex-col gap-1">
-        <div className="mb-1 flex items-baseline justify-between gap-2">
-          <H2>3 priorities</H2>
-          {priorities.length < 3 && (
-            <AddButton onClick={() => openForm("prio", undefined, { week_start: week, sort: String(priorities.length) })} />
-          )}
-        </div>
-        {priorities.map((p) => (
-          <div key={p.id} className="flex items-center gap-3 border-t border-line py-2.5">
-            <button
-              onClick={() => toggle(p.id, !p.done)}
-              aria-label={p.done ? `Mark “${p.title}” as not done` : `Mark “${p.title}” as done`}
-              aria-pressed={p.done}
-              className={`flex h-7 w-7 flex-none items-center justify-center rounded-full border-2 ${p.done ? "border-ink bg-ink text-white" : "border-line2 bg-card"}`}
-            >
-              {p.done && <Check size={15} strokeWidth={3} />}
-            </button>
-            <button onClick={() => openForm("prio", p.id)} className="min-w-0 flex-1 border-0 bg-transparent p-0 text-left">
-              <div className={`text-[14.5px] font-bold ${p.done ? "text-mut2 line-through" : "text-ink"}`}>{p.title}</div>
-            </button>
-            <OwnerPill member={members.find((m) => m.id === p.who)} fallback="Together" />
+      <div className="grid items-stretch gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))]">
+        <Card>
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <div className="eyebrow">{tt("week_eyebrow", { n: weekOfYear(week), range })}</div>
+              <H2 className="mb-3 mt-1">{tt("three_priorities")}</H2>
+            </div>
+            {priorities.length < 3 && <AddButton onClick={() => openForm("prio", undefined, { week_start: week, sort: String(priorities.length) })} />}
           </div>
-        ))}
-        {!priorities.length && <EmptyNote>What are the three things that matter most this week? Tap + Add.</EmptyNote>}
-      </Card>
+          <div className="flex flex-col gap-2">
+            {priorities.map((p) => (
+              <div key={p.id} className="flex items-start gap-3 rounded-[10px] bg-soft p-3">
+                <button
+                  onClick={() => toggle(p.id, !p.done)}
+                  aria-label={p.done ? tt("mark_not_done", { title: p.title }) : tt("mark_done", { title: p.title })}
+                  aria-pressed={p.done}
+                  className={`mt-px flex h-[26px] w-[26px] flex-none items-center justify-center rounded-[9px] border-2 ${p.done ? "border-acc bg-acc text-onacc" : "border-line2 bg-card"}`}
+                >
+                  {p.done && <Check size={14} strokeWidth={3} />}
+                </button>
+                <button onClick={() => openForm("prio", p.id)} className="min-w-0 flex-1 border-0 bg-transparent p-0 text-left">
+                  <div className={`text-[14.5px] font-bold ${p.done ? "text-mut2 line-through" : "text-ink"}`}>{p.title}</div>
+                </button>
+                <OwnerPill member={members.find((m) => m.id === p.who)} fallback={tt("together")} />
+              </div>
+            ))}
+            {!priorities.length && <EmptyNote>{tt("priorities_empty")}</EmptyNote>}
+          </div>
+        </Card>
 
-      <Card className="flex flex-col gap-2">
-        <div className="mb-1 flex items-baseline justify-between gap-2">
-          <H2>The week</H2>
+        <section className="flex flex-col gap-3.5 rounded-[18px] bg-inv p-6 text-white">
+          <div className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-acc2">{shared ? tt("free_together") : tt("free_this_week")}</div>
+          <div className="font-serif text-[49px] font-normal leading-[1.05] tracking-[-0.01em]">
+            {free.length ? tt("free_evening", { day: dates.dowLong(free[0]) }) : tt("no_free_evening")}
+          </div>
+          <p className="m-0 text-sm leading-[1.55] text-white/75">{tt("free_note", { n: free.length, shared: shared ? "yes" : "no" })}</p>
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="rounded-[10px] border border-white/10 bg-white/5 px-3.5 py-3">
+              <div className="text-[11px] text-white/55">{tt("shifts_this_week")}</div>
+              <div className="text-[20px] font-bold leading-[1.2]">{tt("shifts_hours", { n: shifts.length, h: dates.num(shiftH) })}</div>
+            </div>
+            <div className="rounded-[10px] border border-white/10 bg-white/5 px-3.5 py-3">
+              <div className="text-[11px] text-white/55">{tt("study_this_week")}</div>
+              <div className="text-[20px] font-bold leading-[1.2]">{tt("study_of", { done: dates.num(studied), goal: dates.num(studyGoal) })}</div>
+            </div>
+          </div>
+          {shared && (
+            <Link href="/together" className="flex h-11 items-center self-start rounded-full bg-acci px-5 text-sm font-bold text-onacci hover:text-onacci">
+              {tt("plan_the_date")}
+            </Link>
+          )}
+        </section>
+      </div>
+
+      <Card>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <H2>{tt("the_week")}</H2>
+            <AddButton onClick={() => openForm("event", undefined, { date: days.includes(today.iso) ? today.iso : days[0] })} />
+          </div>
           <WhoLegend members={members} />
         </div>
-        {/* Days at least 200 px wide: 7 in a row on big screens, otherwise two rows (e.g. Mon–Thu, Fri–Sun); one column on phones. */}
-        <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr))]">
+        <div className="grid gap-2 overflow-x-auto pb-1 [grid-auto-columns:minmax(140px,1fr)] [grid-auto-flow:column]">
           {days.map((d) => {
             const list = dayEvents(time.events, d);
             const isToday = d === today.iso;
             return (
-              <div key={d} className={`flex flex-col gap-1.5 rounded-[10px] p-2.5 ${isToday ? "bg-tint" : "bg-soft"}`}>
-                <div className="flex items-center justify-between">
-                  <div className="text-[13px] font-extrabold">
-                    {dowShort(d)} <span className="font-mono text-mut">{Number(d.slice(8))}</span>
-                    {isToday && <span className="ml-1.5 text-[11px] font-bold text-acct">today</span>}
+              <div key={d} className={`flex min-h-[180px] flex-col gap-2 rounded-[10px] border-2 px-2.5 py-3 ${isToday ? "border-acc bg-tint" : "border-transparent bg-soft"}`}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className={`text-[11px] font-bold uppercase tracking-[0.12em] ${isToday ? "text-acct" : "text-mut2"}`}>{dates.dow(d)}</div>
+                    <div className="text-[22px] font-bold tracking-[-0.02em]">{Number(d.slice(8))}</div>
                   </div>
                   <button
                     onClick={() => openForm("event", undefined, { date: d })}
-                    aria-label={`Add to ${dowShort(d)} ${Number(d.slice(8))}`}
+                    aria-label={tt("add_to_day", { day: dates.day(d) })}
                     className="flex h-9 w-9 items-center justify-center rounded-full border-0 bg-card text-mut"
                   >
                     <Plus size={16} />
@@ -173,7 +234,7 @@ function WeekView() {
                 {list.map((e) => (
                   <BoardItem key={e.id} e={e} members={members} onOpen={() => openForm(e.kind === "shift" ? "shift" : "event", e.id)} />
                 ))}
-                {!list.length && <div className="px-1 pb-1 text-xs text-mut2">Free</div>}
+                {!list.length && <div className="px-1 pb-1 text-xs text-mut2">{tt("free_day")}</div>}
               </div>
             );
           })}
@@ -184,6 +245,7 @@ function WeekView() {
 }
 
 function BoardItem({ e, members, onOpen }: { e: CalEvent; members: Member[]; onOpen: () => void }) {
+  const tt = useTranslations("time");
   const c = whoColors(members, e.kind === "shift" ? e.owner_id : e.who);
   return (
     <button
@@ -196,8 +258,8 @@ function BoardItem({ e, members, onOpen }: { e: CalEvent; members: Member[]; onO
           {e.title}
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 font-mono text-[11px] text-mut">
-          <span>{timeRange(e)}</span>
-          {e.remind_min != null && <span>· reminder</span>}
+          <span>{timeRange(e, tt("all_day"))}</span>
+          {e.remind_min != null && <span>· {tt("reminder")}</span>}
           {e.visibility === "private" && <PrivateMark />}
         </div>
       </div>
@@ -210,6 +272,8 @@ function BoardItem({ e, members, onOpen }: { e: CalEvent; members: Member[]; onO
 type DayMark = { kind: "bill" | "income" | "tax"; label: string; amount: number | null; id: string };
 
 function MonthView() {
+  const tt = useTranslations("time");
+  const dates = useDates();
   const { today, recurring } = useMoney();
   const { taxDeadlines } = useFinance();
   const { members } = useAppData();
@@ -234,8 +298,8 @@ function MonthView() {
 
   const legend = [
     ...members.map((m) => ({ label: m.display_name, color: whoColors(members, m.id).bg, square: false })),
-    { label: "Together", color: "var(--who-t)", square: false },
-    { label: "Shift (square)", color: "var(--mut)", square: true },
+    { label: tt("together"), color: "var(--who-t)", square: false },
+    { label: tt("shift_square"), color: "var(--mut)", square: true },
   ];
 
   const list = dayEvents(time.events, selected);
@@ -246,18 +310,18 @@ function MonthView() {
       <div className="flex items-center gap-2">
         <button
           onClick={() => setMonth(addMonths(ym, -1))}
-          aria-label="Previous month"
+          aria-label={tt("previous_month")}
           className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-card text-ink"
         >
           <ChevronLeft size={18} />
         </button>
         <div className="min-w-0 flex-1 text-center">
-          <div className="text-[15px] font-extrabold">{monthLabel(ym)}</div>
-          <div className="text-xs text-mut2">{ym === today.ym ? "This month" : ym < today.ym ? "Past month" : "Coming month"}</div>
+          <div className="text-[15px] font-extrabold">{dates.monthFull(ym)}</div>
+          <div className="text-xs text-mut2">{ym === today.ym ? tt("this_month") : ym < today.ym ? tt("past_month") : tt("coming_month")}</div>
         </div>
         <button
           onClick={() => setMonth(addMonths(ym, 1))}
-          aria-label="Next month"
+          aria-label={tt("next_month")}
           className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-card text-ink"
         >
           <ChevronRight size={18} />
@@ -266,8 +330,8 @@ function MonthView() {
 
       <Card className="flex flex-col gap-2 px-2.5 py-3 wide:p-4">
         <div className="grid grid-cols-7 gap-1 text-center font-mono text-[11px] font-bold text-mut2">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-            <div key={d}>{d}</div>
+          {days.slice(0, 7).map((d) => (
+            <div key={d}>{dates.dow(d)}</div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1">
@@ -281,7 +345,7 @@ function MonthView() {
               <button
                 key={d}
                 onClick={() => setPicked(d)}
-                aria-label={`${dayLabel(d)}: ${evs.length} plans${mk.length ? `, ${mk.length} money dates` : ""}`}
+                aria-label={tt("day_summary", { day: dates.day(d), plans: evs.length, money: mk.length })}
                 aria-pressed={isSel}
                 className={`flex min-h-[56px] flex-col items-stretch gap-1 rounded-[9px] border-0 p-1 text-left wide:min-h-[96px] wide:p-1.5 ${
                   isSel ? "bg-inv text-white" : isToday ? "bg-tint text-ink" : inMonth ? "bg-soft text-ink" : "bg-transparent text-mut2"
@@ -310,7 +374,7 @@ function MonthView() {
                       {e.title}
                     </span>
                   ))}
-                  {evs.length > 2 && <span className={`text-[10.5px] font-bold ${isSel ? "text-white/70" : "text-mut"}`}>+{evs.length - 2} more</span>}
+                  {evs.length > 2 && <span className={`text-[10.5px] font-bold ${isSel ? "text-white/70" : "text-mut"}`}>{tt("n_more", { n: evs.length - 2 })}</span>}
                   {mk.length > 0 && (
                     <span className={`truncate text-[10.5px] font-bold ${isSel ? "text-white/70" : "text-mut"}`}>
                       € {mk.map((m) => m.label).join(", ")}
@@ -329,14 +393,14 @@ function MonthView() {
             </span>
           ))}
           <span className="inline-flex items-center gap-1">
-            <span className="text-[10px] font-black">€</span> Bill, income or tax
+            <span className="text-[10px] font-black">€</span> {tt("bill_income_tax")}
           </span>
         </div>
       </Card>
 
       <Card className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <H2>{selected === today.iso ? `Today · ${dayLabel(selected)}` : dayLabel(selected)}</H2>
+          <H2>{selected === today.iso ? tt("today_day", { day: dates.day(selected) }) : dates.day(selected)}</H2>
           <AddButton onClick={() => openForm("event", undefined, { date: selected })} />
         </div>
         {list.map((e) => (
@@ -351,12 +415,12 @@ function MonthView() {
             {m.kind === "tax" ? <Landmark size={16} className="flex-none text-mut" /> : <Receipt size={16} className="flex-none text-mut" />}
             <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-ink">
               {m.label}
-              <span className="font-medium text-mut"> · {m.kind === "tax" ? "tax deadline" : m.kind === "income" ? "income" : "goes out"}</span>
+              <span className="font-medium text-mut"> · {m.kind === "tax" ? tt("tax_deadline") : m.kind === "income" ? tt("income") : tt("goes_out")}</span>
             </span>
             {m.amount != null && <span className={`font-mono text-[13px] font-bold ${m.amount > 0 ? "text-ok" : "text-ink"}`}>{eurSigned(m.amount)}</span>}
           </button>
         ))}
-        {!list.length && !money.length && <EmptyNote>Nothing planned. Tap + Add.</EmptyNote>}
+        {!list.length && !money.length && <EmptyNote>{tt("nothing_planned")}</EmptyNote>}
       </Card>
     </>
   );

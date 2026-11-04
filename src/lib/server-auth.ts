@@ -1,6 +1,6 @@
 // Server routes only: checks the person's own sign-in token with Supabase and
 // returns a database client that acts as that person, so Row Level Security
-// decides what they (and anything working for them, like Rialna) can read.
+// decides what they (and anything working for them, like Clopar) can read.
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 

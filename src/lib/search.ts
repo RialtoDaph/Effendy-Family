@@ -1,5 +1,5 @@
 // Search box (⌘K): finds your own data, not only pages. Works offline and
-// without Rialna, on what this phone has loaded (already limited by Private/Family).
+// without Clopar, on what this phone has loaded (already limited by Private/Family).
 
 import type { Asset, Debt, Subscription } from "./finance";
 import { eur, shortDate, type Category, type Goal, type Income, type Recurring, type Transaction } from "./money";

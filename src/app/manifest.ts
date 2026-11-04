@@ -3,14 +3,14 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "RIDEFF LIFE",
-    short_name: "RIDEFF LIFE",
-    description: "Money, time and life together, for Rialto and Amnah.",
+    name: "rideff Life",
+    short_name: "rideff Life",
+    description: "Money, time, health and goals, in one calm place.",
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#FFFFFF",
-    theme_color: "#0B0D10",
+    background_color: "#000000",
+    theme_color: "#000000",
     lang: "en",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

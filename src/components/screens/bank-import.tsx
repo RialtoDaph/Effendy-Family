@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { FileUp } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
@@ -26,10 +27,10 @@ import {
   type Suggestion,
 } from "@/lib/bank-import";
 import { readStatement } from "@/lib/ai-read";
-import { eur, shortDate } from "@/lib/money";
+import { eur } from "@/lib/money";
+import { useDates } from "@/lib/use-dates";
 import { supabase } from "@/lib/supabase";
-import { ModuleTabs } from "./module-tabs";
-import { PageHeader } from "./page-header";
+import { ModuleHeader } from "./module-tabs";
 
 type Step = "pick" | "columns" | "check" | "done";
 
@@ -43,13 +44,14 @@ type Item = {
   dup: boolean;
 };
 
-const primaryBtn = "min-h-12 rounded-full border-0 bg-acc px-5 text-sm font-extrabold text-onacc disabled:opacity-50";
-const secondaryBtn = "min-h-11 rounded-[10px] border border-line bg-card px-4 text-[13.5px] font-bold text-ink";
+const primaryBtn = "min-h-12 rounded-full border-0 bg-acc px-5 text-sm font-bold text-onacc disabled:opacity-50";
+const secondaryBtn = "min-h-11 rounded-full border border-line bg-card px-4 text-[13.5px] font-bold text-ink";
 const selectCls = "min-h-11 w-full rounded-[10px] border border-line bg-card px-3 text-[14px] text-ink";
 
 const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
 
 export function BankImportScreen() {
+  const tm = useTranslations("money");
   const { userId, settings } = useAppData();
   const money = useMoney();
   const { rate } = useFinance();
@@ -71,13 +73,14 @@ export function BankImportScreen() {
   const [result, setResult] = useState<{ added: number; dup: number } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const bankName = BANKS.find((b) => b.id === bank)!.name;
+  const nameOf = (b: (typeof BANKS)[number]) => (b.id === "other" ? tm("other_bank") : b.name);
+  const bankName = nameOf(BANKS.find((b) => b.id === bank)!);
 
   async function onFile(f: File) {
     setFileName(f.name);
     setText("");
     if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) return readPdf(f);
-    if (f.size > 5 * 1024 * 1024) return toast("That file is larger than 5 MB.");
+    if (f.size > 5 * 1024 * 1024) return toast(tm("that_file_is_larger_than_5_mb"));
     const t = decode(await f.arrayBuffer());
     setText(t);
     setBusy(true);
@@ -101,7 +104,7 @@ export function BankImportScreen() {
 
   /** PDF: Claude reads the statement on the server; you check every row as with CSV. */
   async function readPdf(f: File) {
-    if (f.size > 4 * 1024 * 1024) return toast("That PDF is larger than 4 MB. Download a shorter period.");
+    if (f.size > 4 * 1024 * 1024) return toast(tm("that_pdf_is_larger_than_4_mb_download_a_sh"));
     setBusy(true);
     const read = await readStatement(new File([f], f.name, { type: "application/pdf" }));
     if (read.error !== undefined) {
@@ -114,18 +117,18 @@ export function BankImportScreen() {
     const sk: Skipped[] = [];
     st.transactions.forEach((t, i) => {
       const ok = /^\d{4}-\d{2}-\d{2}$/.test(t.date) && Number.isFinite(t.amount) && t.amount !== 0;
-      if (!ok) sk.push({ line: i + 1, reason: `Could not read “${t.payee || t.date}”` });
+      if (!ok) sk.push({ line: i + 1, reason: tm("could_not_read", { v: t.payee || t.date }) });
       else
         rows.push({
           line: i + 1,
           date: t.date,
           amount: Math.round(t.amount * 100) / 100,
           currency,
-          payee: t.payee.trim().slice(0, 80) || "Unknown",
+          payee: t.payee.trim().slice(0, 80) || tm("unknown"),
           purpose: t.purpose.replace(/\s+/g, " ").trim().slice(0, 300),
         });
     });
-    for (const w of st.warnings) sk.push({ line: 0, reason: `AI note: ${w}` });
+    for (const w of st.warnings) sk.push({ line: 0, reason: tm("ai_note", { w: w }) });
     await prepareRows(rows, sk);
   }
 
@@ -183,7 +186,7 @@ export function BankImportScreen() {
       setSkipped(sk);
       setStep("check");
     } catch {
-      toast(navigator.onLine ? "Could not read that file." : "Importing needs the internet.");
+      toast(navigator.onLine ? tm("could_not_read_that_file") : tm("importing_needs_the_internet"));
     } finally {
       setBusy(false);
     }
@@ -206,7 +209,7 @@ export function BankImportScreen() {
         source: "import",
         import_hash: x.hash,
         note:
-          [x.row.purpose, x.row.currency === "IDR" ? `Rp ${Math.abs(x.row.amount).toLocaleString("id-ID")} at Rp ${rate.toLocaleString("id-ID")}/€` : ""]
+          [x.row.purpose, x.row.currency === "IDR" ? tm("rp_at_rp", { toLocaleString: Math.abs(x.row.amount).toLocaleString("id-ID"), toLocaleString2: rate.toLocaleString("id-ID") }) : ""]
             .filter(Boolean)
             .join(" · ")
             .slice(0, 500) || null,
@@ -215,7 +218,7 @@ export function BankImportScreen() {
       for (const part of chunk(values, 200)) {
         const { data, error } = await sb
           .from("transactions")
-          .upsert(part, { onConflict: "import_hash", ignoreDuplicates: true })
+          .upsert(part, { onConflict: "household_id,import_hash", ignoreDuplicates: true })
           .select("id");
         if (error) throw error;
         added += data?.length ?? 0;
@@ -232,10 +235,10 @@ export function BankImportScreen() {
       }
       setResult({ added, dup: chosen.length - added });
       setStep("done");
-      toast(`${added} transaction${added === 1 ? "" : "s"} imported`);
+      toast(tm("tx_imported", { n: added }));
       await money.reload();
     } catch {
-      toast(navigator.onLine ? "Could not import. Nothing was half-saved twice; try again." : "Importing needs the internet.");
+      toast(navigator.onLine ? tm("could_not_import_nothing_was_half_saved_tw") : tm("importing_needs_the_internet"));
     } finally {
       setBusy(false);
     }
@@ -253,80 +256,99 @@ export function BankImportScreen() {
 
   return (
     <>
-      <div className="flex flex-col gap-3">
-        <PageHeader eyebrow="Money" title="Bank import" />
-        <ModuleTabs module="money" active="import" />
+      <ModuleHeader module="money" active="import" />
+
+      <div className="flex flex-wrap gap-1.5">
+        {[tm("step_upload"), tm("step_check"), tm("step_done")].map((l, i) => {
+          const at = step === "pick" ? 0 : step === "done" ? 2 : 1;
+          return (
+            <span key={l} className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3 text-[12.5px] font-bold ${i === at ? "bg-card" : ""} ${i <= at ? "text-ink" : "text-mut2"}`}>
+              <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full text-[11px] font-bold ${i <= at ? "bg-acc text-onacc" : "bg-soft2 text-mut"}`}>
+                {i < at ? "✓" : i + 1}
+              </span>
+              {l}
+            </span>
+          );
+        })}
       </div>
 
       {step === "pick" && (
-        <Card className="flex flex-col gap-4">
-          <div>
-            <H2>Import a bank statement</H2>
-            <div className="mt-1 text-[13px] text-mut">
-              Download a <b>CSV</b> (best) or <b>PDF</b> statement from your bank’s app or website, then pick it here. Rows you imported before are
-              skipped.
+        <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))]">
+          <Card className="flex flex-col gap-4">
+            <div>
+              <H2 className="mb-1">{tm("which_account")}</H2>
+              <div className="text-[13px] text-mut">{tm.rich("import_intro", { b: (chunks) => <b>{chunks}</b> })}</div>
             </div>
-          </div>
-          <div>
-            <div className="mb-2 text-[12.5px] font-bold text-mut">Bank</div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col gap-2">
               {BANKS.map((b) => (
                 <button
                   key={b.id}
                   onClick={() => setBank(b.id)}
                   aria-pressed={bank === b.id}
-                  className={`min-h-11 rounded-full border px-4 text-[13.5px] font-bold ${
-                    bank === b.id ? "border-acc bg-acc text-onacc" : "border-line bg-card text-ink"
-                  }`}
+                  className={`flex items-center gap-3 rounded-[10px] border-2 bg-card p-3.5 text-left ${bank === b.id ? "border-acc" : "border-line"}`}
                 >
-                  {b.name}
+                  <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-soft2 text-sm font-bold text-ink">{nameOf(b)[0]}</span>
+                  <span className="text-[14.5px] font-bold text-ink">{nameOf(b)}</span>
                 </button>
               ))}
             </div>
-            {bank === "bca" && (
-              <div className="mt-2 text-xs text-mut">
-                Rupiah are changed to euro at your saved rate (€1 = Rp {rate.toLocaleString("id-ID")}) and count in the budget.
+            {bank === "bca" && <div className="text-xs text-mut">{tm("rupiah_are_changed_to_euro_at_your_saved_r", { toLocaleString: rate.toLocaleString("id-ID") })}</div>}
+            <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))]">
+              <div>
+                <div className="mb-2 text-[12.5px] font-bold text-mut">{tm("visible_to")}</div>
+                <Segmented
+                  options={[
+                    { value: "family", label: tm("family") },
+                    { value: "private", label: tm("only_me") },
+                  ]}
+                  value={visibility}
+                  onChange={setVisibility}
+                />
               </div>
-            )}
-          </div>
-          <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))]">
-            <div>
-              <div className="mb-2 text-[12.5px] font-bold text-mut">Visible to</div>
-              <Segmented
-                options={[
-                  { value: "family", label: "Family" },
-                  { value: "private", label: "Only me" },
-                ]}
-                value={visibility}
-                onChange={setVisibility}
-              />
+              <div>
+                <div className="mb-2 text-[12.5px] font-bold text-mut">{tm("paid_by")}</div>
+                <Segmented
+                  options={[
+                    { value: "me", label: tm("me") },
+                    { value: "family", label: tm("family") },
+                  ]}
+                  value={paidBy}
+                  onChange={setPaidBy}
+                />
+              </div>
             </div>
-            <div>
-              <div className="mb-2 text-[12.5px] font-bold text-mut">Paid by</div>
-              <Segmented
-                options={[
-                  { value: "me", label: "Me" },
-                  { value: "family", label: "Family" },
-                ]}
-                value={paidBy}
-                onChange={setPaidBy}
-              />
+          </Card>
+          <Card>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".csv,.pdf,text/csv,text/comma-separated-values,application/vnd.ms-excel,application/pdf,.txt"
+              className="hidden"
+              onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
+            />
+            <div
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                const f = e.dataTransfer.files?.[0];
+                if (f && online && !busy) onFile(f);
+              }}
+              className="flex flex-col items-center gap-2.5 rounded-xl border-2 border-dashed border-line bg-soft px-5 py-9 text-center"
+            >
+              <FileUp size={30} strokeWidth={1.7} />
+              <div className="text-base font-bold">{tm("drop_statement")}</div>
+              <div className="text-[13px] text-mut">{tm("csv_or_pdf_from", { bankName })}</div>
+              <button
+                onClick={() => fileRef.current?.click()}
+                disabled={busy || !online}
+                className="mt-1.5 h-[46px] rounded-full border-0 bg-acc px-[22px] text-sm font-bold text-onacc disabled:opacity-50"
+              >
+                {online ? (busy ? tm("reading_a_pdf_takes_up_to_a_minute") : tm("choose_file_arrow")) : tm("importing_needs_the_internet_2")}
+              </button>
             </div>
-          </div>
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".csv,.pdf,text/csv,text/comma-separated-values,application/vnd.ms-excel,application/pdf,.txt"
-            className="hidden"
-            onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
-          />
-          <button onClick={() => fileRef.current?.click()} disabled={busy || !online} className={`${primaryBtn} flex items-center justify-center gap-2`}>
-            <FileUp size={18} /> {online ? (busy ? "Reading… (a PDF takes up to a minute)" : `Choose ${bankName} file (CSV or PDF)`) : "Importing needs the internet"}
-          </button>
-          <div className="text-xs text-mut2">
-            CSV is read on your phone. A PDF is read by AI (Claude) on our server and not stored there; you check every row before saving.
-          </div>
-        </Card>
+            <p className="m-0 mt-3.5 text-[12.5px] leading-normal text-mut">{tm("csv_is_read_on_your_phone_a_pdf_is_read_by")}</p>
+          </Card>
+        </div>
       )}
 
       {step === "columns" && mapping && (
@@ -361,18 +383,16 @@ export function BankImportScreen() {
 
       {step === "done" && result && (
         <Card className="flex flex-col gap-3">
-          <H2>
-            {result.added} transaction{result.added === 1 ? "" : "s"} imported
-          </H2>
+          <H2>{tm("tx_imported", { n: result.added })}</H2>
           <div className="text-[13px] text-mut">
-            From {fileName}.{result.dup > 0 && ` ${result.dup} were already there and were skipped.`} Categories you picked are remembered for next time.
+            {tm("import_done_from", { file: fileName })} {result.dup > 0 && tm("import_done_dup", { n: result.dup })} {tm("import_done_learned")}
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Link href="/budget" className={`${secondaryBtn} flex items-center justify-center`}>
-              See budget
+              {tm("see_budget")}
             </Link>
             <button onClick={reset} className={secondaryBtn}>
-              Import another file
+              {tm("import_another_file")}
             </button>
           </div>
         </Card>
@@ -402,10 +422,12 @@ function ColumnsStep({
   onBack: () => void;
   onDone: () => void;
 }) {
+  const tm = useTranslations("money");
+  const dates = useDates();
   const all = useMemo(() => parseCsv(text, mapping.delimiter), [text, mapping.delimiter]);
   const header = all[mapping.headerRow] ?? [];
   const preview = useMemo(() => readRows(text, mapping), [text, mapping]);
-  const cols = header.map((h, i) => ({ value: i, label: h || `Column ${i + 1}` }));
+  const cols = header.map((h, i) => ({ value: i, label: h || tm("column", { v: i + 1 }) }));
 
   const field = (label: string, key: "date" | "amount" | "payee" | "credit" | "fee" | "purpose" | "status" | "currency", optional = false) => (
     <label className="flex flex-col gap-1.5">
@@ -418,7 +440,7 @@ function ColumnsStep({
           onChange({ ...mapping, [key]: v < 0 ? undefined : v });
         }}
       >
-        {optional && <option value={-1}>— none —</option>}
+        {optional && <option value={-1}>{tm("none")}</option>}
         {cols.map((c) => (
           <option key={c.value} value={c.value}>
             {c.label}
@@ -431,38 +453,38 @@ function ColumnsStep({
   return (
     <Card className="flex flex-col gap-4">
       <div>
-        <H2>Check the columns · {bankName}</H2>
+        <H2>{tm("check_the_columns", { bankName: bankName })}</H2>
         <div className="mt-1 text-[13px] text-mut">
-          {fileName}. Asked once: next time {bankName} files are read the same way.
+          {tm("asked_once_next_time_files_are_read_the_sa", { fileName: fileName, bankName: bankName })}
         </div>
       </div>
       <div className="flex items-center gap-2 text-[13px]">
-        <span className="text-mut">Table starts at line</span>
-        <button className={secondaryBtn} aria-label="Earlier line" onClick={() => onChange({ ...mapping, headerRow: Math.max(0, mapping.headerRow - 1) })}>
+        <span className="text-mut">{tm("table_starts_at_line")}</span>
+        <button className={secondaryBtn} aria-label={tm("earlier_line")} onClick={() => onChange({ ...mapping, headerRow: Math.max(0, mapping.headerRow - 1) })}>
           −
         </button>
         <b>{mapping.headerRow + 1}</b>
         <button
           className={secondaryBtn}
-          aria-label="Later line"
+          aria-label={tm("later_line")}
           onClick={() => onChange({ ...mapping, headerRow: Math.min(all.length - 1, mapping.headerRow + 1) })}
         >
           +
         </button>
       </div>
       <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))]">
-        {field("Date", "date")}
-        {field(mapping.credit != null ? "Money out" : "Amount", "amount")}
-        {field("Money in (only if a separate column)", "credit", true)}
-        {field("Shop or who paid", "payee")}
-        {field("Purpose / reference", "purpose", true)}
-        {field("Fee (taken off)", "fee", true)}
-        {field("Status (pending rows are skipped)", "status", true)}
-        {field("Currency", "currency", true)}
+        {field(tm("date"), "date")}
+        {field(mapping.credit != null ? tm("money_out") : tm("amount"), "amount")}
+        {field(tm("money_in_only_if_a_separate_column"), "credit", true)}
+        {field(tm("shop_or_who_paid"), "payee")}
+        {field(tm("purpose_reference"), "purpose", true)}
+        {field(tm("fee_taken_off"), "fee", true)}
+        {field(tm("status_pending_rows_are_skipped"), "status", true)}
+        {field(tm("currency"), "currency", true)}
       </div>
       <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))]">
         <div>
-          <div className="mb-2 text-[12.5px] font-bold text-mut">Dates look like</div>
+          <div className="mb-2 text-[12.5px] font-bold text-mut">{tm("dates_look_like")}</div>
           <Segmented
             options={[
               { value: "dmy", label: "31.12.26" },
@@ -474,7 +496,7 @@ function ColumnsStep({
           />
         </div>
         <div>
-          <div className="mb-2 text-[12.5px] font-bold text-mut">Amounts look like</div>
+          <div className="mb-2 text-[12.5px] font-bold text-mut">{tm("amounts_look_like")}</div>
           <Segmented
             options={[
               { value: ",", label: "1.234,56" },
@@ -488,26 +510,26 @@ function ColumnsStep({
 
       <div className="rounded-[10px] bg-soft p-3.5">
         <div className="mb-2 text-[12.5px] font-bold text-mut">
-          Preview · {preview.rows.length} rows read{preview.skipped.length ? ` · ${preview.skipped.length} skipped` : ""}
+          {tm("preview_rows_read", { length: preview.rows.length })}{preview.skipped.length ? tm("skipped", { length: preview.skipped.length }) : ""}
         </div>
         {preview.rows.slice(0, 5).map((r) => (
           <div key={r.line} className="flex items-baseline gap-2 border-b border-line py-1.5 text-[13px] last:border-0">
-            <span className="w-14 flex-none font-mono text-xs text-mut">{shortDate(r.date)}</span>
+            <span className="w-14 flex-none font-mono text-xs text-mut">{dates.short(r.date)}</span>
             <span className="min-w-0 flex-1 truncate font-semibold">{r.payee}</span>
             <span className={`flex-none font-mono text-[13px] font-bold ${r.amount < 0 ? "text-ink" : "text-ok"}`}>
               {r.currency === "EUR" ? eur(r.amount, 2) : `${r.currency} ${r.amount.toLocaleString("en")}`}
             </span>
           </div>
         ))}
-        {!preview.rows.length && <div className="text-[13px] text-bad">No rows could be read yet. Change the columns above.</div>}
+        {!preview.rows.length && <div className="text-[13px] text-bad">{tm("no_rows_could_be_read_yet_change_the_colum")}</div>}
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <button onClick={onBack} className={secondaryBtn}>
-          Back
+          {tm("back")}
         </button>
         <button onClick={onDone} disabled={busy || !preview.rows.length} className={primaryBtn}>
-          {busy ? "Reading…" : "Use these columns"}
+          {busy ? tm("reading") : tm("use_these_columns")}
         </button>
       </div>
     </Card>
@@ -537,6 +559,7 @@ function CheckStep({
   onColumns?: () => void;
   onImport: () => void;
 }) {
+  const tm = useTranslations("money");
   const { categories } = useMoney();
   const [showAll, setShowAll] = useState(false);
   const [showSkipped, setShowSkipped] = useState(false);
@@ -557,41 +580,41 @@ function CheckStep({
     <>
       <Card className="flex flex-col gap-3">
         <div>
-          <H2>Check before saving · {bankName}</H2>
+          <H2>{tm("check_before_saving", { bankName: bankName })}</H2>
           <div className="mt-1 text-[13px] text-mut">{fileName}</div>
         </div>
         <div className="grid grid-cols-2 gap-2 text-[13px] wide:grid-cols-4">
-          <Stat n={chosen.length} label="to import" strong />
-          <Stat n={dups.length} label="already imported" />
-          <Stat n={transfers.length} label="between your accounts" />
-          <Stat n={skipped.length + noRate.length} label="skipped" />
+          <Stat n={chosen.length} label={tm("to_import")} strong />
+          <Stat n={dups.length} label={tm("already_imported")} />
+          <Stat n={transfers.length} label={tm("between_your_accounts")} />
+          <Stat n={skipped.length + noRate.length} label={tm("skipped_label")} />
         </div>
         {transfers.length > 0 && (
           <div className="text-xs text-mut">
-            Money moving between your own accounts (card bill, PayPal or Wise top-up) is left out so nothing counts twice. Tick a row to include it.
+            {tm("money_moving_between_your_own_accounts_car")}
           </div>
         )}
         {onColumns && (
           <button onClick={onColumns} className="self-start border-0 bg-transparent p-0 text-[13px] font-bold text-acct">
-            Something looks wrong? Check the columns
+            {tm("something_looks_wrong_check_the_columns")}
           </button>
         )}
         {(skipped.length > 0 || noRate.length > 0) && (
           <button onClick={() => setShowSkipped((v) => !v)} className="self-start border-0 bg-transparent p-0 text-[13px] font-bold text-acct">
-            {showSkipped ? "Hide skipped rows" : "Why were rows skipped?"}
+            {showSkipped ? tm("hide_skipped_rows") : tm("why_were_rows_skipped")}
           </button>
         )}
         {showSkipped && (
           <div className="rounded-[10px] bg-soft p-3 text-xs text-mut">
             {skipped.map((s) => (
               <div key={`${s.line}-${s.reason}`}>
-                {s.line ? `Line ${s.line}: ` : ""}
-                {s.reason}
+                {s.line ? tm("line", { line: s.line }) : ""}
+                {s.code ? tm(`skip_${s.code}`, { detail: s.detail ?? "" }) : s.reason}
               </div>
             ))}
             {noRate.map((x) => (
               <div key={x.hash}>
-                Line {x.row.line}: {x.row.currency} is not changed to euro automatically
+                {tm("line_is_not_changed_to_euro_automatically", { line: x.row.line, currency: x.row.currency })}
               </div>
             ))}
           </div>
@@ -600,8 +623,8 @@ function CheckStep({
 
       {flagged.length > 0 && (
         <Card className="flex flex-col gap-1">
-          <H2>Needs a category · {flagged.length}</H2>
-          <div className="mb-1 text-[13px] text-mut">Your choice is remembered for this shop next time.</div>
+          <H2>{tm("needs_a_category", { length: flagged.length })}</H2>
+          <div className="mb-1 text-[13px] text-mut">{tm("your_choice_is_remembered_for_this_shop_ne")}</div>
           {flagged.map((x) => (
             <div key={x.hash} className="flex flex-col gap-2 border-b border-line py-3 last:border-0">
               <RowLine item={x} />
@@ -616,12 +639,12 @@ function CheckStep({
                   </button>
                 ))}
                 <select
-                  aria-label={`Category for ${x.row.payee}`}
+                  aria-label={tm("category_for", { payee: x.row.payee })}
                   className="min-h-10 rounded-full border border-line bg-card px-3 text-[13px] font-bold text-mut"
                   value=""
                   onChange={(e) => e.target.value && update(x.hash, { categoryId: e.target.value })}
                 >
-                  <option value="">Other…</option>
+                  <option value="">{tm("other_2")}</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -635,7 +658,7 @@ function CheckStep({
       )}
 
       <Card className="flex flex-col gap-1">
-        <H2>Rows</H2>
+        <H2>{tm("rows")}</H2>
         {shown.map((x) => (
           <div key={x.hash} className={`flex items-center gap-3 border-b border-line py-2.5 last:border-0 ${x.include ? "" : "opacity-55"}`}>
             <input
@@ -643,19 +666,19 @@ function CheckStep({
               checked={x.include}
               disabled={x.eur == null}
               onChange={(e) => update(x.hash, { include: e.target.checked })}
-              aria-label={`Import ${x.row.payee}`}
+              aria-label={tm("import", { payee: x.row.payee })}
               className="h-5 w-5 flex-none accent-[var(--acc)]"
             />
             <div className="min-w-0 flex-1">
               <RowLine item={x} />
               {x.eur != null && x.eur < 0 && x.include && (
                 <select
-                  aria-label={`Category for ${x.row.payee}`}
+                  aria-label={tm("category_for", { payee: x.row.payee })}
                   className="mt-1.5 min-h-9 max-w-full rounded-lg border border-line bg-card px-2 text-[12.5px] text-ink"
                   value={x.categoryId ?? ""}
                   onChange={(e) => update(x.hash, { categoryId: e.target.value || null })}
                 >
-                  <option value="">No category</option>
+                  <option value="">{tm("no_category")}</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -663,31 +686,32 @@ function CheckStep({
                   ))}
                 </select>
               )}
-              {x.suggestion.transfer && !x.include && <div className="mt-0.5 text-[11.5px] text-mut2">Between your accounts · not counted</div>}
+              {x.suggestion.transfer && !x.include && <div className="mt-0.5 text-[11.5px] text-mut2">{tm("between_your_accounts_not_counted")}</div>}
             </div>
           </div>
         ))}
         {rest.length > shown.length && (
           <button onClick={() => setShowAll(true)} className="mt-2 min-h-11 border-0 bg-transparent text-[13px] font-bold text-acct">
-            Show all {rest.length} rows
+            {tm("show_all_rows", { length: rest.length })}
           </button>
         )}
-        {dups.length > 0 && <div className="pt-2 text-xs text-mut2">{dups.length} rows from this file are already in the app and are not shown.</div>}
+        {dups.length > 0 && <div className="pt-2 text-xs text-mut2">{tm("rows_from_this_file_are_already_in_the_app", { length: dups.length })}</div>}
       </Card>
 
-      <div className="sticky bottom-[calc(84px+env(safe-area-inset-bottom))] z-20 mr-[72px] flex flex-col gap-2 rounded-[10px] border border-line bg-card p-3 shadow-[0_4px_16px_rgba(0,0,0,.08)] wide:bottom-4 wide:mr-[84px]">
+      <div className="sticky bottom-[calc(84px+env(safe-area-inset-bottom))] z-20 mr-[72px] flex flex-col gap-2 rounded-[18px] border border-line bg-card p-3 shadow-[0_4px_16px_rgba(0,0,0,.08)] wide:bottom-4 wide:mr-[84px]">
         <div className="flex justify-between text-[13px]">
           <span className="text-mut">
-            {chosen.length} rows{flagged.length ? ` · ${flagged.length} without category` : ""}
+            {tm("n_rows", { n: chosen.length })}
+            {flagged.length ? ` · ${tm("n_without_category", { n: flagged.length })}` : ""}
           </span>
           <span className="font-mono font-bold">{eur(total, 2)}</span>
         </div>
         <div className="grid grid-cols-[auto_1fr] gap-2">
           <button onClick={onBack} className={secondaryBtn}>
-            Cancel
+            {tm("cancel")}
           </button>
           <button onClick={onImport} disabled={busy || !chosen.length} className={primaryBtn}>
-            {busy ? "Saving…" : `Import ${chosen.length}`}
+            {busy ? tm("saving") : tm("import_2", { length: chosen.length })}
           </button>
         </div>
       </div>
@@ -697,18 +721,20 @@ function CheckStep({
 
 function Stat({ n, label, strong = false }: { n: number; label: string; strong?: boolean }) {
   return (
-    <div className={`rounded-[10px] px-3 py-2.5 ${strong ? "bg-inv text-white" : "bg-soft"}`}>
-      <div className="font-mono text-xl font-extrabold">{n}</div>
-      <div className={`text-xs ${strong ? "text-white/70" : "text-mut"}`}>{label}</div>
+    <div className="rounded-xl border border-line bg-card p-4">
+      <div className={`text-[30px] font-bold tabular-nums ${strong ? "text-acct" : ""}`}>{n}</div>
+      <div className="text-xs text-mut">{label}</div>
     </div>
   );
 }
 
 function RowLine({ item }: { item: Item }) {
+  const tm = useTranslations("money");
+  const dates = useDates();
   const r = item.row;
   return (
     <div className="flex items-baseline gap-2">
-      <span className="w-12 flex-none font-mono text-xs text-mut">{shortDate(r.date)}</span>
+      <span className="w-12 flex-none font-mono text-xs text-mut">{dates.short(r.date)}</span>
       <div className="min-w-0 flex-1">
         <div className="truncate text-[13.5px] font-bold">{r.payee}</div>
         {r.purpose && <div className="truncate text-[11.5px] text-mut2">{r.purpose}</div>}
@@ -717,7 +743,7 @@ function RowLine({ item }: { item: Item }) {
         <div className={`font-mono text-[13.5px] font-bold ${r.amount < 0 ? "text-ink" : "text-ok"}`}>
           {item.eur != null ? eur(item.eur, 2) : `${r.currency} ${r.amount}`}
         </div>
-        {r.currency !== "EUR" && <div className="font-mono text-[11px] text-mut2">{r.currency === "IDR" ? `Rp ${Math.abs(r.amount).toLocaleString("id-ID")}` : r.currency}</div>}
+        {r.currency !== "EUR" && <div className="font-mono text-[11px] text-mut2">{r.currency === "IDR" ? tm("rp", { toLocaleString: Math.abs(r.amount).toLocaleString("id-ID") }) : r.currency}</div>}
       </div>
     </div>
   );

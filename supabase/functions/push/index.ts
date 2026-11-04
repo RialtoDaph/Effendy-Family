@@ -10,7 +10,7 @@ import postgres from "npm:postgres@3.4.5";
 import { generateVapidKeys, sendPush, type VapidKeys } from "./webpush.ts";
 
 const sql = postgres(Deno.env.get("SUPABASE_DB_URL")!, { prepare: false, max: 3 });
-const SUBJECT = "https://effendyfamily.vercel.app";
+const SUBJECT = "https://life.rideff.com";
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -19,6 +19,12 @@ const CORS = {
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
+
+const TEST_TEXT: Record<string, [string, string]> = {
+  en: ["Rent goes out tomorrow", "This is a test · reminders work on this phone"],
+  de: ["Morgen wird die Miete abgebucht", "Das ist ein Test · Erinnerungen funktionieren auf diesem Handy"],
+  id: ["Sewa keluar besok", "Ini tes · pengingat berfungsi di HP ini"],
+};
 
 let keys: VapidKeys | null = null;
 
@@ -107,13 +113,9 @@ Deno.serve(async (req) => {
       const subs = await sql<Sub[]>`select id, member_id, endpoint, p256dh, auth from public.push_subscriptions
                                     where member_id = ${uid} and (${endpoint ?? null}::text is null or endpoint = ${endpoint ?? null})`;
       if (!subs.length) return json({ error: "This phone is not set up for reminders yet." }, 404);
-      const item: Item = {
-        member_id: uid,
-        key: "test",
-        title: "Rent goes out tomorrow",
-        body: "This is a test · reminders work on this phone",
-        url: "/settings",
-      };
+      const [me] = await sql`select lang from public.member_settings where member_id = ${uid}`;
+      const [title, body] = TEST_TEXT[me?.lang as string] ?? TEST_TEXT.en;
+      const item: Item = { member_id: uid, key: "test", title, body, url: "/settings" };
       return json(await deliver([item], subs));
     }
 

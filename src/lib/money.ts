@@ -21,7 +21,7 @@ export type Transaction = {
   payee: string;
   category_id: string | null;
   paid_by: string | null; // member id, null = Family
-  source: "manual" | "recurring" | "import" | "receipt";
+  source: "manual" | "recurring" | "import" | "receipt" | "assistant";
   recurring_id: string | null;
   note: string | null;
   receipt_file_id?: string | null;
@@ -50,6 +50,9 @@ export type Recurring = {
   day_of_month: number;
   active: boolean;
   last_posted_month: string | null;
+  is_subscription: boolean;
+  last_used_at: string | null;
+  cancelled_on: string | null;
 };
 
 export type Goal = {
@@ -268,10 +271,20 @@ export type Alert = {
   area: AlertArea;
   title: string;
   meta: string;
-  when: string;
+  when: { key: "this_month" | "ongoing" | "today" | "tomorrow" } | { key: "in_days"; n: number };
   href: string;
   cta: string;
+  /** The same alert as a message key and its values, for the app's language. */
+  msg: AlertMsg;
 };
+
+export type AlertMsg =
+  | { code: "over"; cat: string; spent: string; limit: string; over: string; left: number }
+  | { code: "near"; cat: string; pct: number; rest: string; left: number; warn: number }
+  | { code: "fast"; cat: string; pct: number; month: number }
+  | { code: "due"; name: string; amount: string; days: number }
+  | { code: "bills"; date: string; total: string; list: string }
+  | { code: "ef"; months: string; rest: string; target: number; low: boolean };
 
 const SEV_RANK: Record<Severity, number> = { urgent: 0, soon: 1, info: 2 };
 
@@ -297,9 +310,10 @@ export function buildAlerts(input: {
         area: "money",
         title: `${r.cat.name} is over budget`,
         meta: `${eur(r.spent)} of ${eur(r.cat.monthly_limit)} · ${eur(r.spent - r.cat.monthly_limit)} over with ${left} days to go`,
-        when: "This month",
+        when: { key: "this_month" },
         href: "/budget",
         cta: "Open budget",
+        msg: { code: "over", cat: r.cat.name, spent: eur(r.spent), limit: eur(r.cat.monthly_limit), over: eur(r.spent - r.cat.monthly_limit), left },
       });
     } else if (r.status === "near") {
       out.push({
@@ -308,9 +322,10 @@ export function buildAlerts(input: {
         area: "money",
         title: `${r.cat.name} at ${Math.round(r.pct)}% of budget`,
         meta: `${eur(r.cat.monthly_limit - r.spent)} left for the next ${left} days · warning at ${warnPct}%`,
-        when: "This month",
+        when: { key: "this_month" },
         href: "/budget",
         cta: "Open budget",
+        msg: { code: "near", cat: r.cat.name, pct: Math.round(r.pct), rest: eur(r.cat.monthly_limit - r.spent), left, warn: warnPct },
       });
     } else if (r.status === "fast") {
       out.push({
@@ -319,9 +334,10 @@ export function buildAlerts(input: {
         area: "money",
         title: `${r.cat.name} is moving fast`,
         meta: `${Math.round(r.pct)}% used with ${budget.monthPct}% of the month gone`,
-        when: "This month",
+        when: { key: "this_month" },
         href: "/budget",
         cta: "Open budget",
+        msg: { code: "fast", cat: r.cat.name, pct: Math.round(r.pct), month: budget.monthPct },
       });
     }
   }
@@ -336,28 +352,31 @@ export function buildAlerts(input: {
       area: "money",
       title: `${r.name} goes out ${n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`}`,
       meta: `${eur(-r.amount)} · recurring`,
-      when: n === 0 ? "Today" : n === 1 ? "Tomorrow" : `In ${n} days`,
+      when: n === 0 ? { key: "today" } : n === 1 ? { key: "tomorrow" } : { key: "in_days", n },
       href: "/recur",
       cta: "Open recurring",
+      msg: { code: "due", name: r.name, amount: eur(-r.amount), days: n },
     });
   }
 
   const fixedTotal = budget.rows.filter((r) => r.cat.is_fixed).reduce((a, r) => a + r.cat.monthly_limit, 0);
   if (fixedTotal > 0 && left <= 7) {
     const nextM = today.m === 12 ? 1 : today.m + 1;
+    const list = budget.rows
+      .filter((r) => r.cat.is_fixed && r.cat.monthly_limit > 0)
+      .slice(0, 4)
+      .map((r) => `${r.cat.name} ${eur(r.cat.monthly_limit)}`)
+      .join(" · ");
     out.push({
       key: `bills-${tag}`,
       sev: left <= 3 ? "soon" : "info",
       area: "money",
       title: `Bills on 1 ${MONTHS[nextM - 1]}: ${eur(fixedTotal)}`,
-      meta: budget.rows
-        .filter((r) => r.cat.is_fixed && r.cat.monthly_limit > 0)
-        .slice(0, 4)
-        .map((r) => `${r.cat.name} ${eur(r.cat.monthly_limit)}`)
-        .join(" · "),
-      when: left === 0 ? "Tomorrow" : `In ${left + 1} days`,
+      meta: list,
+      when: left === 0 ? { key: "tomorrow" } : { key: "in_days", n: left + 1 },
       href: "/budget",
       cta: "Open budget",
+      msg: { code: "bills", date: `${nextM === 1 ? today.y + 1 : today.y}-${String(nextM).padStart(2, "0")}-01`, total: eur(fixedTotal), list },
     });
   }
 
@@ -368,9 +387,10 @@ export function buildAlerts(input: {
       area: "goals",
       title: `Emergency fund covers ${(Math.floor(ef.months * 10) / 10).toFixed(1)} months`,
       meta: `${ef.months < 3 ? "Below the 3-month minimum. " : ""}${eur(ef.remaining)} more to reach ${ef.target} months.`,
-      when: "Ongoing",
+      when: { key: "ongoing" },
       href: "/budget",
       cta: "Open budget",
+      msg: { code: "ef", months: (Math.floor(ef.months * 10) / 10).toFixed(1), rest: eur(ef.remaining), target: ef.target, low: ef.months < 3 },
     });
   }
 

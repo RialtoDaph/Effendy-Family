@@ -1,0 +1,9 @@
+{
+  "name": "rideff Life",
+  "short_name": "rideff Life",
+  "start_url": "./rideff Life.dc.html",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0B0D10",
+  "lang": "en"
+}

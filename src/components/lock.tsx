@@ -1,6 +1,7 @@
 "use client";
 
 import { Delete, ScanFace } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
 import { LogoTile } from "@/components/logo";
@@ -41,6 +42,7 @@ export function useLock() {
 }
 
 export function LockProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations("settings");
   const { userId, signOut } = useAppData();
   const toast = useToast();
   const [checked, setChecked] = useState(false);
@@ -100,7 +102,7 @@ export function LockProvider({ children }: { children: ReactNode }) {
   };
 
   async function forgot() {
-    if (!confirm("Sign in again with your password or Face ID to reset the PIN on this phone?")) return;
+    if (!confirm(t("lk_reset_q"))) return;
     clearAllPins();
     await signOut();
   }
@@ -121,7 +123,7 @@ export function LockProvider({ children }: { children: ReactNode }) {
           onDone={(next) => {
             if (next === "pin-set") {
               setHasPin(true);
-              toast("PIN lock is on");
+              toast(t("lk_on"));
             }
             if (next === "pin-off") {
               setHasPin(false);
@@ -154,6 +156,7 @@ function LockScreen({
   onCancel?: () => void;
   onDone: (d: Done) => void;
 }) {
+  const t = useTranslations("settings");
   const [step, setStep] = useState<Mode>(mode);
   const [digits, setDigits] = useState("");
   const [first, setFirst] = useState("");
@@ -169,11 +172,11 @@ function LockScreen({
   }, [waitMs]);
 
   const titles: Record<Mode, [string, string]> = {
-    unlock: ["Enter your PIN", "RIDEFF LIFE is locked"],
-    setup1: ["Choose a PIN", `${PIN_LENGTH} digits, for this phone`],
-    setup2: ["Enter it once more", "To make sure it is right"],
-    "verify-change": ["Current PIN", "Before you choose a new one"],
-    "verify-off": ["Current PIN", "To turn the PIN lock off"],
+    unlock: [t("lk_enter"), t("lk_locked")],
+    setup1: [t("lk_choose"), t("lk_digits", { n: PIN_LENGTH })],
+    setup2: [t("lk_again"), t("lk_sure")],
+    "verify-change": [t("lk_current"), t("lk_before")],
+    "verify-off": [t("lk_current"), t("lk_turnoff")],
   };
 
   const submit = useCallback(
@@ -187,7 +190,7 @@ function LockScreen({
         }
         if (step === "setup2") {
           if (pin !== first) {
-            setError("The PINs did not match. Try again.");
+            setError(t("lk_mismatch"));
             setStep("setup1");
             return;
           }
@@ -216,7 +219,7 @@ function LockScreen({
         setBusy(false);
       }
     },
-    [step, first, userId, prefs.failed, setPrefs, onDone],
+    [step, first, userId, prefs.failed, setPrefs, onDone, t],
   );
 
   function press(d: string) {
@@ -243,7 +246,7 @@ function LockScreen({
     const sb = supabase();
     const { data, error } = await sb.auth.signInWithPasskey();
     if (error || data?.user?.id !== userId) {
-      setError(navigator.onLine ? "Face ID did not work. Use your PIN." : "Face ID needs the internet. Use your PIN.");
+      setError(navigator.onLine ? t("lk_face_fail") : t("lk_face_net"));
       return;
     }
     setPrefs({ failed: 0, lockedUntil: 0 });
@@ -283,7 +286,7 @@ function LockScreen({
               key={i}
               onClick={() => (k === "del" ? setDigits((s) => s.slice(0, -1)) : k === "face" ? faceId() : press(k))}
               disabled={!!waitMs && k !== "face"}
-              aria-label={k === "del" ? "Delete" : k === "face" ? "Unlock with Face ID or fingerprint" : k}
+              aria-label={k === "del" ? t("lk_delete") : k === "face" ? t("lk_face") : k}
               className={`flex h-[76px] w-[76px] items-center justify-center rounded-full border-0 text-[28px] font-semibold text-ink active:bg-line2 disabled:opacity-40 ${
                 k === "del" || k === "face" ? "bg-transparent" : "bg-soft2"
               }`}

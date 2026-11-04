@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Camera } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAppData } from "@/components/app-data";
@@ -16,6 +17,7 @@ import { toEur } from "@/lib/bank-import";
  * before saving. The photo is kept privately and linked to the transaction.
  */
 export function ReceiptScan({ onClose, onRead }: { onClose: () => void; onRead: (preset: FormValues) => void }) {
+  const tm = useTranslations("money");
   const { settings, userId } = useAppData();
   const money = useMoney();
   const fin = useFinance();
@@ -41,7 +43,7 @@ export function ReceiptScan({ onClose, onRead }: { onClose: () => void; onRead: 
     const r = read.result;
     const visibility = settings?.default_visibility?.transactions === "private" ? "private" : "family";
     const saved = await fin.upload(photo, "receipt", visibility);
-    if (saved.error) toast("The photo could not be kept, but the receipt was read.");
+    if (saved.error) toast(tm("the_photo_could_not_be_kept_but_the_receip"));
     else void fin.reload();
 
     const eur = toEur(-Math.abs(r.total), r.currency.toUpperCase(), fin.rate);
@@ -62,14 +64,14 @@ export function ReceiptScan({ onClose, onRead }: { onClose: () => void; onRead: 
       note: [foreign, items].filter(Boolean).join(" · ").slice(0, 300),
       receipt_file_id: saved.id ?? null,
     });
-    if (r.confidence === "low") toast("Hard to read: please check the amount and date.");
-    else if (eur == null) toast(`Amount is in ${r.currency}: please enter it in euro.`);
+    if (r.confidence === "low") toast(tm("hard_to_read_please_check_the_amount_and_d"));
+    else if (eur == null) toast(tm("amount_is_in_please_enter_it_in_euro", { currency: r.currency }));
   }
 
   return (
-    <Sheet title="Scan receipt" onClose={onClose}>
-      <div className="text-[22px] font-extrabold tracking-[-0.01em]">Scan receipt</div>
-      <div className="-mt-2 text-[13px] text-mut">Take a photo of the whole receipt. You check everything before it is saved.</div>
+    <Sheet title={tm("scan_receipt")} onClose={onClose}>
+      <div className="text-[22px] font-extrabold tracking-[-0.01em]">{tm("scan_receipt")}</div>
+      <div className="-mt-2 text-[13px] text-mut">{tm("take_a_photo_of_the_whole_receipt_you_chec")}</div>
       <input
         ref={inputRef}
         type="file"
@@ -80,12 +82,12 @@ export function ReceiptScan({ onClose, onRead }: { onClose: () => void; onRead: 
       />
       {preview && (
         // eslint-disable-next-line @next/next/no-img-element -- local photo preview
-        <img src={preview} alt="Receipt photo" className="max-h-[42dvh] w-full rounded-[10px] bg-soft object-contain" />
+        <img src={preview} alt={tm("receipt_photo")} className="max-h-[42dvh] w-full rounded-[10px] bg-soft object-contain" />
       )}
       {busy && (
         <div className="flex items-center gap-2.5 text-[13.5px] font-bold text-mut" role="status">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-ink" />
-          Reading the receipt…
+          {tm("reading_the_receipt")}
         </div>
       )}
       {error && (
@@ -98,10 +100,10 @@ export function ReceiptScan({ onClose, onRead }: { onClose: () => void; onRead: 
         disabled={busy}
         className="flex min-h-12 items-center justify-center gap-2 rounded-full border-0 bg-acc text-sm font-extrabold text-onacc disabled:opacity-50"
       >
-        <Camera size={18} /> {preview ? "Take another photo" : "Take photo or choose one"}
+        <Camera size={18} /> {preview ? tm("take_another_photo") : tm("take_photo_or_choose_one")}
       </button>
       <button onClick={onClose} className="min-h-11 border-0 bg-transparent text-[13.5px] font-bold text-mut">
-        Cancel
+        {tm("cancel")}
       </button>
     </Sheet>
   );

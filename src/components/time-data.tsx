@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
 import { SYNCED_EVENT, useMoney } from "@/components/money-data";
@@ -96,6 +97,7 @@ export function useTime() {
 const cacheKey = (userId: string) => `ef-time-v1-${userId}`;
 
 export function TimeProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations("settings");
   const { userId } = useAppData();
   const { today } = useMoney();
   const [rows, setRows] = useState<TimeRows>(EMPTY);
@@ -191,11 +193,11 @@ export function TimeProvider({ children }: { children: ReactNode }) {
         applyLocal(table, id ? "update" : "insert", rowId, values);
         return QUEUED;
       }
-      if (error) return error.code === "23505" ? "That is already saved." : `Could not save: ${error.message}`;
+      if (error) return error.code === "23505" ? t("already_saved") : t("save_failed");
       await load();
       return null;
     },
-    [load, applyLocal],
+    [load, applyLocal, t],
   );
 
   const remove = useCallback(
@@ -206,11 +208,11 @@ export function TimeProvider({ children }: { children: ReactNode }) {
         applyLocal(table, "delete", id);
         return QUEUED;
       }
-      if (error) return `Could not delete: ${error.message}`;
+      if (error) return t("del_failed");
       await load();
       return null;
     },
-    [load, applyLocal],
+    [load, applyLocal, t],
   );
 
   const insertMany = useCallback(
@@ -222,13 +224,13 @@ export function TimeProvider({ children }: { children: ReactNode }) {
         if (!error) added++;
         else if (error.code !== "23505") {
           await load();
-          return { added, error: isNetworkError(error) ? "This needs the internet." : `Could not save: ${error.message}` };
+          return { added, error: isNetworkError(error) ? t("needs_net") : t("save_failed") };
         }
       }
       await load();
       return { added };
     },
-    [load],
+    [load, t],
   );
 
   return <TimeContext value={{ ...rows, loaded, reload: load, save, remove, insertMany }}>{children}</TimeContext>;

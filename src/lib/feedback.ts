@@ -19,13 +19,12 @@ export type Feedback = {
   updated_at: string;
 };
 
-export const COLUMNS: { id: FeedbackStatus; label: string }[] = [
-  { id: "todo", label: "To do" },
-  { id: "doing", label: "Doing" },
-  { id: "done", label: "Done" },
+export const COLUMNS: { id: FeedbackStatus; label: "col_todo" | "col_doing" | "col_done" }[] = [
+  { id: "todo", label: "col_todo" },
+  { id: "doing", label: "col_doing" },
+  { id: "done", label: "col_done" },
 ];
 
-export const KIND_LABEL: Record<FeedbackKind, string> = { bug: "Bug", idea: "Idea", other: "Other" };
 
 /** Fired after a report is sent, so an open Reports screen reloads. */
 export const FEEDBACK_EVENT = "ef-feedback";

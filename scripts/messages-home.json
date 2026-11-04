@@ -1,0 +1,477 @@
+{
+ "greet_morning": [
+  "Good morning",
+  "Guten Morgen",
+  "Selamat pagi"
+ ],
+ "greet_afternoon": [
+  "Good afternoon",
+  "Guten Tag",
+  "Selamat siang"
+ ],
+ "greet_evening": [
+  "Good evening",
+  "Guten Abend",
+  "Selamat malam"
+ ],
+ "greet_name": [
+  "{greeting}, {name}",
+  "{greeting}, {name}",
+  "{greeting}, {name}"
+ ],
+ "family": [
+  "Family",
+  "Familie",
+  "Keluarga"
+ ],
+ "loading": [
+  "Loading…",
+  "Wird geladen…",
+  "Memuat…"
+ ],
+ "flex_left": [
+  "Flexible money left",
+  "Flexibles Geld übrig",
+  "Uang fleksibel tersisa"
+ ],
+ "flex_note": [
+  "{left} left · {perDay} a day · {days, plural, one {# day} other {# days}}",
+  "{left} übrig · {perDay} pro Tag · {days, plural, one {# Tag} other {# Tage}}",
+  "Sisa {left} · {perDay} per hari · {days} hari"
+ ],
+ "flex_over": [
+  "{over} over this month's flexible money",
+  "{over} über dem flexiblen Geld dieses Monats",
+  "{over} melebihi uang fleksibel bulan ini"
+ ],
+ "no_budget": [
+  "Set a monthly budget to see what you can still spend.",
+  "Lege ein Monatsbudget fest, um zu sehen, was du noch ausgeben kannst.",
+  "Atur anggaran bulanan untuk melihat sisa yang bisa dibelanjakan."
+ ],
+ "cta_budget": [
+  "Budget",
+  "Budget",
+  "Anggaran"
+ ],
+ "hero_ask_sub": [
+  "Ask anything about your money, time or goals",
+  "Frag alles zu deinem Geld, deiner Zeit oder deinen Zielen",
+  "Tanyakan apa saja tentang uang, waktu, atau tujuanmu"
+ ],
+ "hero_ask_cta": [
+  "Ask {name}",
+  "{name} fragen",
+  "Tanya {name}"
+ ],
+ "hero_map_sub": [
+  "Four areas, everything connected",
+  "Vier Bereiche, alles verbunden",
+  "Empat bidang, semuanya terhubung"
+ ],
+ "hero_map_cta": [
+  "Open map",
+  "Karte öffnen",
+  "Buka peta"
+ ],
+ "hero_dot": [
+  "Show stage {n}",
+  "Ansicht {n} zeigen",
+  "Tampilkan tahap {n}"
+ ],
+ "alerts_n": [
+  "{n, plural, one {# alert} other {# alerts}}",
+  "{n, plural, one {# Hinweis} other {# Hinweise}}",
+  "{n} peringatan"
+ ],
+ "read_all": [
+  "Read all",
+  "Alles lesen",
+  "Baca semua"
+ ],
+ "less": [
+  "Less",
+  "Weniger",
+  "Lebih sedikit"
+ ],
+ "listen": [
+  "Listen",
+  "Anhören",
+  "Dengarkan"
+ ],
+ "stop": [
+  "Stop",
+  "Stopp",
+  "Berhenti"
+ ],
+ "ask_more": [
+  "Ask {name} a question",
+  "{name} etwas fragen",
+  "Tanya {name}"
+ ],
+ "brief_empty": [
+  "Nothing to report yet. Add your income and your first transactions, and this summary fills itself.",
+  "Noch nichts zu berichten. Trag dein Einkommen und deine ersten Buchungen ein, dann füllt sich diese Übersicht von selbst.",
+  "Belum ada yang dilaporkan. Tambahkan pendapatan dan transaksi pertamamu, lalu ringkasan ini terisi sendiri."
+ ],
+ "brief_flex": [
+  "{spent} of {limit} flexible money spent. {left} left, about {perDay} a day.",
+  "{spent} von {limit} flexiblem Geld ausgegeben. {left} übrig, etwa {perDay} pro Tag.",
+  "{spent} dari {limit} uang fleksibel terpakai. Sisa {left}, sekitar {perDay} per hari."
+ ],
+ "brief_over": [
+  "Flexible spending is {over} over this month's {limit}.",
+  "Die flexiblen Ausgaben liegen {over} über den {limit} dieses Monats.",
+  "Pengeluaran fleksibel melebihi {limit} bulan ini sebesar {over}."
+ ],
+ "things": [
+  "3 things this week",
+  "3 Dinge diese Woche",
+  "3 hal minggu ini"
+ ],
+ "things_done": [
+  "{n}/3 done",
+  "{n}/3 erledigt",
+  "{n}/3 selesai"
+ ],
+ "things_none": [
+  "Nothing urgent this week. Enjoy it.",
+  "Diese Woche ist nichts dringend. Genieß es.",
+  "Tidak ada yang mendesak minggu ini. Nikmati."
+ ],
+ "mark_done": [
+  "Mark “{title}” done",
+  "„{title}“ als erledigt markieren",
+  "Tandai “{title}” selesai"
+ ],
+ "done": [
+  "Done",
+  "Erledigt",
+  "Selesai"
+ ],
+ "open": [
+  "Open",
+  "Öffnen",
+  "Buka"
+ ],
+ "open_budget": [
+  "Open budget",
+  "Budget öffnen",
+  "Buka anggaran"
+ ],
+ "open_recur": [
+  "Open recurring",
+  "Daueraufträge öffnen",
+  "Buka pembayaran rutin"
+ ],
+ "up_next": [
+  "Up next",
+  "Als Nächstes",
+  "Berikutnya"
+ ],
+ "whole_week": [
+  "Whole week",
+  "Ganze Woche",
+  "Seminggu penuh"
+ ],
+ "today": [
+  "Today",
+  "Heute",
+  "Hari ini"
+ ],
+ "tomorrow": [
+  "Tomorrow",
+  "Morgen",
+  "Besok"
+ ],
+ "nothing_planned": [
+  "Nothing planned",
+  "Nichts geplant",
+  "Tidak ada rencana"
+ ],
+ "all_day": [
+  "All day",
+  "Ganztägig",
+  "Sepanjang hari"
+ ],
+ "shared_goals": [
+  "Shared goals",
+  "Gemeinsame Ziele",
+  "Tujuan bersama"
+ ],
+ "per_month": [
+  "{amount}/mo",
+  "{amount}/Monat",
+  "{amount}/bln"
+ ],
+ "add_goal_note": [
+  "Add a goal you save for together, like a car or a trip.",
+  "Füge ein Ziel hinzu, für das ihr gemeinsam spart, etwa ein Auto oder eine Reise.",
+  "Tambahkan tujuan yang kalian tabung bersama, misalnya mobil atau liburan."
+ ],
+ "private_goals": [
+  "Your private goals",
+  "Deine privaten Ziele",
+  "Tujuan pribadimu"
+ ],
+ "only_you": [
+  "Only you can see these",
+  "Nur du kannst sie sehen",
+  "Hanya kamu yang bisa melihat ini"
+ ],
+ "goal_of": [
+  "{current} of {target}",
+  "{current} von {target}",
+  "{current} dari {target}"
+ ],
+ "goal_saved": [
+  "{current} saved",
+  "{current} gespart",
+  "{current} terkumpul"
+ ],
+ "goal_reached": [
+  "reached",
+  "erreicht",
+  "tercapai"
+ ],
+ "goal_see_budget": [
+  "see Budget",
+  "siehe Budget",
+  "lihat Anggaran"
+ ],
+ "alert_over_title": [
+  "{cat} is over budget",
+  "{cat} ist über dem Budget",
+  "{cat} melebihi anggaran"
+ ],
+ "alert_over_meta": [
+  "{spent} of {limit} · {over} over with {left, plural, one {# day} other {# days}} to go",
+  "{spent} von {limit} · {over} drüber, noch {left, plural, one {# Tag} other {# Tage}}",
+  "{spent} dari {limit} · lebih {over}, sisa {left} hari"
+ ],
+ "alert_near_title": [
+  "{cat} at {pct}% of budget",
+  "{cat} bei {pct}% des Budgets",
+  "{cat} mencapai {pct}% anggaran"
+ ],
+ "alert_near_meta": [
+  "{rest} left for the next {left, plural, one {# day} other {# days}} · warning at {warn}%",
+  "{rest} übrig für {left, plural, one {# Tag} other {# Tage}} · Warnung bei {warn}%",
+  "Sisa {rest} untuk {left} hari ke depan · peringatan di {warn}%"
+ ],
+ "alert_fast_title": [
+  "{cat} is moving fast",
+  "{cat} geht schnell weg",
+  "{cat} terpakai cepat"
+ ],
+ "alert_fast_meta": [
+  "{pct}% used with {month}% of the month gone",
+  "{pct}% verbraucht, {month}% des Monats vorbei",
+  "{pct}% terpakai, {month}% bulan sudah lewat"
+ ],
+ "alert_due_title": [
+  "{days, plural, =0 {{name} goes out today} =1 {{name} goes out tomorrow} other {{name} goes out in # days}}",
+  "{days, plural, =0 {{name} wird heute abgebucht} =1 {{name} wird morgen abgebucht} other {{name} wird in # Tagen abgebucht}}",
+  "{days, plural, =0 {{name} ditarik hari ini} =1 {{name} ditarik besok} other {{name} ditarik dalam # hari}}"
+ ],
+ "alert_due_meta": [
+  "{amount} · recurring",
+  "{amount} · wiederkehrend",
+  "{amount} · rutin"
+ ],
+ "alert_bills_title": [
+  "Bills on {date}: {total}",
+  "Rechnungen am {date}: {total}",
+  "Tagihan pada {date}: {total}"
+ ],
+ "alert_ef_title": [
+  "Emergency fund covers {months} months",
+  "Notgroschen reicht für {months} Monate",
+  "Dana darurat cukup untuk {months} bulan"
+ ],
+ "alert_ef_meta": [
+  "{rest} more to reach {target} months.",
+  "Noch {rest} bis {target} Monate.",
+  "Kurang {rest} untuk mencapai {target} bulan."
+ ],
+ "alert_ef_low": [
+  "Below the 3-month minimum. {rest} more to reach {target} months.",
+  "Unter dem Minimum von 3 Monaten. Noch {rest} bis {target} Monate.",
+  "Di bawah minimum 3 bulan. Kurang {rest} untuk mencapai {target} bulan."
+ ],
+ "map_close": [
+  "Close map",
+  "Karte schließen",
+  "Tutup peta"
+ ],
+ "close": [
+  "Close",
+  "Schließen",
+  "Tutup"
+ ],
+ "map_empty": [
+  "Your Life Map grows from what you add. Start with your income and it begins to take shape.",
+  "Deine Life Map wächst mit dem, was du einträgst. Beginne mit deinem Einkommen, dann nimmt sie Form an.",
+  "Life Map tumbuh dari yang kamu tambahkan. Mulai dari pendapatan, lalu petanya terbentuk."
+ ],
+ "map_empty_action": [
+  "Add income",
+  "Einkommen hinzufügen",
+  "Tambah pendapatan"
+ ],
+ "map_failed": [
+  "This device can't draw the 3D map. Your areas still work: tap one above.",
+  "Dieses Gerät kann die 3D-Karte nicht anzeigen. Die Bereiche oben funktionieren trotzdem.",
+  "Perangkat ini tidak bisa menampilkan peta 3D. Bidang di atas tetap bisa diketuk."
+ ],
+ "unlock": [
+  "See plans",
+  "Tarife ansehen",
+  "Lihat paket"
+ ],
+ "f_score": [
+  "Score",
+  "Punkte",
+  "Skor"
+ ],
+ "f_month": [
+  "Per month",
+  "Pro Monat",
+  "Per bulan"
+ ],
+ "f_balance": [
+  "Balance",
+  "Saldo",
+  "Saldo"
+ ],
+ "f_rate": [
+  "Interest",
+  "Zinsen",
+  "Bunga"
+ ],
+ "f_spent": [
+  "Spent",
+  "Ausgegeben",
+  "Terpakai"
+ ],
+ "f_saved": [
+  "Saved",
+  "Gespart",
+  "Terkumpul"
+ ],
+ "f_progress": [
+  "Progress",
+  "Fortschritt",
+  "Kemajuan"
+ ],
+ "f_when": [
+  "When",
+  "Wann",
+  "Kapan"
+ ],
+ "line_flex": [
+  "{pct}% of flexible money used",
+  "{pct}% des flexiblen Geldes verbraucht",
+  "{pct}% uang fleksibel terpakai"
+ ],
+ "line_ef": [
+  "Emergency fund: {months} of {target} months",
+  "Notgroschen: {months} von {target} Monaten",
+  "Dana darurat: {months} dari {target} bulan"
+ ],
+ "line_evenings": [
+  "{n, plural, one {# free evening} other {# free evenings}} in the next 7 days",
+  "{n, plural, one {# freier Abend} other {# freie Abende}} in den nächsten 7 Tagen",
+  "{n} malam bebas dalam 7 hari ke depan"
+ ],
+ "line_focus": [
+  "{done} of {total} priorities done",
+  "{done} von {total} Prioritäten erledigt",
+  "{done} dari {total} prioritas selesai"
+ ],
+ "line_learn": [
+  "{minutes} min learning this week",
+  "{minutes} Min. Lernen diese Woche",
+  "{minutes} menit belajar minggu ini"
+ ],
+ "line_gym": [
+  "{done} of {goal} workouts this week",
+  "{done} von {goal} Trainings diese Woche",
+  "{done} dari {goal} latihan minggu ini"
+ ],
+ "line_goals": [
+  "{done} of {total} goals moving",
+  "{done} von {total} Zielen in Bewegung",
+  "{done} dari {total} tujuan berjalan"
+ ],
+ "line_yearly": [
+  "{done} of {total} yearly goals on track",
+  "{done} von {total} Jahreszielen im Plan",
+  "{done} dari {total} tujuan tahunan sesuai rencana"
+ ],
+ "inbox_hide": [
+  "Hide until tomorrow's digest",
+  "Bis zur morgigen Übersicht ausblenden",
+  "Sembunyikan sampai ringkasan besok"
+ ],
+ "inbox_needs": [
+  "Needs you",
+  "Braucht dich",
+  "Perlu kamu"
+ ],
+ "inbox_dated": [
+  "Has a date",
+  "Hat ein Datum",
+  "Ada tanggalnya"
+ ],
+ "inbox": [
+  "Inbox",
+  "Posteingang",
+  "Kotak masuk"
+ ],
+ "inbox_new": [
+  "{n} new · {when}",
+  "{n} neu · {when}",
+  "{n} baru · {when}"
+ ],
+ "inbox_morning": [
+  "this morning",
+  "heute Morgen",
+  "pagi ini"
+ ],
+ "inbox_rest": [
+  "{n, plural, one {# other email} other {# other emails}}, nothing to do",
+  "{n, plural, one {# weitere E-Mail} other {# weitere E-Mails}}, nichts zu tun",
+  "{n} email lain, tidak perlu tindakan"
+ ],
+ "inbox_event": [
+  "Add to calendar",
+  "Zum Kalender hinzufügen",
+  "Tambah ke kalender"
+ ],
+ "inbox_recurring": [
+  "Add as monthly payment",
+  "Als Monatszahlung hinzufügen",
+  "Tambah sebagai pembayaran bulanan"
+ ],
+ "inbox_tax": [
+  "Add tax deadline",
+  "Steuerfrist hinzufügen",
+  "Tambah tenggat pajak"
+ ],
+ "inbox_gmail": [
+  "Open in Gmail",
+  "In Gmail öffnen",
+  "Buka di Gmail"
+ ],
+ "inbox_settings": [
+  "Inbox settings",
+  "Posteingang-Einstellungen",
+  "Pengaturan kotak masuk"
+ ],
+ "only_you_inbox": [
+  "Only you see this.",
+  "Nur du siehst das.",
+  "Hanya kamu yang melihat ini."
+ ]
+}

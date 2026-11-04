@@ -20,7 +20,7 @@ const base: SearchData = {
 
 const data: SearchData = {
   ...base,
-  recurring: [{ id: "rent", owner_id: "r", visibility: "family", name: "Rent", icon: "house", amount: -1335, category_id: null, paid_by: null, day_of_month: 1, active: true, last_posted_month: null }],
+  recurring: [{ id: "rent", owner_id: "r", visibility: "family", name: "Rent", icon: "house", amount: -1335, category_id: null, paid_by: null, day_of_month: 1, active: true, last_posted_month: null, is_subscription: false, last_used_at: null, cancelled_on: null }],
   categories: [{ id: "c1", name: "Rent & utilities", icon: "house", monthly_limit: 1335, is_fixed: true, sort: 0 } as SearchData["categories"][number]],
   transactions: Array.from({ length: 8 }, (_, i) => ({
     id: `t${i}`,

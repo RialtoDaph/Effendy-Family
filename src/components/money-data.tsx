@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
 import { useToast } from "@/components/toast";
@@ -75,7 +76,6 @@ function subscribeDay(cb: () => void) {
   return () => clearInterval(id);
 }
 
-const OFFLINE_MSG = "Could not save. Check your internet connection.";
 export const SYNCED_EVENT = "ef-synced";
 
 const ROW_KEY: Record<MoneyTable, keyof MoneyRows> = {
@@ -87,6 +87,7 @@ const ROW_KEY: Record<MoneyTable, keyof MoneyRows> = {
 };
 
 export function MoneyProvider({ children }: { children: ReactNode }) {
+  const tm = useTranslations("money");
   const { userId, settings, reload: reloadProfile } = useAppData();
   const toast = useToast();
   const [rows, setRows] = useState<MoneyRows>(EMPTY);
@@ -128,11 +129,11 @@ export function MoneyProvider({ children }: { children: ReactNode }) {
       const seen = localStorage.getItem(seenKey(userId));
       const fresh = next.transactions.filter((x) => x.source === "recurring" && (!seen || x.created_at > seen));
       if (seen && fresh.length) {
-        toast(`${fresh.length} recurring item${fresh.length > 1 ? "s" : ""} added · ${fresh.slice(0, 2).map((x) => x.payee).join(", ")}${fresh.length > 2 ? "…" : ""}`);
+        toast(tm("recurring_added", { n: fresh.length, names: `${fresh.slice(0, 2).map((x) => x.payee).join(", ")}${fresh.length > 2 ? "…" : ""}` }));
       }
       localStorage.setItem(seenKey(userId), new Date().toISOString());
     } catch {}
-  }, [userId, toast]);
+  }, [tm, userId, toast]);
 
   useEffect(() => {
     if (!userId) return;
@@ -183,11 +184,11 @@ export function MoneyProvider({ children }: { children: ReactNode }) {
         applyLocal(table, id ? "update" : "insert", rowId, values);
         return QUEUED;
       }
-      if (error) return `Could not save: ${error.message}`;
+      if (error) return tm("could_not_save", { message: error.message });
       await load();
       return null;
     },
-    [load, applyLocal],
+    [tm, load, applyLocal],
   );
 
   const remove = useCallback(
@@ -198,11 +199,11 @@ export function MoneyProvider({ children }: { children: ReactNode }) {
         applyLocal(table, "delete", id);
         return QUEUED;
       }
-      if (error) return `Could not delete: ${error.message}`;
+      if (error) return tm("could_not_delete", { message: error.message });
       await load();
       return null;
     },
-    [load, applyLocal],
+    [tm, load, applyLocal],
   );
 
   // Send writes made offline as soon as the connection is back.
@@ -212,9 +213,7 @@ export function MoneyProvider({ children }: { children: ReactNode }) {
       const { saved, refused } = await flush(supabase());
       if (!saved && !refused) return;
       toast(
-        refused
-          ? `${saved} change${saved === 1 ? "" : "s"} synced · ${refused} could not be saved`
-          : `${saved} change${saved === 1 ? "" : "s"} synced`,
+        refused ? `${tm("changes_synced", { n: saved })} · ${tm("changes_refused", { n: refused })}` : tm("changes_synced", { n: saved }),
       );
       await load();
       window.dispatchEvent(new Event(SYNCED_EVENT));
@@ -222,7 +221,7 @@ export function MoneyProvider({ children }: { children: ReactNode }) {
     sync();
     window.addEventListener("online", sync);
     return () => window.removeEventListener("online", sync);
-  }, [userId, load, toast]);
+  }, [tm, userId, load, toast]);
 
   const closeAlert = useCallback(
     async (key: string, how: "dismissed" | "done") => {
@@ -242,10 +241,10 @@ export function MoneyProvider({ children }: { children: ReactNode }) {
     async (patch: { warn_pct?: number; ef_months?: number }) => {
       if (!userId) return;
       const { error } = await supabase().from("member_settings").update(patch).eq("member_id", userId);
-      if (error) toast(OFFLINE_MSG);
+      if (error) toast(tm("offline_save"));
       await reloadProfile();
     },
-    [userId, reloadProfile, toast],
+    [tm, userId, reloadProfile, toast],
   );
 
   const warnPct = settings?.warn_pct ?? 80;

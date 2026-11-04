@@ -38,7 +38,7 @@ function rows(): AskRows {
   };
 }
 
-describe("Rialna's context", () => {
+describe("Clopar's context", () => {
   it("never contains the partner's private items, even if the rows were passed in", () => {
     const ctx = JSON.stringify(buildContext(rows(), R, today, R));
     expect(ctx).not.toContain("Secret anniversary gift");

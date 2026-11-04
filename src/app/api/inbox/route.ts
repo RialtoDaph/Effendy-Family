@@ -14,7 +14,7 @@ const MODEL = "claude-opus-5-5";
 const fail = (error: string, status: number) => Response.json({ error }, { status });
 
 export async function POST(req: Request) {
-  if (!process.env.ANTHROPIC_API_KEY) return fail("Rialna is not set up yet.", 503);
+  if (!process.env.ANTHROPIC_API_KEY) return fail("Clopar is not set up yet.", 503);
   const key = req.headers.get("authorization")?.replace(/^Bearer /, "") ?? "";
   if (!/^efk_[0-9a-f]{64}$/.test(key)) return fail("Missing or wrong key. Make a new one in Settings → Inbox.", 401);
   if (Number(req.headers.get("content-length") ?? 0) > 1_500_000) return fail("Too much at once.", 413);
@@ -53,15 +53,15 @@ export async function POST(req: Request) {
         ],
       });
       const msg = await stream.finalMessage();
-      if (msg.stop_reason === "refusal") return fail("Rialna could not sum up these emails.", 422);
+      if (msg.stop_reason === "refusal") return fail("Clopar could not sum up these emails.", 422);
       const text = msg.content.find((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")?.text;
-      if (!text || msg.stop_reason === "max_tokens") return fail("Rialna gave no full answer. Try again.", 502);
+      if (!text || msg.stop_reason === "max_tokens") return fail("Clopar gave no full answer. Try again.", 502);
       digest = mergeDigest(mails, JSON.parse(text));
     } catch (e) {
       console.error("inbox failed", e instanceof Anthropic.APIError ? `${e.status} ${e.message}` : String(e));
-      if (e instanceof Anthropic.RateLimitError) return fail("Rialna is busy. The script will try again tomorrow.", 429);
+      if (e instanceof Anthropic.RateLimitError) return fail("Clopar is busy. The script will try again tomorrow.", 429);
       if (e instanceof Anthropic.AuthenticationError) return fail("The AI key is not valid. Check it in Vercel.", 503);
-      return fail("Rialna is not reachable right now.", 502);
+      return fail("Clopar is not reachable right now.", 502);
     }
   }
 

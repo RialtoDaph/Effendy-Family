@@ -43,7 +43,7 @@ export type ParsedRow = {
   purpose: string;
 };
 
-export type Skipped = { line: number; reason: string };
+export type Skipped = { line: number; reason: string; code?: "pending" | "no_date" | "no_amount"; detail?: string };
 
 /* Reading the file -------------------------------------------------------- */
 
@@ -308,13 +308,13 @@ export function readRows(text: string, map: Mapping): { rows: ParsedRow[]; skipp
     const cell = (c?: number) => (c == null ? "" : unquote(r[c] ?? ""));
     if (r.length < 2) continue;
     if (map.status != null && SKIP_STATUS.test(cell(map.status))) {
-      skipped.push({ line, reason: `Not booked yet (${cell(map.status)})` });
+      skipped.push({ line, reason: `Not booked yet (${cell(map.status)})`, code: "pending", detail: cell(map.status) });
       continue;
     }
     const date = parseDate(cell(map.date), map.dateOrder, year);
     if (!date) {
       // Totals or notes below the table are not transactions.
-      if (cell(map.date)) skipped.push({ line, reason: `No date (“${cell(map.date).slice(0, 20)}”)` });
+      if (cell(map.date)) skipped.push({ line, reason: `No date (“${cell(map.date).slice(0, 20)}”)`, code: "no_date", detail: cell(map.date).slice(0, 20) });
       continue;
     }
     let amount: number | null;
@@ -330,7 +330,7 @@ export function readRows(text: string, map: Mapping): { rows: ParsedRow[]; skipp
     const fee = map.fee != null ? parseAmount(cell(map.fee), map.decimal) : null;
     if (amount != null && fee) amount = Math.round((amount - Math.abs(fee)) * 100) / 100;
     if (amount == null || amount === 0) {
-      skipped.push({ line, reason: "No amount" });
+      skipped.push({ line, reason: "No amount", code: "no_amount" });
       continue;
     }
     const payee =

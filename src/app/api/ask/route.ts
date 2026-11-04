@@ -1,29 +1,30 @@
-// Ask Rialna and the Home briefing (README → Ask Rialna; Home briefing).
+// Ask Clopar and the Home briefing (README → Ask Clopar; Home briefing).
 // The data is read with the asker's own login, so Row Level Security keeps the
 // partner's private items out, and buildContext() filters them once more.
 
 import Anthropic from "@anthropic-ai/sdk";
 import { ACTIONS, ASK_PROMPT, BRIEFING_PROMPT, answerSchema } from "@/lib/ask-schema";
 import { buildContext, type AskRows } from "@/lib/ask-context";
-import { DEFAULT_IDR_PER_EUR } from "@/lib/finance";
-import { berlinToday } from "@/lib/money";
+import { DEFAULT_IDR_PER_EUR, asSubscription } from "@/lib/finance";
+import { berlinToday, type Recurring } from "@/lib/money";
 import { addDays } from "@/lib/time";
 import { authorize } from "@/lib/server-auth";
 
 export const maxDuration = 120;
 
 const MODEL = "claude-opus-5-5";
+const BRIEFING_LANGUAGE: Record<string, string> = { en: "English", de: "German", id: "Indonesian" };
 const fail = (error: string, status: number) => Response.json({ error }, { status });
 
 type Turn = { role: "user" | "assistant"; text: string };
 
 export async function POST(req: Request) {
-  if (!process.env.ANTHROPIC_API_KEY) return fail(`Rialna is not set up yet.`, 503);
+  if (!process.env.ANTHROPIC_API_KEY) return fail(`Clopar is not set up yet.`, 503);
   const auth = await authorize(req);
   if (auth instanceof Response) return auth;
   const { sb, userId } = auth;
 
-  const body = (await req.json().catch(() => null)) as { mode?: string; question?: string; history?: Turn[]; scope?: string } | null;
+  const body = (await req.json().catch(() => null)) as { mode?: string; question?: string; history?: Turn[]; scope?: string; locale?: string } | null;
   const mode = body?.mode === "briefing" ? "briefing" : "ask";
   const question = String(body?.question ?? "").trim().slice(0, 1000);
   if (mode === "ask" && !question) return fail("Please type a question.", 400);
@@ -31,6 +32,12 @@ export async function POST(req: Request) {
     .filter((t) => (t.role === "user" || t.role === "assistant") && typeof t.text === "string")
     .slice(-6)
     .map((t) => ({ role: t.role, content: t.text.slice(0, 2000) }));
+
+  // The briefing is free; a question counts against the plan's messages.
+  if (mode === "ask") {
+    const { error: quota } = await sb.rpc("ai_message_used");
+    if (quota?.message.includes("ai_quota")) return Response.json({ error: "quota", code: "ai_quota" }, { status: 402 });
+  }
 
   // Everything this person may see (RLS decides), limited to what is useful.
   const today = berlinToday();
@@ -43,7 +50,7 @@ export async function POST(req: Request) {
     sb.from("recurring").select("*"),
     sb.from("goals").select("*"),
     sb.from("debts").select("*"),
-    sb.from("subscriptions").select("*"),
+    sb.from("recurring").select("*").eq("is_subscription", true),
     sb.from("assets").select("*"),
     sb.from("remittances").select("*").gte("date", `${today.y}-01-01`),
     sb.from("businesses").select("id,name"),
@@ -64,7 +71,7 @@ export async function POST(req: Request) {
     recurring: d[4] as AskRows["recurring"],
     goals: d[5] as AskRows["goals"],
     debts: d[6] as AskRows["debts"],
-    subscriptions: d[7] as AskRows["subscriptions"],
+    subscriptions: (d[7] as Recurring[]).map(asSubscription),
     assets: d[8] as AskRows["assets"],
     remittances: d[9] as AskRows["remittances"],
     businesses: d[10] as AskRows["businesses"],
@@ -89,7 +96,7 @@ export async function POST(req: Request) {
       fallbacks: "default",
       thinking: { type: "adaptive" },
       output_config: { effort: mode === "briefing" ? "low" : "medium", format: { type: "json_schema", schema: answerSchema() } },
-      system: mode === "briefing" ? BRIEFING_PROMPT : ASK_PROMPT,
+      system: mode === "briefing" ? BRIEFING_PROMPT.replace("in English", `in ${BRIEFING_LANGUAGE[body?.locale ?? "en"] ?? "English"}`) : ASK_PROMPT,
       messages: [
         { role: "user", content: `DATA (what ${context.asked_by} can see):\n${JSON.stringify(context)}` },
         { role: "assistant", content: "Understood. I will only use this data." },
@@ -101,9 +108,9 @@ export async function POST(req: Request) {
       ],
     });
     const msg = await stream.finalMessage();
-    if (msg.stop_reason === "refusal") return fail("Rialna can't help with that one.", 422);
+    if (msg.stop_reason === "refusal") return fail("Clopar can't help with that one.", 422);
     const text = msg.content.find((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")?.text;
-    if (!text) return fail("Rialna gave no answer. Try again.", 502);
+    if (!text) return fail("Clopar gave no answer. Try again.", 502);
     const a = JSON.parse(text) as { text: string; nums: { label: string; value: string }[]; next: string | null; action: string };
     return Response.json({
       text: a.text,
@@ -113,8 +120,8 @@ export async function POST(req: Request) {
     });
   } catch (e) {
     console.error("ask failed", e instanceof Anthropic.APIError ? `${e.status} ${e.message}` : String(e));
-    if (e instanceof Anthropic.RateLimitError) return fail("Rialna is busy. Try again in a minute.", 429);
+    if (e instanceof Anthropic.RateLimitError) return fail("Clopar is busy. Try again in a minute.", 429);
     if (e instanceof Anthropic.AuthenticationError) return fail("The AI key is not valid. Check it in Vercel.", 503);
-    return fail("Rialna is not reachable right now. Try again.", 502);
+    return fail("Clopar is not reachable right now. Try again.", 502);
   }
 }

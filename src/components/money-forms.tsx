@@ -1,13 +1,14 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { TIME_FORM_KINDS, TimeForm, type TimeFormKind } from "@/components/time-forms";
 import { ReceiptScan } from "@/components/receipt-scan";
-import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
+import { QUEUED } from "@/lib/offline-queue";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
 import { FinanceForm, type FinanceFormKind } from "@/components/finance-forms";
 import { useMoney, type MoneyTable } from "@/components/money-data";
-import { FormSheet, type Field, type FormValues } from "@/components/sheet";
+import { FormSheet, useVisibilityField, type Field, type FormValues } from "@/components/sheet";
 import { useToast } from "@/components/toast";
 import { CATEGORY_ICONS, GOAL_ICONS, iconFor } from "@/lib/icons";
 import { parseAmount, type Category, type Goal, type Income, type Recurring, type Transaction } from "@/lib/money";
@@ -21,17 +22,6 @@ type MoneyForms = {
 
 const MoneyFormsContext = createContext<MoneyForms>({ openForm: () => {} });
 export const useMoneyForms = () => useContext(MoneyFormsContext);
-
-const VISIBILITY: Field = {
-  kind: "chips",
-  key: "visibility",
-  label: "Visible to",
-  required: true,
-  options: [
-    { value: "family", label: "Family" },
-    { value: "private", label: "Only me" },
-  ],
-};
 
 export function MoneyFormsProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<Open | null>(null);
@@ -53,6 +43,10 @@ function MoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
   if (TIME_FORM_KINDS.includes(open.kind as TimeFormKind)) {
     return <TimeForm kind={open.kind as TimeFormKind} id={open.id} preset={open.preset} onClose={onClose} />;
   }
+  return <MoneyFormBody open={open} onClose={onClose} />;
+}
+
+function MoneyFormBody({ open, onClose }: { open: Open; onClose: () => void }) {
   if (!["tx", "cat", "income", "recur", "goal"].includes(open.kind)) {
     return <FinanceForm kind={open.kind as FinanceFormKind} id={open.id} preset={open.preset} onClose={onClose} />;
   }
@@ -60,13 +54,15 @@ function MoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
 }
 
 function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
+  const tm = useTranslations("money");
+  const VISIBILITY = useVisibilityField();
   const { members, settings, userId } = useAppData();
   const money = useMoney();
   const toast = useToast();
 
   const who = [
     ...members.map((m) => ({ value: m.id, label: m.display_name })),
-    { value: "family", label: "Family" },
+    { value: "family", label: tm("family") },
   ];
   const catOptions = money.categories.map((c) => ({ value: c.id, label: c.name, icon: iconFor(c.icon) }));
   const defaultVis = (module: string) => settings?.default_visibility?.[module] ?? "family";
@@ -75,7 +71,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
   async function finish(table: MoneyTable, values: Record<string, unknown>, id: string | undefined, msg: string) {
     const err = await money.save(table, values, id);
     if (err && err !== QUEUED) return err;
-    toast(err === QUEUED ? QUEUED_MSG : msg);
+    toast(err === QUEUED ? tm("queued") : msg);
     onClose();
   }
 
@@ -84,7 +80,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
     const err = await money.remove(table, id);
     if (err && err !== QUEUED) toast(err);
     else {
-      toast(err === QUEUED ? QUEUED_MSG : "Deleted");
+      toast(err === QUEUED ? tm("queued") : tm("deleted"));
       onClose();
     }
   }
@@ -111,23 +107,23 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
         : { kind: "out", date: money.today.iso, paid_by: userId, visibility: defaultVis("transactions"), ...open.preset };
       return (
         <FormSheet
-          title={t ? "Edit transaction" : "Add transaction"}
+          title={t ? tm("edit_transaction") : tm("add_transaction")}
           editing={!!t}
           initial={initial}
           fields={[
-            { kind: "chips", key: "kind", label: "Type", options: [{ value: "out", label: "Money out" }, { value: "in", label: "Money in" }] },
-            { kind: "amount", key: "amount", label: "Amount", placeholder: "0.00", required: true },
-            { kind: "text", key: "payee", label: "Shop or who paid", placeholder: "e.g. Rewe", required: true },
-            { kind: "chips", key: "category", label: "Category", options: catOptions },
-            { kind: "date", key: "date", label: "Date", required: true },
-            { kind: "chips", key: "paid_by", label: "Paid by", options: who },
+            { kind: "chips", key: "kind", label: tm("type"), options: [{ value: "out", label: tm("money_out") }, { value: "in", label: tm("money_in") }] },
+            { kind: "amount", key: "amount", label: tm("amount"), placeholder: "0.00", required: true },
+            { kind: "text", key: "payee", label: tm("shop_or_who_paid"), placeholder: tm("e_g_rewe"), required: true },
+            { kind: "chips", key: "category", label: tm("category"), options: catOptions },
+            { kind: "date", key: "date", label: tm("date"), required: true },
+            { kind: "chips", key: "paid_by", label: tm("paid_by"), options: who },
             VISIBILITY,
-            { kind: "text", key: "note", label: "Note (optional)" },
+            { kind: "text", key: "note", label: tm("note_optional") },
           ]}
           onClose={onClose}
-          onDelete={t ? () => del("transactions", t.id, `Delete “${t.payee}”?`) : undefined}
+          onDelete={t ? () => del("transactions", t.id, tm("delete_4", { payee: t.payee })) : undefined}
           onSave={(v) => {
-            if (!amountOk(v.amount)) return "Please enter an amount above 0.";
+            if (!amountOk(v.amount)) return tm("please_enter_an_amount_above_0");
             const n = parseAmount(v.amount);
             return finish(
               "transactions",
@@ -142,7 +138,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
                 ...(!t && v.receipt_file_id ? { receipt_file_id: v.receipt_file_id, source: "receipt" } : {}),
               },
               t?.id,
-              t ? "Saved" : "Transaction added",
+              t ? tm("saved") : tm("transaction_added"),
             );
           }}
         />
@@ -153,7 +149,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
       const c = money.categories.find((x) => x.id === open.id) as Category | undefined;
       return (
         <FormSheet
-          title={c ? "Edit category" : "Add category"}
+          title={c ? tm("edit_category") : tm("add_category")}
           editing={!!c}
           initial={
             c
@@ -161,27 +157,27 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
               : { icon: "tag", type: "flex", ...open.preset }
           }
           fields={[
-            { kind: "text", key: "name", label: "Name", placeholder: "e.g. Groceries", required: true },
-            { kind: "chips", key: "icon", label: "Icon", options: CATEGORY_ICONS.map((i) => ({ value: i, label: "", icon: iconFor(i) })) },
-            { kind: "amount", key: "limit", label: "Monthly limit", placeholder: "0", required: true },
+            { kind: "text", key: "name", label: tm("name"), placeholder: tm("e_g_groceries"), required: true },
+            { kind: "chips", key: "icon", label: tm("icon"), options: CATEGORY_ICONS.map((i) => ({ value: i, label: "", icon: iconFor(i) })) },
+            { kind: "amount", key: "limit", label: tm("monthly_limit"), placeholder: "0", required: true },
             {
               kind: "chips",
               key: "type",
-              label: "Type",
+              label: tm("type"),
               options: [
-                { value: "fixed", label: "Fixed (rent, insurance)" },
-                { value: "flex", label: "Flexible (day to day)" },
+                { value: "fixed", label: tm("fixed_rent_insurance") },
+                { value: "flex", label: tm("flexible_day_to_day") },
               ],
             },
           ]}
           onClose={onClose}
           onDelete={
             c
-              ? () => del("categories", c.id, `Delete “${c.name}”? Its transactions stay, without a category.`)
+              ? () => del("categories", c.id, tm("delete_its_transactions_stay_without_a_cat", { name: c.name }))
               : undefined
           }
           onSave={(v) => {
-            if (!amountOk(v.limit, true)) return "Please enter a monthly limit (0 or more).";
+            if (!amountOk(v.limit, true)) return tm("please_enter_a_monthly_limit_0_or_more");
             return finish(
               "categories",
               {
@@ -192,7 +188,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
                 ...(c ? {} : { sort: money.categories.length + 1 }),
               },
               c?.id,
-              c ? "Saved" : "Category added",
+              c ? tm("saved") : tm("category_added"),
             );
           }}
         />
@@ -203,7 +199,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
       const i = money.incomes.find((x) => x.id === open.id) as Income | undefined;
       return (
         <FormSheet
-          title={i ? "Edit income" : "Add income"}
+          title={i ? tm("edit_income") : tm("add_income")}
           editing={!!i}
           initial={
             i
@@ -211,25 +207,25 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
               : { member: userId, kind: "Salary", visibility: defaultVis("incomes"), ...open.preset }
           }
           fields={[
-            { kind: "text", key: "name", label: "Name", placeholder: "e.g. Bar salary (net)", required: true },
-            { kind: "chips", key: "member", label: "Whose income", options: who },
+            { kind: "text", key: "name", label: tm("name"), placeholder: tm("e_g_bar_salary_net"), required: true },
+            { kind: "chips", key: "member", label: tm("whose_income"), options: who },
             {
               kind: "chips",
               key: "kind",
-              label: "Kind",
+              label: tm("kind"),
               options: [
-                { value: "Salary", label: "Salary" },
-                { value: "Business", label: "Business" },
-                { value: "Other", label: "Other" },
+                { value: "Salary", label: tm("salary") },
+                { value: "Business", label: tm("business") },
+                { value: "Other", label: tm("other") },
               ],
             },
-            { kind: "amount", key: "amount", label: "Per month (net, average)", placeholder: "0", required: true },
+            { kind: "amount", key: "amount", label: tm("per_month_net_average"), placeholder: "0", required: true },
             VISIBILITY,
           ]}
           onClose={onClose}
-          onDelete={i ? () => del("incomes", i.id, `Delete “${i.name}”?`) : undefined}
+          onDelete={i ? () => del("incomes", i.id, tm("delete", { name: i.name })) : undefined}
           onSave={(v) => {
-            if (!amountOk(v.amount, true)) return "Please enter an amount (0 or more).";
+            if (!amountOk(v.amount, true)) return tm("please_enter_an_amount_0_or_more");
             return finish(
               "incomes",
               {
@@ -240,7 +236,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
                 visibility: v.visibility,
               },
               i?.id,
-              i ? "Saved" : "Income added",
+              i ? tm("saved") : tm("income_added"),
             );
           }}
         />
@@ -251,7 +247,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
       const r = money.recurring.find((x) => x.id === open.id) as Recurring | undefined;
       return (
         <FormSheet
-          title={r ? "Edit recurring" : "Add recurring payment"}
+          title={r ? tm("edit_recurring") : tm("add_recurring_payment")}
           editing={!!r}
           initial={
             r
@@ -268,21 +264,21 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
               : { kind: "out", paid_by: "family", visibility: defaultVis("recurring"), active: true, ...open.preset }
           }
           fields={[
-            { kind: "text", key: "name", label: "Name", placeholder: "e.g. Rent", required: true },
-            { kind: "chips", key: "kind", label: "Type", options: [{ value: "out", label: "Goes out" }, { value: "in", label: "Comes in" }] },
-            { kind: "amount", key: "amount", label: "Amount", placeholder: "0.00", required: true },
-            { kind: "chips", key: "category", label: "Category", options: catOptions },
-            { kind: "number", key: "day", label: "Day of the month (1–28)", placeholder: "1", required: true },
-            { kind: "chips", key: "paid_by", label: "Paid by", options: who },
+            { kind: "text", key: "name", label: tm("name"), placeholder: tm("e_g_rent"), required: true },
+            { kind: "chips", key: "kind", label: tm("type"), options: [{ value: "out", label: tm("goes_out") }, { value: "in", label: tm("comes_in") }] },
+            { kind: "amount", key: "amount", label: tm("amount"), placeholder: "0.00", required: true },
+            { kind: "chips", key: "category", label: tm("category"), options: catOptions },
+            { kind: "number", key: "day", label: tm("day_of_the_month_1_28"), placeholder: "1", required: true },
+            { kind: "chips", key: "paid_by", label: tm("paid_by"), options: who },
             VISIBILITY,
-            { kind: "toggle", key: "active", label: "Status", toggleLabel: "On: add it every month" },
+            { kind: "toggle", key: "active", label: tm("status"), toggleLabel: tm("on_add_it_every_month") },
           ]}
           onClose={onClose}
-          onDelete={r ? () => del("recurring", r.id, `Delete “${r.name}”? Past transactions stay.`) : undefined}
+          onDelete={r ? () => del("recurring", r.id, tm("delete_past_transactions_stay", { name: r.name })) : undefined}
           onSave={(v) => {
-            if (!amountOk(v.amount)) return "Please enter an amount above 0.";
+            if (!amountOk(v.amount)) return tm("please_enter_an_amount_above_0");
             const day = Number(String(v.day).trim());
-            if (!Number.isInteger(day) || day < 1 || day > 28) return "Day must be a whole number from 1 to 28.";
+            if (!Number.isInteger(day) || day < 1 || day > 28) return tm("day_must_be_a_whole_number_from_1_to_28");
             const n = parseAmount(v.amount);
             const cat = money.categories.find((c) => c.id === v.category);
             return finish(
@@ -298,7 +294,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
                 active: !!v.active,
               },
               r?.id,
-              r ? "Saved" : "Recurring payment added",
+              r ? tm("saved") : tm("recurring_payment_added"),
             );
           }}
         />
@@ -309,16 +305,16 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
       const g = money.goals.find((x) => x.id === open.id) as Goal | undefined;
       const isEf = !!g?.is_emergency_fund;
       const fields: Field[] = [
-        { kind: "text", key: "name", label: "Name", placeholder: "e.g. Family car", required: true },
-        { kind: "chips", key: "icon", label: "Icon", options: GOAL_ICONS.map((i) => ({ value: i, label: "", icon: iconFor(i) })) },
-        ...(isEf ? [] : [{ kind: "amount", key: "target", label: "Target", placeholder: "0", required: true } as Field]),
-        { kind: "amount", key: "current", label: "Saved so far", placeholder: "0" },
-        { kind: "amount", key: "monthly", label: "Put in each month", placeholder: "0" },
-        ...(isEf ? [] : [{ kind: "date", key: "deadline", label: "Ready by (optional)" } as Field, VISIBILITY]),
+        { kind: "text", key: "name", label: tm("name"), placeholder: tm("e_g_family_car"), required: true },
+        { kind: "chips", key: "icon", label: tm("icon"), options: GOAL_ICONS.map((i) => ({ value: i, label: "", icon: iconFor(i) })) },
+        ...(isEf ? [] : [{ kind: "amount", key: "target", label: tm("target"), placeholder: "0", required: true } as Field]),
+        { kind: "amount", key: "current", label: tm("saved_so_far"), placeholder: "0" },
+        { kind: "amount", key: "monthly", label: tm("put_in_each_month"), placeholder: "0" },
+        ...(isEf ? [] : [{ kind: "date", key: "deadline", label: tm("ready_by_optional") } as Field, VISIBILITY]),
       ];
       return (
         <FormSheet
-          title={isEf ? "Update emergency fund" : g ? "Edit goal" : "Add goal"}
+          title={isEf ? tm("update_emergency_fund") : g ? tm("edit_goal") : tm("add_goal")}
           editing={!!g}
           initial={
             g
@@ -335,10 +331,10 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
           }
           fields={fields}
           onClose={onClose}
-          onDelete={g && !isEf ? () => del("goals", g.id, `Delete “${g.name}”?`) : undefined}
+          onDelete={g && !isEf ? () => del("goals", g.id, tm("delete", { name: g.name })) : undefined}
           onSave={(v) => {
             for (const k of ["target", "current", "monthly"]) {
-              if (String(v[k] ?? "").trim() && !amountOk(v[k], true)) return "Amounts must be numbers (0 or more).";
+              if (String(v[k] ?? "").trim() && !amountOk(v[k], true)) return tm("amounts_must_be_numbers_0_or_more");
             }
             const num = (k: string) => (String(v[k] ?? "").trim() ? parseAmount(v[k]) : 0);
             return finish(
@@ -351,7 +347,7 @@ function CoreMoneyForm({ open, onClose }: { open: Open; onClose: () => void }) {
                 ...(isEf ? {} : { target: num("target"), deadline: v.deadline || null, visibility: v.visibility }),
               },
               g?.id,
-              g ? "Saved" : "Goal added",
+              g ? tm("saved") : tm("goal_added"),
             );
           }}
         />
