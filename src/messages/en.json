@@ -2180,7 +2180,14 @@
     "ib_privacy": "New mail without Promotions and Social is sent to the AI to be summed up. The partner never sees your digest. Digests are deleted after 60 days.",
     "e_invest": "Add savings or investments to see what you own in one place.",
     "del_failed": "Could not delete. Check your internet connection.",
-    "already_saved": "That is already saved."
+    "already_saved": "That is already saved.",
+    "pw_open": "Sign in with password",
+    "pw_title": "Sign in",
+    "pw_label": "Password",
+    "pw_submit": "Sign in",
+    "pw_back": "Back",
+    "pw_wrong": "Email or password is wrong.",
+    "pw_failed": "Could not sign in. Try again."
   },
   "plans": {
     "life": [

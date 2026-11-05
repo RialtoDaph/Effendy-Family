@@ -79,6 +79,7 @@ http.createServer((req, res) => {
     if (url.startsWith('/__session')) return send(200, { ...session(), expires_at: exp() });
     if (url.startsWith('/__seed')) { Object.assign(rows, JSON.parse(JSON.stringify(seed))); return send(200, 'seeded'); }
     if (url.startsWith('/__clear')) { for (const k of Object.keys(seed)) delete rows[k]; return send(200, 'cleared'); }
+    if (url.includes('/auth/v1/token') && url.includes('password')) return j.password === 'right' ? send(200, session()) : send(400, { code: 400, error_code: 'invalid_credentials', msg: 'Invalid login credentials' });
     if (url.includes('/auth/v1/otp')) { log.push(['otp', j]); return send(200, {}); }
     if (url.includes('/auth/v1/verify')) { log.push(['verify', j]); return j.token === '123456' ? send(200, session()) : send(403, { code: 403, error_code: 'otp_expired', msg: 'bad' }); }
     if (url.includes('/rpc/invite_preview')) return send(200, j.p_token === 'rl_good' ? [{ household: 'Morgan family', inviter: 'Alex', invitee: 'Mira', role: 'partner', share }] : []);

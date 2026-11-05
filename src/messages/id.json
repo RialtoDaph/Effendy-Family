@@ -2180,7 +2180,14 @@
     "ib_privacy": "Email baru tanpa Promosi dan Sosial dikirim ke AI untuk dirangkum. Pasanganmu tidak pernah melihat rangkumanmu. Rangkuman dihapus setelah 60 hari.",
     "e_invest": "Tambahkan tabungan atau investasi untuk melihat semua milikmu di satu tempat.",
     "del_failed": "Gagal menghapus. Periksa koneksi internetmu.",
-    "already_saved": "Itu sudah tersimpan."
+    "already_saved": "Itu sudah tersimpan.",
+    "pw_open": "Masuk dengan kata sandi",
+    "pw_title": "Masuk",
+    "pw_label": "Kata sandi",
+    "pw_submit": "Masuk",
+    "pw_back": "Kembali",
+    "pw_wrong": "Email atau kata sandi salah.",
+    "pw_failed": "Gagal masuk. Coba lagi."
   },
   "plans": {
     "life": [

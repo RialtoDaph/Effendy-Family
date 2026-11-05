@@ -2180,7 +2180,14 @@
     "ib_privacy": "Neue Mails ohne Werbung und Soziale Netzwerke gehen zur Zusammenfassung an die KI. Dein:e Partner:in sieht deine Zusammenfassung nie. Sie werden nach 60 Tagen gelöscht.",
     "e_invest": "Füge Ersparnisse oder Investments hinzu, um alles an einem Ort zu sehen.",
     "del_failed": "Löschen fehlgeschlagen. Prüfe deine Internetverbindung.",
-    "already_saved": "Das ist schon gespeichert."
+    "already_saved": "Das ist schon gespeichert.",
+    "pw_open": "Mit Passwort anmelden",
+    "pw_title": "Anmelden",
+    "pw_label": "Passwort",
+    "pw_submit": "Anmelden",
+    "pw_back": "Zurück",
+    "pw_wrong": "E-Mail oder Passwort ist falsch.",
+    "pw_failed": "Anmeldung fehlgeschlagen. Versuche es erneut."
   },
   "plans": {
     "life": [
