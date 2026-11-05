@@ -988,5 +988,40 @@
 "That is already saved.",
 "Das ist schon gespeichert.",
 "Itu sudah tersimpan."
+],
+"pw_open": [
+"Sign in with password",
+"Mit Passwort anmelden",
+"Masuk dengan kata sandi"
+],
+"pw_title": [
+"Sign in",
+"Anmelden",
+"Masuk"
+],
+"pw_label": [
+"Password",
+"Passwort",
+"Kata sandi"
+],
+"pw_submit": [
+"Sign in",
+"Anmelden",
+"Masuk"
+],
+"pw_back": [
+"Back",
+"Zurück",
+"Kembali"
+],
+"pw_wrong": [
+"Email or password is wrong.",
+"E-Mail oder Passwort ist falsch.",
+"Email atau kata sandi salah."
+],
+"pw_failed": [
+"Could not sign in. Try again.",
+"Anmeldung fehlgeschlagen. Versuche es erneut.",
+"Gagal masuk. Coba lagi."
 ]
 }

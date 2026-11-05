@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
   const secret = res?.ok ? ((await res.json().catch(() => null)) as { value?: string } | null) : null;
   if (!secret?.value) {
-    console.error("realtime token failed", res?.status);
+    console.error("realtime token failed", MODEL, res?.status, (await res?.text().catch(() => ""))?.slice(0, 500));
     await sb.rpc("ai_session_end", { p_session: info.session_id });
     return fail("failed", 502);
   }

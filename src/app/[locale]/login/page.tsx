@@ -1,19 +1,20 @@
 "use client";
 
-import { Mail, ScanFace } from "lucide-react";
+import { KeyRound, Mail, ScanFace } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { AuthScreen, authSecondary } from "@/components/auth/auth-card";
 import { EmailCode } from "@/components/auth/email-code";
 import { PasskeyOffer } from "@/components/auth/passkey-offer";
+import { PasswordSignIn } from "@/components/auth/password-sign-in";
 import { Clopar } from "@/components/clopar";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const t = useTranslations();
   const router = useRouter();
-  const [step, setStep] = useState<"start" | "email" | "passkey">("start");
+  const [step, setStep] = useState<"start" | "email" | "password" | "passkey">("start");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,6 +40,7 @@ export default function LoginPage() {
   return (
     <AuthScreen>
       {step === "email" && <EmailCode onDone={() => setStep("passkey")} />}
+      {step === "password" && <PasswordSignIn onDone={() => router.replace("/")} onBack={() => setStep("start")} />}
       {step === "passkey" && <PasskeyOffer onDone={() => router.replace("/")} />}
       {step === "start" && (
         <>
@@ -66,6 +68,10 @@ export default function LoginPage() {
             <button onClick={passkey} disabled={busy} className={`${authSecondary} border-0 bg-soft2`}>
               <ScanFace size={20} strokeWidth={1.8} />
               {t("ui.sign_in_passkey")}
+            </button>
+            <button onClick={() => setStep("password")} className={`${authSecondary} border-0 bg-soft2`}>
+              <KeyRound size={18} strokeWidth={1.8} />
+              {t("settings.pw_open")}
             </button>
             {error && <div className="text-center text-[13px] font-bold text-bad">{error}</div>}
           </div>
