@@ -1,23 +1,23 @@
-// RIDEFF LIFE service worker.
+// rideff Life service worker.
 // - App shell: every page's HTML plus its /_next/static files are cached on install,
 //   so the app opens offline from the Home Screen.
 // - Pages and RSC data: network first, cached copy when offline.
 // - /_next/static (hashed, never changes): cache first.
 // - Supabase and other origins are never touched here.
 
-const VERSION = "ef-v18";
+const VERSION = "rl-v2";
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 
 const PAGES = [
-  "/", "/login", "/settings", "/more",
+  "/", "/login", "/settings", "/more", "/map", "/plan", "/help",
   "/budget", "/debts", "/import", "/recur", "/subs", "/remit", "/biz", "/tax",
   "/week", "/shifts", "/ygoals", "/learn",
   "/invest", "/sim", "/career",
   "/gym", "/together", "/journal",
   "/alerts", "/report", "/reports", "/ask", "/whatif", "/setup",
 ];
-const EXTRA = ["/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png"];
+const EXTRA = ["/manifest.webmanifest", "/rideff-particles.js", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon.png"];
 
 const STATIC_RE = /\/_next\/static\/[^"'\s)\\]+/g;
 
@@ -102,7 +102,7 @@ self.addEventListener("push", (e) => {
     d = { body: e.data ? e.data.text() : "" };
   }
   e.waitUntil(
-    self.registration.showNotification(d.title || "RIDEFF LIFE", {
+    self.registration.showNotification(d.title || "rideff Life", {
       body: d.body || "",
       icon: "/icons/icon-192.png",
       badge: "/icons/icon-192.png",

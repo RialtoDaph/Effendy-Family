@@ -1,6 +1,6 @@
-// What Rialna is told. Built on the server from rows read with the asker's
+// What Clopar is told. Built on the server from rows read with the asker's
 // own login (Row Level Security), and filtered here once more: the partner's
-// private items never reach the AI (README → Privacy: "Ask Rialna only uses
+// private items never reach the AI (README → Privacy: "Ask Clopar only uses
 // data the asking person can see").
 
 import { assetEur, payoffPlan, subscriptionTotals, type Asset, type BusinessMonth, type Debt, type Remittance, type Subscription, type TaxDeadline } from "./finance";

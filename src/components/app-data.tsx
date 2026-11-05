@@ -9,6 +9,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { BILLING_START, activePlan, type Billing, type PlanKey } from "@/lib/plans";
+import { AI_NAME } from "@/lib/nav";
 import { clearAllPins } from "@/lib/pin";
 import { disablePushHere } from "@/lib/push";
 import { supabase } from "@/lib/supabase";
@@ -22,6 +24,7 @@ export type Member = {
   avatar_bg: string | null;
   avatar_fg: string | null;
   sort: number;
+  share: Record<string, boolean>;
 };
 
 export type Household = { id: string; name: string; home_city: string; currency: string };
@@ -36,6 +39,13 @@ export type MemberSettings = {
   ef_months: number;
   learn_week_min?: number;
   gym_week_goal?: number;
+  shift_wage?: number | null;
+  memory_on?: boolean;
+  memory_shared?: boolean;
+  lang?: string;
+  ai_name?: string;
+  voice?: "text" | "audio" | "both";
+  brief_at?: string;
 };
 
 type Profile = {
@@ -43,10 +53,13 @@ type Profile = {
   members: Member[];
   household: Household | null;
   settings: MemberSettings | null;
+  billing?: Billing | null;
 };
 
 type AppData = Profile & {
   me: Member | undefined;
+  bill: Billing;
+  plan: PlanKey;
   ready: boolean;
   reload: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -59,6 +72,11 @@ export function useAppData() {
   const v = useContext(AppDataContext);
   if (!v) throw new Error("useAppData must be used inside <AppDataProvider>");
   return v;
+}
+
+/** The name each person gave their assistant. Safe outside the app shell, as on the login page. */
+export function useAiName() {
+  return useContext(AppDataContext)?.settings?.ai_name || AI_NAME;
 }
 
 function readCache(): Profile | null {
@@ -84,10 +102,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   const load = useCallback(async (userId: string) => {
     const sb = supabase();
-    const [m, h, s] = await Promise.all([
+    const [m, h, s, b] = await Promise.all([
       sb.from("members").select("*").order("sort"),
       sb.from("households").select("*").limit(1).maybeSingle(),
       sb.from("member_settings").select("*").eq("member_id", userId).maybeSingle(),
+      sb.from("subscriptions_billing").select("plan,interval,status,seats,current_period_end").maybeSingle(),
     ]);
     if (m.error || h.error || s.error) return; // offline or a network hiccup: keep the cached copy
     const next: Profile = {
@@ -95,6 +114,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       members: m.data as Member[],
       household: h.data as Household | null,
       settings: s.data as MemberSettings | null,
+      billing: b.data as Billing | null,
     };
     setProfile(next);
     try {
@@ -140,15 +160,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     clearAllPins();
     try {
-      // Rialna's chat and briefings belong to this person, not to the phone.
+      // Clopar's chat and briefings belong to this person, not to the phone.
       for (const k of Object.keys(localStorage)) if (k.startsWith("ef-ask-") || k.startsWith("ef-brief-") || k.startsWith("ef-inbox-")) localStorage.removeItem(k);
     } catch {}
     await disablePushHere();
     await supabase().auth.signOut();
   }, []);
 
+  const bill = profile.billing ?? BILLING_START;
   const value: AppData = {
     ...profile,
+    bill,
+    plan: activePlan(bill),
     me: profile.members.find((x) => x.id === profile.userId),
     ready,
     reload,

@@ -3,13 +3,18 @@
 import { Printer } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { EmptyState } from "@/components/empty-state";
 import { useFinance } from "@/components/finance-data";
+import { useLabel } from "@/components/nav-label";
 import { useMoney } from "@/components/money-data";
 import { useTime } from "@/components/time-data";
 import { Segmented } from "@/components/ui";
 import { businessStats, subscriptionTotals } from "@/lib/finance";
-import { MONTHS_LONG, STATUS_LABEL, budgetSummary, emergencyFund, eur, type Today } from "@/lib/money";
-import { GOAL_STATUS_LABEL, goalStatus, monthShifts } from "@/lib/time";
+import { budgetSummary, emergencyFund, eur, type Today } from "@/lib/money";
+import { goalStatus, monthShifts } from "@/lib/time";
+import { useDates } from "@/lib/use-dates";
 
 /** A Today for the last day of a month (or the real today for the current month). */
 function monthEnd(ym: string, today: Today): Today {
@@ -25,7 +30,7 @@ function prevYm(today: Today) {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="break-inside-avoid rounded-[10px] border border-line bg-card p-5 print:p-3">
+    <section className="break-inside-avoid rounded-[18px] border border-line bg-card p-5 print:p-3">
       <h2 className="m-0 mb-3 text-[17px] font-extrabold">{title}</h2>
       {children}
     </section>
@@ -42,6 +47,10 @@ function Row({ k, v, strong = false }: { k: ReactNode; v: ReactNode; strong?: bo
 }
 
 export function ReportScreen() {
+  const tt = useTranslations("t");
+  const r_ = useTranslations("tools");
+  const fmt = useDates();
+  const navLabel = useLabel();
   const money = useMoney();
   const fin = useFinance();
   const time = useTime();
@@ -50,7 +59,7 @@ export function ReportScreen() {
   const [picked, setYm] = useState<string | null>(null);
   const ym = picked && options.includes(picked) ? picked : options[0];
   const t = monthEnd(ym, money.today);
-  const label = `${MONTHS_LONG[t.m - 1]} ${t.y}`;
+  const label = fmt.monthFull(ym);
 
   // Family view only: private items are never in the report.
   const txs = money.transactions.filter((x) => x.visibility === "family" && x.date.startsWith(ym));
@@ -77,31 +86,42 @@ export function ReportScreen() {
   const dates = time.dateNights.filter((d) => d.visibility === "family" && d.date.startsWith(ym));
   const ygoals = time.yearlyGoals.filter((g) => g.visibility === "family" && g.year === t.y);
 
+  if (money.loaded && !money.transactions.length) {
+    return (
+      <EmptyState eyebrow={navLabel("nav.monthly_report")} title={tt("e_report")}>
+        <Link href="/setup" className="flex min-h-[46px] items-center rounded-full bg-acc px-5 text-sm font-bold text-onacc hover:text-onacc">
+          {tt("b_setup")}
+        </Link>
+      </EmptyState>
+    );
+  }
+
   return (
     <div data-report className="flex flex-col gap-4">
       <div data-noprint className="flex flex-wrap items-center gap-2">
-        <Segmented options={options.map((o) => ({ value: o, label: MONTHS_LONG[Number(o.slice(5)) - 1] }))} value={ym} onChange={setYm} />
+        <Segmented options={options.map((o) => ({ value: o, label: fmt.monthLong(Number(o.slice(5))) }))} value={ym} onChange={setYm} />
         <button onClick={() => window.print()} className="ml-auto flex min-h-11 items-center gap-2 rounded-full border-0 bg-acc px-5 text-sm font-extrabold text-onacc">
-          <Printer size={17} /> Save as PDF
+          <Printer size={17} /> {r_("re_pdf")}
         </button>
       </div>
       <div data-noprint className="text-xs text-mut2">
-        In the print window, choose “Save as PDF” and paper size A4. Private items are never in the report.
+        {r_("re_pdf_note")}
       </div>
 
       <header>
-        <div className="eyebrow">{household?.name ?? "RIDEFF LIFE"} · Monthly report</div>
+        <div className="eyebrow">{r_("re_eyebrow", { name: household?.name ?? "rideff Life" })}</div>
         <h1 className="m-0 mt-1.5 text-[30px] font-extrabold tracking-[-0.02em]">{label}</h1>
         <div className="mt-1 text-[13px] text-mut">
-          {ym === money.today.ym ? `So far, up to ${money.today.d} ${MONTHS_LONG[t.m - 1]}` : "Whole month"} · family view
+          {ym === money.today.ym ? r_("re_sofar", { date: fmt.short(money.today.iso) }) : r_("re_whole")}
+          {r_("re_family")}
         </div>
       </header>
 
       <div className="grid grid-cols-3 gap-2 print:gap-2">
         {[
-          ["Money in (booked)", eur(income)],
-          ["Money out", eur(spent)],
-          ["Left over", eur(income - spent)],
+          [r_("re_in"), eur(income)],
+          [r_("re_out"), eur(spent)],
+          [r_("re_left"), eur(income - spent)],
         ].map(([k, v]) => (
           <div key={k} className="rounded-[10px] bg-inv p-3.5 text-white">
             <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/60">{k}</div>
@@ -112,87 +132,85 @@ export function ReportScreen() {
 
       {plannedIncome > 0 && (
         <div className="rounded-[10px] border border-line bg-soft px-4 py-3 text-[13px] leading-normal text-mut">
-          Planned income: <b className="text-ink">{eur(plannedIncome)} a month</b> (Budget → Incomes). Booked as money in:{" "}
-          <b className="text-ink">{eur(income)}</b>.
-          {income < plannedIncome * 0.9 &&
-            ` ${eur(plannedIncome - income)} is not booked yet, so “Left over” looks lower than it will be. Post income automatically under Money → Recurring.`}
+          {r_.rich("re_planned", { planned: eur(plannedIncome), booked: eur(income), b: (c) => <b className="text-ink">{c}</b> })}
+          {income < plannedIncome * 0.9 && r_("re_unbooked", { amount: eur(plannedIncome - income) })}
         </div>
       )}
 
       <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))] print:grid-cols-2">
-        <Section title="Budget">
-          <Row k="Flexible money" v={`${eur(budget.flexSpent)} of ${eur(budget.flexLimit)}`} strong />
+        <Section title={r_("re_budget")}>
+          <Row k={r_("re_flex")} v={r_("re_of", { a: eur(budget.flexSpent), b: eur(budget.flexLimit) })} strong />
           {budget.rows
             .filter((r) => r.cat.monthly_limit > 0 || r.spent > 0)
             .map((r) => (
-              <Row key={r.cat.id} k={`${r.cat.name} · ${STATUS_LABEL[r.status]}`} v={`${eur(r.spent)} / ${eur(r.cat.monthly_limit)}`} />
+              <Row key={r.cat.id} k={`${r.cat.name} · ${r_(`st_${r.status}`)}`} v={`${eur(r.spent)} / ${eur(r.cat.monthly_limit)}`} />
             ))}
         </Section>
 
-        <Section title="Where the money went">
+        <Section title={r_("re_where")}>
           {topPayees.map(([p, v]) => (
             <Row key={p} k={p} v={eur(v)} />
           ))}
-          {!topPayees.length && <div className="text-[13px] text-mut">No spending recorded.</div>}
-          <Row k="Subscriptions (active)" v={`${eur(subs.monthly)} / month`} />
+          {!topPayees.length && <div className="text-[13px] text-mut">{r_("re_nospend")}</div>}
+          <Row k={r_("re_subs")} v={r_("re_permonth", { amount: eur(subs.monthly) })} />
         </Section>
 
-        <Section title="Savings & net worth">
-          <Row k="Net worth" v={eur(fin.worth.net)} strong />
-          <Row k="Owned" v={eur(fin.worth.assets)} />
-          <Row k="Debts left" v={eur(debts)} />
-          {ef.goal && <Row k="Emergency fund" v={`${ef.months.toFixed(1)} of ${ef.target} months`} />}
+        <Section title={r_("re_savings")}>
+          <Row k={r_("re_net")} v={eur(fin.worth.net)} strong />
+          <Row k={r_("re_owned")} v={eur(fin.worth.assets)} />
+          <Row k={r_("re_debts")} v={eur(debts)} />
+          {ef.goal && <Row k={r_("re_ef")} v={r_("re_months", { a: ef.months.toFixed(1), b: ef.target })} />}
           {money.goals
             .filter((g) => g.visibility === "family" && !g.is_emergency_fund && g.target > 0)
             .map((g) => (
-              <Row key={g.id} k={g.name} v={`${eur(g.current)} of ${eur(g.target)}`} />
+              <Row key={g.id} k={g.name} v={r_("re_of", { a: eur(g.current), b: eur(g.target) })} />
             ))}
         </Section>
 
         {(bizMonths.length > 0 || remit.length > 0) && (
-          <Section title="Business & transfers home">
+          <Section title={r_("re_biz")}>
             {bizMonths.map((b) => {
               const biz = fin.businesses.find((x) => x.id === b.business_id);
-              return <Row key={b.id} k={biz?.name ?? "Business"} v={`${eur(b.revenue)} in · ${eur(b.revenue - b.costs)} profit`} />;
+              return <Row key={b.id} k={biz?.name ?? r_("re_business")} v={r_("re_inprofit", { rev: eur(b.revenue), profit: eur(b.revenue - b.costs) })} />;
             })}
-            {fin.businesses.length > 0 && bizMonths.length === 0 && <div className="text-[13px] text-mut">No business month entered yet.</div>}
+            {fin.businesses.length > 0 && bizMonths.length === 0 && <div className="text-[13px] text-mut">{r_("re_nobiz")}</div>}
             {remit.length > 0 && (
               <Row
-                k={`Sent to Indonesia (${remit.length}×)`}
+                k={r_("re_sent", { n: remit.length })}
                 v={`${eur(remit.reduce((a, r) => a + r.eur, 0))} · Rp ${remit.reduce((a, r) => a + r.idr_received, 0).toLocaleString("id-ID")}`}
               />
             )}
             {fin.businesses.map((b) => {
               const s = businessStats(fin.businessMonths.filter((m) => m.business_id === b.id && m.visibility === "family"));
-              return s.months > 0 ? <Row key={b.id} k={`${b.name}, last ${s.months} months`} v={`${eur(s.perMonth)} profit / month`} /> : null;
+              return s.months > 0 ? <Row key={b.id} k={r_("re_last", { name: b.name, n: s.months })} v={r_("re_profit", { amount: eur(s.perMonth) })} /> : null;
             })}
           </Section>
         )}
 
-        <Section title="Goals this year">
+        <Section title={r_("re_goals")}>
           {ygoals.map((g) => {
             const st = goalStatus(g, t.iso);
-            return <Row key={g.id} k={g.name} v={`${st.pct}% · ${GOAL_STATUS_LABEL[st.status]}`} />;
+            return <Row key={g.id} k={g.name} v={`${st.pct}% · ${r_(`gs_${st.status}`)}`} />;
           })}
-          {!ygoals.length && <div className="text-[13px] text-mut">No yearly goals yet.</div>}
+          {!ygoals.length && <div className="text-[13px] text-mut">{r_("re_nogoals")}</div>}
         </Section>
 
-        <Section title="Time & life">
+        <Section title={r_("re_time")}>
           {shiftsByMember.map(({ m, count, hours }) => (
-            <Row key={m.id} k={`${m.display_name}: bar shifts`} v={`${count} · ${Math.round(hours)} h`} />
+            <Row key={m.id} k={r_("re_shifts", { name: m.display_name })} v={`${count} · ${Math.round(hours)} h`} />
           ))}
           {gym.map(({ m, n }) => (
-            <Row key={m.id} k={`${m.display_name}: gym`} v={`${n} sessions`} />
+            <Row key={m.id} k={r_("re_gym", { name: m.display_name })} v={r_("re_sessions", { n })} />
           ))}
           {learn.map(({ m, min }) => (
-            <Row key={m.id} k={`${m.display_name}: learning`} v={`${Math.round(min / 6) / 10} h`} />
+            <Row key={m.id} k={r_("re_learn", { name: m.display_name })} v={`${Math.round(min / 6) / 10} h`} />
           ))}
-          <Row k="Date nights" v={dates.length ? `${dates.length} · ${eur(dates.reduce((a, d) => a + (d.cost ?? 0), 0))}` : "0"} />
+          <Row k={r_("re_dates")} v={dates.length ? `${dates.length} · ${eur(dates.reduce((a, d) => a + (d.cost ?? 0), 0))}` : "0"} />
         </Section>
       </div>
 
       <footer className="text-xs text-mut2">
-        Made by RIDEFF LIFE on {money.today.iso}. Amounts in euro; Rupiah at the saved rate.
+        {r_("re_footer", { date: fmt.full(money.today.iso) })}
       </footer>
     </div>
   );

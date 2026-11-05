@@ -28,17 +28,19 @@ function keyBytes(b64url: string) {
   return Uint8Array.from(s, (c) => c.charCodeAt(0));
 }
 
-/** Asks for permission, subscribes and saves. Returns an error text or null. */
-export async function enablePush(): Promise<string | null> {
-  if (!pushSupported()) return "This browser cannot show reminders.";
+export type PushError = "pe_unsupported" | "pe_denied" | "pe_reopen" | "pe_server" | "needs_net" | "save_failed" | "pe_first" | "pe_wait" | "pe_nosub" | "pe_test";
+
+/** Asks for permission, subscribes and saves. Returns a message key or null. */
+export async function enablePush(): Promise<PushError | null> {
+  if (!pushSupported()) return "pe_unsupported";
   const perm = await Notification.requestPermission();
-  if (perm !== "granted") return "Notifications were not allowed.";
+  if (perm !== "granted") return "pe_denied";
   const reg = await registration();
-  if (!reg) return "Open the installed app once more, then try again.";
+  if (!reg) return "pe_reopen";
 
   const sb = supabase();
   const { data, error } = await sb.functions.invoke<{ publicKey: string }>("push", { body: { action: "key" } });
-  if (error || !data?.publicKey) return navigator.onLine ? "Could not reach the server." : "This needs the internet.";
+  if (error || !data?.publicKey) return navigator.onLine ? "pe_server" : "needs_net";
   const appKey = keyBytes(data.publicKey);
 
   let sub = await reg.pushManager.getSubscription();
@@ -57,22 +59,23 @@ export async function enablePush(): Promise<string | null> {
     p_auth: j.keys?.auth,
     p_agent: navigator.userAgent,
   });
-  return res.error ? "Could not save. Check your internet connection." : null;
+  return res.error ? "save_failed" : null;
 }
 
 function sameBytes(a: Uint8Array, b: Uint8Array) {
   return a.length === b.length && a.every((x, i) => x === b[i]);
 }
 
-/** Sends one test reminder to this phone. Returns an error text or null. */
-export async function sendTestPush(): Promise<string | null> {
+/** Sends one test reminder to this phone. Returns a message key or null. */
+export async function sendTestPush(): Promise<PushError | null> {
   const sub = await (await registration())?.pushManager.getSubscription();
-  if (!sub) return "Allow notifications first.";
+  if (!sub) return "pe_first";
   const { error } = await supabase().functions.invoke("push", { body: { action: "test", endpoint: sub.endpoint } });
   if (!error) return null;
   const ctx = (error as { context?: Response }).context;
-  const body = ctx && typeof ctx.json === "function" ? await ctx.json().catch(() => null) : null;
-  return body?.error ?? (navigator.onLine ? "Could not send the test." : "This needs the internet.");
+  if (ctx?.status === 429) return "pe_wait";
+  if (ctx?.status === 404) return "pe_nosub";
+  return navigator.onLine ? "pe_test" : "needs_net";
 }
 
 /** On sign out: this phone stops getting the person's reminders. */

@@ -1,10 +1,12 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useAppData } from "@/components/app-data";
 import { useToast } from "@/components/toast";
 import {
   DEFAULT_IDR_PER_EUR,
+  asSubscription,
   netWorth,
   type Asset,
   type Business,
@@ -17,14 +19,13 @@ import {
   type TaxDeadline,
   type TaxDeduction,
 } from "@/lib/finance";
-import { SYNCED_EVENT } from "@/components/money-data";
+import { SYNCED_EVENT, useMoney } from "@/components/money-data";
 import { QUEUED, enqueue, isNetworkError } from "@/lib/offline-queue";
 import { supabase } from "@/lib/supabase";
 
 type FinanceRows = {
   debts: Debt[];
   debtSettings: DebtSettings;
-  subscriptions: Subscription[];
   remittances: Remittance[];
   businesses: Business[];
   businessMonths: BusinessMonth[];
@@ -43,7 +44,6 @@ export type WorthPoint = { day: string; assets: number; debts: number; net: numb
 
 export type FinanceTable =
   | "debts"
-  | "subscriptions"
   | "remittances"
   | "businesses"
   | "business_months"
@@ -53,6 +53,8 @@ export type FinanceTable =
 
 type Finance = FinanceRows & {
   loaded: boolean;
+  /** The is_subscription rows of Recurring, most expensive first. */
+  subscriptions: Subscription[];
   /** Saved rate, or the default until one is saved. */
   rate: number;
   /** Family net worth: private rows never count here. */
@@ -70,7 +72,6 @@ type Finance = FinanceRows & {
 const EMPTY: FinanceRows = {
   debts: [],
   debtSettings: { strategy: "avalanche", extra_per_month: 0 },
-  subscriptions: [],
   remittances: [],
   businesses: [],
   businessMonths: [],
@@ -93,11 +94,9 @@ export function useFinance() {
 }
 
 const cacheKey = (userId: string) => `ef-finance-v1-${userId}`;
-const OFFLINE_MSG = "Could not save. Check your internet connection.";
 
 const ROW_KEY: Record<FinanceTable, keyof FinanceRows> = {
   debts: "debts",
-  subscriptions: "subscriptions",
   remittances: "remittances",
   businesses: "businesses",
   business_months: "businessMonths",
@@ -128,7 +127,9 @@ async function saveTodayWorth(rows: FinanceRows): Promise<WorthPoint[]> {
 }
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
+  const tm = useTranslations("money");
   const { userId, household } = useAppData();
+  const { recurring } = useMoney();
   const toast = useToast();
   const [rows, setRows] = useState<FinanceRows>(EMPTY);
   const [loaded, setLoaded] = useState(false);
@@ -139,7 +140,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     const res = await Promise.all([
       sb.from("debts").select("*").order("created_at"),
       sb.from("debt_settings").select("strategy,extra_per_month").maybeSingle(),
-      sb.from("subscriptions").select("*").order("monthly_price", { ascending: false }),
       sb.from("remittances").select("*").order("date", { ascending: false }).limit(500),
       sb.from("businesses").select("*").order("sort"),
       sb.from("business_months").select("*").order("month", { ascending: false }),
@@ -152,11 +152,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       sb.from("networth_history").select("day,assets,debts,net").gte("day", berlinDay(-400)).order("day"),
     ]);
     if (res.some((r) => r.error)) return; // offline: keep what we have
-    const [debts, ds, subs, rem, biz, bm, files, dl, ded, ty, assets, fx, hist] = res.map((r) => r.data);
+    const [debts, ds, rem, biz, bm, files, dl, ded, ty, assets, fx, hist] = res.map((r) => r.data);
     const next: FinanceRows = {
       debts: debts as Debt[],
       debtSettings: (ds as DebtSettings | null) ?? EMPTY.debtSettings,
-      subscriptions: subs as Subscription[],
       remittances: rem as Remittance[],
       businesses: biz as Business[],
       businessMonths: bm as BusinessMonth[],
@@ -223,11 +222,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         applyLocal(table, id ? "update" : "insert", rowId, values);
         return QUEUED;
       }
-      if (error) return `Could not save: ${error.message}`;
+      if (error) return tm("could_not_save", { message: error.message });
       await load();
       return null;
     },
-    [load, applyLocal],
+    [tm, load, applyLocal],
   );
 
   const remove = useCallback(
@@ -238,11 +237,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         applyLocal(table, "delete", id);
         return QUEUED;
       }
-      if (error) return `Could not delete: ${error.message}`;
+      if (error) return tm("could_not_delete", { message: error.message });
       await load();
       return null;
     },
-    [load, applyLocal],
+    [tm, load, applyLocal],
   );
 
   useEffect(() => {
@@ -263,22 +262,22 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         const body = pendingSettings.current;
         pendingSettings.current = {};
         const { error } = await supabase().from("debt_settings").update(body).eq("household_id", household?.id);
-        if (error) toast(OFFLINE_MSG);
+        if (error) toast(tm("offline_save"));
       }, 600);
     },
-    [household?.id, toast],
+    [tm, household?.id, toast],
   );
 
   const saveRate = useCallback(
     async (idrPerEur: number) => {
       const { error } = await supabase().from("fx_rates").insert({ idr_per_eur: idrPerEur });
-      if (error) toast(OFFLINE_MSG);
+      if (error) toast(tm("offline_save"));
       else {
-        toast(`Rate saved: €1 = Rp ${idrPerEur.toLocaleString("id-ID")}`);
+        toast(tm("rate_saved_1_rp", { toLocaleString: idrPerEur.toLocaleString("id-ID") }));
         await load();
       }
     },
-    [load, toast],
+    [tm, load, toast],
   );
 
   const setRefund = useCallback(
@@ -287,48 +286,48 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       const sb = supabase();
       const upd = await sb.from("tax_years").update({ refund_estimate: refund }).eq("year", year).select("year");
       const error = upd.error ?? (upd.data?.length ? null : (await sb.from("tax_years").insert({ year, refund_estimate: refund })).error);
-      if (error) toast(OFFLINE_MSG);
+      if (error) toast(tm("offline_save"));
       await load();
     },
-    [load, toast],
+    [tm, load, toast],
   );
 
   const upload = useCallback(
     async (file: File, kind: "business_report" | "receipt" | "statement", visibility: string) => {
-      if (!household || !userId) return { error: "Not signed in." };
-      if (file.size > 20 * 1024 * 1024) return { error: "The file is larger than 20 MB." };
+      if (!household || !userId) return { error: tm("not_signed_in") };
+      if (file.size > 20 * 1024 * 1024) return { error: tm("the_file_is_larger_than_20_mb") };
       const sb = supabase();
       const safe = file.name.replace(/[^\w.\-]+/g, "_").slice(-80);
       const path = `${household.id}/${userId}/${Date.now()}-${safe}`;
       const up = await sb.storage.from("files").upload(path, file, { contentType: file.type || undefined, upsert: false });
-      if (up.error) return { error: navigator.onLine ? `Upload failed: ${up.error.message}` : OFFLINE_MSG };
+      if (up.error) return { error: navigator.onLine ? tm("upload_failed_2", { message: up.error.message }) : tm("offline_save") };
       const { data, error } = await sb
         .from("files")
         .insert({ storage_path: path, name: file.name, kind, mime: file.type || null, size: file.size, visibility })
         .select("id")
         .single();
-      if (error || !data) return { error: `Upload failed: ${error?.message ?? "unknown"}` };
+      if (error || !data) return { error: tm("upload_failed_3", { v: error?.message ?? "unknown" }) };
       return { id: data.id as string };
     },
-    [household, userId],
+    [tm, household, userId],
   );
 
   const openFile = useCallback(
     async (fileId: string) => {
       const f = rows.files.find((x) => x.id === fileId);
-      if (!f) return toast("File not found.");
+      if (!f) return toast(tm("file_not_found"));
       // Open the tab first (iOS blocks pop-ups opened after an await).
       const win = window.open("", "_blank");
       const { data, error } = await supabase().storage.from("files").createSignedUrl(f.storage_path, 60);
       if (error || !data) {
         win?.close();
-        toast(navigator.onLine ? "Could not open the file." : "Files need the internet.");
+        toast(navigator.onLine ? tm("could_not_open_the_file") : tm("files_need_the_internet"));
         return;
       }
       if (win) win.location.href = data.signedUrl;
       else window.location.href = data.signedUrl;
     },
-    [rows.files, toast],
+    [tm, rows.files, toast],
   );
 
   const rate = rows.fxRate ?? DEFAULT_IDR_PER_EUR;
@@ -342,9 +341,15 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     [rows.assets, rows.debts, rate],
   );
 
+  const subscriptions = useMemo(
+    () => recurring.filter((r) => r.is_subscription).map(asSubscription).sort((a, b) => b.monthly_price - a.monthly_price),
+    [recurring],
+  );
+
   const value: Finance = {
     ...rows,
     loaded,
+    subscriptions,
     rate,
     worth,
     reload: load,

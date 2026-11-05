@@ -2,6 +2,7 @@
 
 import { ASK_EVENT, ASK_HANDOFF } from "@/lib/ask";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   BookOpen,
   CalendarDays,
@@ -21,14 +22,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAppData } from "@/components/app-data";
+import { useAiName, useAppData } from "@/components/app-data";
 import { useFinance } from "@/components/finance-data";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
+import { useLabel } from "@/components/nav-label";
 import { useTime } from "@/components/time-data";
 import { useTheme } from "@/components/theme";
 import { searchData, type HitKind } from "@/lib/search";
-import { AI_NAME, HOME, MODULE_ORDER, MODULES, QUICK_ADD, TOOLS, hrefOf } from "@/lib/nav";
+import { HOME, MODULE_ORDER, MODULES, QUICK_ADD, TOOLS, hrefOf } from "@/lib/nav";
 import { useShell } from "./app-shell";
 
 type Cmd = { label: string; icon: LucideIcon; hint: string; detail?: string; run: () => void };
@@ -50,6 +52,7 @@ const HIT_ICON: Record<HitKind, LucideIcon> = {
 };
 
 export function CommandPalette({ onClose }: { onClose: () => void }) {
+  const aiName = useAiName();
   const router = useRouter();
   const { runQuickAdd } = useShell();
   const { setTheme } = useTheme();
@@ -58,6 +61,8 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   const fin = useFinance();
   const time = useTime();
   const { openForm } = useMoneyForms();
+  const t = useTranslations();
+  const label = useLabel();
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,18 +74,19 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       onClose();
       router.push(hrefOf(id));
     };
-    const jump: Cmd[] = [{ label: HOME.label, icon: HOME.icon, hint: "Go", run: go("home") }];
+    const hintGo = t("ui.hint_go");
+    const jump: Cmd[] = [{ label: label(HOME.key), icon: HOME.icon, hint: hintGo, run: go("home") }];
     for (const k of MODULE_ORDER) {
       const M = MODULES[k];
-      jump.push({ label: M.name, icon: M.icon, hint: "Go", run: go(M.tabs[0].id) });
-      for (const t of M.tabs) jump.push({ label: `${M.name} › ${t.label}`, icon: CircleDot, hint: "Go", run: go(t.id) });
+      jump.push({ label: label(M.key), icon: M.icon, hint: hintGo, run: go(M.tabs[0].id) });
+      for (const tab of M.tabs) jump.push({ label: `${label(M.key)} › ${label(tab.key)}`, icon: CircleDot, hint: hintGo, run: go(tab.id) });
     }
-    for (const t of TOOLS) jump.push({ label: t.label, icon: t.icon, hint: "Go", run: go(t.id) });
+    for (const tool of TOOLS) jump.push({ label: label(tool.key), icon: tool.icon, hint: hintGo, run: go(tool.id) });
 
     const add: Cmd[] = QUICK_ADD.map((item) => ({
-      label: `Add ${item.label.toLowerCase()}`,
+      label: t("ui.add_item", { item: label(item.label) }),
       icon: item.icon,
-      hint: "New",
+      hint: t("ui.hint_new"),
       run: () => {
         onClose();
         if (item.href) router.push(item.href);
@@ -89,14 +95,14 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     }));
     const prefs: Cmd[] = (
       [
-        ["light", "Light mode"],
-        ["dark", "Dark mode"],
-        ["auto", "Auto theme"],
+        ["light", t("ui.theme_light")],
+        ["dark", t("ui.theme_dark")],
+        ["auto", t("ui.theme_auto")],
       ] as const
-    ).map(([v, label]) => ({
-      label,
+    ).map(([v, text]) => ({
+      label: text,
       icon: Settings,
-      hint: "Theme",
+      hint: t("ui.hint_theme"),
       run: () => {
         onClose();
         setTheme(v);
@@ -113,7 +119,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       go("ask")();
       window.dispatchEvent(new Event(ASK_EVENT));
     };
-    // Your own data first (works offline and without Rialna), then pages, then Ask.
+    // Your own data first (works offline and without Clopar), then pages, then Ask.
     const hits: Cmd[] = searchData(q, {
       viewerId: userId,
       transactions: money.transactions,
@@ -133,26 +139,26 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       label: h.label,
       detail: h.detail,
       icon: HIT_ICON[h.kind],
-      hint: "Open",
+      hint: t("ui.hint_open"),
       run: () => {
         onClose();
         openForm(h.form as Parameters<typeof openForm>[0], h.id);
       },
     }));
-    if (hits.length) out.push({ label: "In your data", items: hits });
+    if (hits.length) out.push({ label: t("ui.in_your_data"), items: hits });
     const sections: [string, Cmd[], number][] = [
-      ["Jump to", f(jump), 8],
-      ["Quick add", f(add), 9],
-      ["Settings", f(prefs), 9],
+      [t("copy.jump_to"), f(jump), 8],
+      [t("copy.quick_add"), f(add), 9],
+      [t("nav.settings"), f(prefs), 9],
     ];
-    for (const [label, items, max] of sections) {
-      if (items.length) out.push({ label, items: query ? items.slice(0, 6) : items.slice(0, max) });
+    for (const [title, items, max] of sections) {
+      if (items.length) out.push({ label: title, items: query ? items.slice(0, 6) : items.slice(0, max) });
     }
-    if (query) out.push({ label: "Ask", items: [{ label: `Ask ${AI_NAME}: “${q.trim()}”`, icon: Sparkles, hint: "Ask", run: ask }] });
+    if (query) out.push({ label: t("nav.ask"), items: [{ label: t("ui.ask_query", { name: aiName, query: q.trim() }), icon: Sparkles, hint: t("ui.hint_ask"), run: ask }] });
     return out;
-  }, [q, onClose, router, runQuickAdd, setTheme, userId, money, fin, time, openForm]);
+  }, [q, onClose, router, runQuickAdd, setTheme, userId, money, fin, time, openForm, t, label, aiName]);
 
-  // With no match, ↵ asks Rialna (README → Command palette).
+  // With no match, ↵ asks Clopar (README → Command palette).
   const flat = groups.flatMap((g) => g.items);
 
   function onKey(e: React.KeyboardEvent) {
@@ -177,9 +183,9 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     >
       <div
         role="dialog"
-        aria-label="Search"
+        aria-label={t("copy.search")}
         onClick={(e) => e.stopPropagation()}
-        className="flex w-full max-w-[620px] flex-col overflow-hidden rounded-[14px] border border-line bg-card shadow-[0_24px_70px_rgba(0,0,0,.28)]"
+        className="flex w-full max-w-[620px] flex-col overflow-hidden rounded-[14px] border border-line bg-card shadow-palette"
       >
         <div className="flex items-center gap-2.5 border-b border-line px-4">
           <Search size={18} strokeWidth={2} className="flex-none text-mut2" />
@@ -191,12 +197,12 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
               setSel(0);
             }}
             onKeyDown={onKey}
-            placeholder={`Search your data, pages, or ask ${AI_NAME}…`}
+            placeholder={t("ui.search_placeholder", { name: aiName })}
             className="h-14 min-w-0 flex-1 border-0 bg-transparent text-base text-ink outline-none"
           />
           <button
             onClick={onClose}
-            className="no-hit flex-none rounded-md border border-line bg-soft px-[7px] py-[3px] font-mono text-[11px] text-mut"
+            className="flex-none rounded-md border border-line bg-soft px-[7px] py-[3px] font-mono text-[11px] text-mut"
           >
             esc
           </button>
@@ -232,13 +238,13 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
             </div>
           ))}
           {!groups.length && (
-            <div className="px-3 py-6 text-center text-[13.5px] text-mut">Type to search your data and pages, or ask {AI_NAME}.</div>
+            <div className="px-3 py-6 text-center text-[13.5px] text-mut">{t("ui.search_empty", { name: aiName })}</div>
           )}
         </div>
         <div className="hidden gap-4 border-t border-line bg-soft px-4 py-2.5 font-mono text-[11.5px] text-mut2 wide:flex">
-          <span>↑↓ move</span>
-          <span>↵ open</span>
-          <span>⌘K toggle</span>
+          <span>{t("ui.key_move")}</span>
+          <span>{t("ui.key_open")}</span>
+          <span>{t("ui.key_toggle")}</span>
         </div>
       </div>
     </div>

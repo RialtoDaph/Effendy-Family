@@ -1,118 +1,122 @@
 "use client";
 
 import { FileText, Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAppData } from "@/components/app-data";
+import { ModuleEmpty } from "@/components/empty-state";
 import { useFinance } from "@/components/finance-data";
 import { useMoneyForms } from "@/components/money-forms";
-import { EmptyNote, OwnerPill, PrivateMark } from "@/components/ui";
+import { useLabel } from "@/components/nav-label";
+import { avatarColors } from "@/components/shell/avatar";
+import { PrivateMark } from "@/components/ui";
 import { businessStats, profit } from "@/lib/finance";
-import { MONTHS, eur } from "@/lib/money";
-import { ModuleTabs } from "./module-tabs";
-import { PageHeader } from "./page-header";
-
-const VAT_LABEL = { none: "No VAT · Kleinunternehmer", monthly: "VAT monthly", quarterly: "VAT quarterly" };
-
-export function monthLabel(ym: string) {
-  const [y, m] = ym.split("-").map(Number);
-  return `${MONTHS[m - 1]} ${y}`;
-}
+import { eur } from "@/lib/money";
+import { useDates } from "@/lib/use-dates";
+import { ModuleHeader } from "./module-tabs";
 
 export function BusinessScreen() {
-  const { businesses, businessMonths, files, openFile } = useFinance();
+  const tm = useTranslations("money");
+  const dates = useDates();
+  const label = useLabel();
+  const { businesses, businessMonths, files, openFile, loaded } = useFinance();
   const { members } = useAppData();
   const { openForm } = useMoneyForms();
 
+  if (loaded && !businesses.length) {
+    return (
+      <>
+        <ModuleHeader module="money" active="biz" />
+        <ModuleEmpty screen="biz" eyebrow={label("nav.business")} onAction={() => openForm("business")} />
+      </>
+    );
+  }
+
   return (
     <>
-      <div className="flex flex-col gap-3">
-        <PageHeader eyebrow="Money" title="Business" />
-        <ModuleTabs module="money" active="biz" />
-      </div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="m-0 max-w-[640px] text-[13.5px] leading-normal text-mut">
-          The businesses run in their own apps. Here you only keep the monthly totals, plus the report file, so family money and
-          taxes stay in one picture.
-        </p>
-        <button
-          onClick={() => openForm("business")}
-          className="min-h-11 whitespace-nowrap rounded-full border border-line bg-card px-4 text-[13px] font-bold text-ink"
-        >
-          + Add business
-        </button>
+      <ModuleHeader module="money" active="biz" />
+
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-dashed border-line bg-card px-4 py-3.5">
+        <div className="max-w-[560px] text-[13px] leading-normal text-mut">{tm("biz_intro")}</div>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => openForm("business")} className="hit44 min-h-10 whitespace-nowrap rounded-full border border-line bg-card px-4 text-[13px] font-bold text-ink">
+            {tm("add_business")}
+          </button>
+          <button onClick={() => openForm("bizmonth")} className="hit44 min-h-10 whitespace-nowrap rounded-full border-0 bg-acc px-4 text-[13px] font-bold text-onacc">
+            {tm("add_a_month")}
+          </button>
+        </div>
       </div>
 
-      {businesses.map((b) => {
-        const months = businessMonths.filter((m) => m.business_id === b.id);
-        const familyMonths = months.filter((m) => m.visibility === "family");
-        const st = businessStats(familyMonths);
-        return (
-          <section key={b.id} className="rounded-[10px] border border-line bg-card p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <button onClick={() => openForm("business", b.id)} className="border-0 bg-transparent p-0 text-left">
-                <h2 className="m-0 text-lg font-extrabold text-ink">{b.name}</h2>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-mut2">
-                  <OwnerPill member={members.find((m) => m.id === b.member_id)} />
-                  <span>{VAT_LABEL[b.vat_mode]}</span>
-                  {b.visibility === "private" && <PrivateMark />}
-                </div>
+      <div className="grid items-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))]">
+        {businesses.map((b) => {
+          const months = businessMonths.filter((m) => m.business_id === b.id);
+          const st = businessStats(months.filter((m) => m.visibility === "family"));
+          const owner = members.find((m) => m.id === b.member_id);
+          const { bg, fg } = owner ? avatarColors(owner) : { bg: "var(--acc)", fg: "var(--onacc)" };
+          return (
+            <section key={b.id} className="flex flex-col gap-3.5 rounded-[18px] border border-line bg-card p-5">
+              <button onClick={() => openForm("business", b.id)} className="flex items-center gap-3 border-0 bg-transparent p-0 text-left">
+                <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full font-bold" style={{ background: bg, color: fg }}>
+                  {b.name[0]?.toUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[17px] font-bold text-ink">{b.name}</span>
+                  <span className="flex flex-wrap items-center gap-2 text-[12.5px] text-mut">
+                    {tm(`vat_${b.vat_mode}`)}
+                    {b.visibility === "private" && <PrivateMark />}
+                  </span>
+                </span>
               </button>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { k: tm("revenue_n_mo", { n: st.months || 3 }), v: eur(st.revenue, 0), c: "" },
+                  { k: tm("profit_n_mo", { n: st.months || 3 }), v: eur(st.profit, 0), c: "text-ok" },
+                  { k: tm("profit_per_month"), v: eur(st.perMonth, 0), c: "" },
+                ].map(({ k, v, c }) => (
+                  <div key={k} className="min-w-0 rounded-[10px] bg-soft p-3">
+                    <div className="text-[11.5px] text-mut">{k}</div>
+                    <div className={`mt-1 text-lg font-bold tabular-nums ${c}`}>{v}</div>
+                  </div>
+                ))}
+              </div>
               <button
                 onClick={() => openForm("bizmonth", undefined, { business: b.id })}
-                className="flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full border-0 bg-inv px-4 text-[13px] font-extrabold text-white"
+                className="flex min-h-12 items-center justify-center gap-2 rounded-[10px] border-2 border-dashed border-line2 bg-card text-[13.5px] font-bold text-ink"
               >
-                <Upload size={15} strokeWidth={2.2} />
-                Upload monthly report
+                <Upload size={16} strokeWidth={2} />
+                {tm("upload_report")}
               </button>
-            </div>
-            <div className="mt-4 grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))]">
-              {[
-                [`Revenue · ${st.months || 3} mo`, eur(st.revenue, 0)],
-                [`Profit · ${st.months || 3} mo`, eur(st.profit, 0)],
-                ["Profit / month", eur(st.perMonth, 0)],
-              ].map(([k, v]) => (
-                <div key={k} className="rounded-[10px] bg-soft px-4 py-3">
-                  <div className="text-xs text-mut">{k}</div>
-                  <div className="text-xl font-black">{v}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3">
-              {months.map((m) => {
-                const file = m.file_id ? files.find((f) => f.id === m.file_id) : undefined;
-                return (
-                  <div
-                    key={m.id}
-                    className={`flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-line py-3 ${m.visibility === "private" ? "border-dashed" : ""}`}
-                  >
-                    <button onClick={() => openForm("bizmonth", m.id)} className="min-w-0 flex-1 border-0 bg-transparent p-0 text-left">
-                      <div className="text-sm font-bold text-ink">{monthLabel(m.month)}</div>
-                      <div className="flex flex-wrap items-center gap-x-2 text-xs text-mut2">
-                        <span>
-                          {eur(m.revenue, 0)} in · {eur(profit(m), 0)} profit · {eur(m.tax_set_aside, 0)} for tax
-                        </span>
-                        {m.visibility === "private" && <PrivateMark />}
+              <div>
+                {months.map((m) => {
+                  const file = m.file_id ? files.find((f) => f.id === m.file_id) : undefined;
+                  return (
+                    <div key={m.id} className={`flex items-center gap-3 border-t border-line py-3 ${m.visibility === "private" ? "border-dashed" : ""}`}>
+                      <div className="min-w-0 flex-1">
+                        <button onClick={() => openForm("bizmonth", m.id)} className="hit44 border-0 bg-transparent p-0 text-left text-sm font-bold text-ink">
+                          {dates.monthYear(m.month)}
+                        </button>
+                        {m.visibility === "private" && <span className="ml-2"><PrivateMark /></span>}
+                        {file ? (
+                          <button onClick={() => openFile(file.id)} className="hit44 mt-0.5 flex max-w-full items-center gap-[5px] border-0 bg-transparent p-0 text-xs text-mut2">
+                            <FileText size={12} strokeWidth={2} className="flex-none" />
+                            <span className="truncate">{file.name}</span>
+                          </button>
+                        ) : (
+                          <div className="mt-0.5 text-xs font-bold text-warnt">{tm("no_file_attached")}</div>
+                        )}
                       </div>
-                    </button>
-                    {file ? (
-                      <button
-                        onClick={() => openFile(file.id)}
-                        className="flex min-h-10 max-w-full items-center gap-1.5 rounded-full border border-line bg-card px-3 text-[12.5px] font-bold text-ink"
-                      >
-                        <FileText size={14} strokeWidth={2} className="flex-none" />
-                        <span className="truncate">{file.name}</span>
+                      <button onClick={() => openForm("bizmonth", m.id)} className="flex-none border-0 bg-transparent p-0 text-right">
+                        <span className="block text-[14.5px] font-bold tabular-nums text-ink">{eur(profit(m), 0)}</span>
+                        <span className="block text-[11.5px] text-mut2">{tm("biz_row_meta", { revenue: eur(m.revenue, 0), tax: eur(m.tax_set_aside, 0) })}</span>
                       </button>
-                    ) : (
-                      <span className="rounded-full bg-warnbg px-2.5 py-1 text-[11.5px] font-bold text-warnt">No file attached</span>
-                    )}
-                  </div>
-                );
-              })}
-              {!months.length && <EmptyNote>No months yet. Upload last month&apos;s report to start.</EmptyNote>}
-            </div>
-          </section>
-        );
-      })}
-      {!businesses.length && <EmptyNote>No businesses yet.</EmptyNote>}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
+      </div>
     </>
   );
 }

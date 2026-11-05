@@ -6,6 +6,8 @@ import {
   payoffPlan,
   received,
   remittanceQuotes,
+  asSubscription,
+  isUnused,
   subscriptionTotals,
   taxPot,
   worthChange,
@@ -87,6 +89,17 @@ describe("business and taxes", () => {
 });
 
 describe("subscriptions", () => {
+  it("are recurring rows: price is the positive of the amount, off means cancelled", () => {
+    const r = { id: "r", owner_id: "a", visibility: "family", name: "DAZN", icon: "tv", amount: -34.99, category_id: null, paid_by: null, day_of_month: 5, active: false, last_posted_month: null, is_subscription: true, last_used_at: null, cancelled_on: "2026-10-01" } as const;
+    expect(asSubscription(r)).toMatchObject({ monthly_price: 34.99, status: "cancelled", cancelled_on: "2026-10-01", day_of_month: 5 });
+  });
+  it("count as unused after more than 45 days, never without a date or once stopped", () => {
+    const u = (last_used_at: string | null, status: "active" | "cancelled" = "active") => ({ status, last_used_at }) as Subscription;
+    expect(isUnused(u("2026-09-15"), "2026-11-04")).toBe(true);
+    expect(isUnused(u("2026-09-20"), "2026-11-04")).toBe(false);
+    expect(isUnused(u(null), "2026-11-04")).toBe(false);
+    expect(isUnused(u("2026-01-01", "cancelled"), "2026-11-04")).toBe(false);
+  });
   const s = (price: number, status: "active" | "cancelled") => ({ monthly_price: price, status }) as Subscription;
   it("totals active ones and counts what cancelling saves", () => {
     const t = subscriptionTotals([s(10, "active"), s(5, "active"), s(35, "cancelled")]);

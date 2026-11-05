@@ -18,7 +18,6 @@ const STORE = "queue";
 export const QUEUE_EVENT = "ef-queue-change";
 /** Returned by save/remove when the change waits on this phone. */
 export const QUEUED = "queued";
-export const QUEUED_MSG = "Saved on this phone · it syncs when you are online";
 
 function open(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -66,6 +65,19 @@ export function isNetworkError(error: { message?: string; code?: string } | null
 let flushing = false;
 
 /**
+ * One queued write. An update loses to a newer edit on the server (last write wins).
+ * A row this same flush already wrote has a fresh updated_at, so the phone's later
+ * edits to it are not compared.
+ */
+export async function send(q: ReturnType<SupabaseClient["from"]>, op: QueuedOp, written: Set<string>) {
+  if (op.kind === "insert") return { ...(await q.insert({ ...op.values, id: op.id })), hit: true };
+  if (op.kind === "delete") return { ...(await q.delete().eq("id", op.id)), hit: false };
+  const update = q.update(op.values ?? {}).eq("id", op.id);
+  const { data, error } = await (written.has(op.id) ? update : update.lte("updated_at", new Date(op.at).toISOString())).select("id");
+  return { error, hit: !!data?.length };
+}
+
+/**
  * Sends queued writes in order. Returns how many were saved and how many the
  * server refused (those are dropped so one bad change cannot block the rest).
  */
@@ -74,15 +86,12 @@ export async function flush(sb: SupabaseClient): Promise<{ saved: number; refuse
   flushing = true;
   let saved = 0;
   let refused = 0;
+  const written = new Set<string>();
   try {
     for (const op of await pending()) {
       const q = sb.from(op.table);
-      const { error } =
-        op.kind === "insert"
-          ? await q.insert({ ...op.values, id: op.id })
-          : op.kind === "update"
-            ? await q.update(op.values ?? {}).eq("id", op.id)
-            : await q.delete().eq("id", op.id);
+      const { error, hit } = await send(q, op, written);
+      if (hit) written.add(op.id);
       if (error && isNetworkError(error)) break; // still offline: try again later
       if (error && error.code !== "23505") refused++; // 23505 = already saved earlier
       else saved++;

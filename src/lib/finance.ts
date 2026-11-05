@@ -1,7 +1,7 @@
 // Phase 2 money rules: remittances, debt payoff, net worth, business, taxes.
 // Pure functions (tested in finance.test.ts). Formulas: docs/design/README.md.
 
-import type { Visibility } from "./money";
+import type { Recurring, Visibility } from "./money";
 
 type Owned = { id: string; owner_id: string; visibility: Visibility };
 
@@ -22,11 +22,10 @@ export type Subscription = Owned & {
   for_whom: string | null;
   status: "active" | "cancelled";
   cancelled_on: string | null;
-  /** Day of the month it is charged; the linked recurring payment books it then. */
+  /** Day of the month it is charged; the 05:00 job books it then. */
   day_of_month: number;
   category_id: string | null;
-  /** The recurring payment kept in step by the database (see migration subscription_recurring). */
-  recurring_id: string | null;
+  last_used_at: string | null;
 };
 
 export type Remittance = Owned & {
@@ -216,6 +215,31 @@ export function taxPot(months: BusinessMonth[], year: number) {
 }
 
 /* Subscriptions ------------------------------------------------------------------------ */
+
+/** A subscription is a recurring row with is_subscription set; this is its subscription view. */
+export function asSubscription(r: Recurring): Subscription {
+  return {
+    id: r.id,
+    owner_id: r.owner_id,
+    visibility: r.visibility,
+    name: r.name,
+    monthly_price: -r.amount,
+    for_whom: r.paid_by,
+    status: r.active ? "active" : "cancelled",
+    cancelled_on: r.cancelled_on,
+    day_of_month: r.day_of_month,
+    category_id: r.category_id,
+    last_used_at: r.last_used_at,
+  };
+}
+
+const UNUSED_AFTER_DAYS = 45;
+
+/** Active and last used more than 45 days ago. No date saved means we don't know, so it is not flagged. */
+export function isUnused(s: Subscription, todayIso: string) {
+  if (s.status !== "active" || !s.last_used_at) return false;
+  return (Date.parse(todayIso) - Date.parse(s.last_used_at)) / 86_400_000 > UNUSED_AFTER_DAYS;
+}
 
 export function subscriptionTotals(subs: Subscription[]) {
   const active = subs.filter((s) => s.status === "active");

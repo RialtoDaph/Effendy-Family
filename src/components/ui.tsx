@@ -1,25 +1,27 @@
 import { Lock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import type { Member } from "@/components/app-data";
 import { avatarColors } from "@/components/shell/avatar";
-import { STATUS_LABEL, type Status } from "@/lib/money";
+import type { Status } from "@/lib/money";
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-[10px] border border-line bg-card p-5 ${className}`}>{children}</section>;
+  return <section className={`rounded-[18px] border border-line bg-card p-5 ${className}`}>{children}</section>;
 }
 
 export function H2({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <h2 className={`m-0 text-lg font-extrabold ${className}`}>{children}</h2>;
 }
 
-/** "+ Add" tint pill used next to section titles. */
-export function AddButton({ onClick, label = "+ Add" }: { onClick: () => void; label?: string }) {
+/** "+ Add" pill used next to section titles. */
+export function AddButton({ onClick, label }: { onClick: () => void; label?: string }) {
+  const tm = useTranslations("money");
   return (
     <button
       onClick={onClick}
-      className="min-h-10 whitespace-nowrap rounded-full border-0 bg-tint px-3 text-[12.5px] font-extrabold text-acct"
+      className="hit44 min-h-10 flex-none whitespace-nowrap rounded-full border-0 bg-acc px-4 text-[13px] font-bold text-onacc"
     >
-      {label}
+      {label ?? tm("add")}
     </button>
   );
 }
@@ -34,9 +36,10 @@ const STATUS_STYLE: Record<Status, string> = {
 };
 
 export function StatusPill({ status }: { status: Status }) {
+  const tm = useTranslations("money");
   return (
     <span className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-extrabold ${STATUS_STYLE[status]}`}>
-      {STATUS_LABEL[status]}
+      {tm(`status_${status}`)}
     </span>
   );
 }
@@ -79,20 +82,22 @@ export function Segmented<T extends string | number>({
 }
 
 /** Small owner pill: "Rialto", "Amnah", "Family". */
-export function OwnerPill({ member, fallback = "Family" }: { member: Member | undefined; fallback?: string }) {
+export function OwnerPill({ member, fallback }: { member: Member | undefined; fallback?: string }) {
+  const tm = useTranslations("money");
   const { bg, fg } = member ? avatarColors(member) : { bg: "var(--acc)", fg: "var(--onacc)" };
   return (
     <span className="whitespace-nowrap rounded-full px-[9px] py-[3px] text-[11px] font-bold" style={{ background: bg, color: fg }}>
-      {member?.display_name ?? fallback}
+      {member?.display_name ?? fallback ?? tm("family")}
     </span>
   );
 }
 
 export function PrivateMark() {
+  const tm = useTranslations("money");
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-mut2" title="Only you can see this">
+    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-mut2" title={tm("only_you_see")}>
       <Lock size={11} strokeWidth={2.2} />
-      Only me
+      {tm("only_me")}
     </span>
   );
 }

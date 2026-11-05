@@ -1,0 +1,992 @@
+{
+"eyebrow": [
+"rideff Life · {plan}",
+"rideff Life · {plan}",
+"rideff Life · {plan}"
+],
+"title": [
+"Settings",
+"Einstellungen",
+"Pengaturan"
+],
+"g_account": [
+"Account",
+"Konto",
+"Akun"
+],
+"g_account_sub": [
+"Plan, sign-in, members",
+"Tarif, Anmeldung, Mitglieder",
+"Paket, masuk, anggota"
+],
+"g_ai_sub": [
+"Memory, briefing, reminders",
+"Erinnerung, Briefing, Hinweise",
+"Memori, briefing, pengingat"
+],
+"g_look": [
+"Look & language",
+"Aussehen & Sprache",
+"Tampilan & bahasa"
+],
+"g_look_sub": [
+"Theme, language, region",
+"Design, Sprache, Region",
+"Tema, bahasa, wilayah"
+],
+"g_data": [
+"Data & privacy",
+"Daten & Privatsphäre",
+"Data & privasi"
+],
+"g_data_sub": [
+"Backup, reset, offline",
+"Backup, Zurücksetzen, offline",
+"Cadangan, reset, offline"
+],
+"g_help": [
+"Help",
+"Hilfe",
+"Bantuan"
+],
+"g_help_sub": [
+"Setup, questions, bugs",
+"Einrichtung, Fragen, Fehler",
+"Penyiapan, pertanyaan, bug"
+],
+"setup_title": [
+"Setup checklist",
+"Einrichtungs-Checkliste",
+"Daftar penyiapan"
+],
+"setup_sub": [
+"Where to put in your real data, step by step.",
+"Wo du deine echten Daten einträgst, Schritt für Schritt.",
+"Tempat memasukkan data aslimu, langkah demi langkah."
+],
+"help_link": [
+"Help center",
+"Hilfe-Center",
+"Pusat bantuan"
+],
+"help_link_sub": [
+"Answers to common questions.",
+"Antworten auf häufige Fragen.",
+"Jawaban untuk pertanyaan umum."
+],
+"bug_link": [
+"Report a bug",
+"Fehler melden",
+"Laporkan bug"
+],
+"bug_link_sub": [
+"Your device and screen are attached, never your data.",
+"Gerät und Bildschirm werden mitgeschickt, nie deine Daten.",
+"Perangkat dan layar ikut terlampir, datamu tidak."
+],
+"edit_member": [
+"Edit member",
+"Mitglied bearbeiten",
+"Ubah anggota"
+],
+"name": [
+"Name",
+"Name",
+"Nama"
+],
+"saved": [
+"Saved",
+"Gespeichert",
+"Tersimpan"
+],
+"save_failed": [
+"Could not save. Check your internet connection.",
+"Speichern fehlgeschlagen. Prüfe deine Internetverbindung.",
+"Gagal menyimpan. Periksa koneksi internetmu."
+],
+"currency": [
+"Currency",
+"Währung",
+"Mata uang"
+],
+"home": [
+"Home",
+"Zuhause",
+"Rumah"
+],
+"germany": [
+"{city}, Germany",
+"{city}, Deutschland",
+"{city}, Jerman"
+],
+"needs_net": [
+"This needs the internet.",
+"Dafür brauchst du Internet.",
+"Ini butuh internet."
+],
+"ai_title": [
+"Assistant",
+"Assistent",
+"Asisten"
+],
+"ai_sub": [
+"How your assistant sounds and when it speaks up.",
+"Wie dein Assistent klingt und wann er sich meldet.",
+"Cara asistenmu terdengar dan kapan ia bicara."
+],
+"ai_name": [
+"Name",
+"Name",
+"Nama"
+],
+"ai_voice": [
+"Morning briefing as",
+"Morgen-Briefing als",
+"Briefing pagi sebagai"
+],
+"ai_time": [
+"Ready at",
+"Fertig um",
+"Siap pukul"
+],
+"data_title": [
+"Your data",
+"Deine Daten",
+"Datamu"
+],
+"data_sub": [
+"Saved to your private database in Frankfurt.",
+"Gespeichert in deiner privaten Datenbank in Frankfurt.",
+"Tersimpan di database pribadimu di Frankfurt."
+],
+"synced": [
+"Synced",
+"Synchronisiert",
+"Tersinkron"
+],
+"export": [
+"Export backup",
+"Backup exportieren",
+"Ekspor cadangan"
+],
+"import": [
+"Import backup",
+"Backup importieren",
+"Impor cadangan"
+],
+"backup_note": [
+"The backup is a JSON file. It holds what you can see: private items of your partner are never in it.",
+"Das Backup ist eine JSON-Datei. Es enthält, was du sehen kannst: Private Einträge deines Partners sind nie dabei.",
+"Cadangan berupa file JSON. Isinya hanya yang bisa kamu lihat: item privat pasanganmu tidak pernah ikut."
+],
+"backup_done": [
+"Backup downloaded",
+"Backup heruntergeladen",
+"Cadangan terunduh"
+],
+"backup_bad": [
+"That file is not a backup from this app.",
+"Diese Datei ist kein Backup dieser App.",
+"File itu bukan cadangan dari aplikasi ini."
+],
+"backup_confirm": [
+"Replace your settings with the ones in this backup?",
+"Deine Einstellungen durch die aus diesem Backup ersetzen?",
+"Ganti pengaturanmu dengan yang ada di cadangan ini?"
+],
+"backup_partial": [
+"Some parts could not be restored: {parts}.",
+"Einige Teile konnten nicht wiederhergestellt werden: {parts}.",
+"Sebagian tidak bisa dipulihkan: {parts}."
+],
+"backup_restored": [
+"Backup restored",
+"Backup wiederhergestellt",
+"Cadangan dipulihkan"
+],
+"reset": [
+"Delete everything I entered",
+"Alles löschen, was ich eingegeben habe",
+"Hapus semua yang kumasukkan"
+],
+"reset_sure": [
+"Tap again to delete for good",
+"Zum endgültigen Löschen erneut tippen",
+"Ketuk lagi untuk menghapus permanen"
+],
+"reset_note": [
+"Removes your own entries and memories. Your partner's entries stay.",
+"Entfernt deine eigenen Einträge und Erinnerungen. Einträge deines Partners bleiben.",
+"Menghapus entri dan memorimu sendiri. Entri pasanganmu tetap ada."
+],
+"reset_done": [
+"Your entries are deleted",
+"Deine Einträge sind gelöscht",
+"Entrimu sudah dihapus"
+],
+"reset_failed": [
+"Could not delete. Nothing was changed.",
+"Löschen fehlgeschlagen. Nichts wurde geändert.",
+"Gagal menghapus. Tidak ada yang berubah."
+],
+"signin": [
+"Sign-in",
+"Anmeldung",
+"Masuk"
+],
+"signed_as": [
+"Signed in as {email}",
+"Angemeldet als {email}",
+"Masuk sebagai {email}"
+],
+"your_account": [
+"Your account",
+"Dein Konto",
+"Akunmu"
+],
+"pk_off": [
+"Face ID sign-in is not switched on in Supabase yet.",
+"Die Face-ID-Anmeldung ist in Supabase noch nicht aktiviert.",
+"Masuk dengan Face ID belum diaktifkan di Supabase."
+],
+"pk_exists": [
+"This device is already added.",
+"Dieses Gerät ist schon hinzugefügt.",
+"Perangkat ini sudah ditambahkan."
+],
+"pk_failed": [
+"Face ID / fingerprint was not added.",
+"Face ID / Fingerabdruck wurde nicht hinzugefügt.",
+"Face ID / sidik jari tidak ditambahkan."
+],
+"pk_added": [
+"Face ID / fingerprint added",
+"Face ID / Fingerabdruck hinzugefügt",
+"Face ID / sidik jari ditambahkan"
+],
+"pk_remove_q": [
+"Remove {name}?",
+"{name} entfernen?",
+"Hapus {name}?"
+],
+"pk": [
+"Passkey",
+"Passkey",
+"Passkey"
+],
+"pk_remove_failed": [
+"Could not remove it.",
+"Konnte nicht entfernt werden.",
+"Gagal menghapus."
+],
+"pk_added_on": [
+"Added {date}",
+"Hinzugefügt am {date}",
+"Ditambahkan {date}"
+],
+"pk_remove": [
+"Remove passkey",
+"Passkey entfernen",
+"Hapus passkey"
+],
+"pk_intro": [
+"Sign in with Face ID or your fingerprint instead of typing your password. Add it once on each phone or laptop.",
+"Melde dich mit Face ID oder Fingerabdruck an, statt dein Passwort zu tippen. Einmal pro Handy oder Laptop einrichten.",
+"Masuk dengan Face ID atau sidik jari tanpa mengetik kata sandi. Tambahkan sekali di tiap HP atau laptop."
+],
+"pk_wait": [
+"Waiting for your device…",
+"Warte auf dein Gerät…",
+"Menunggu perangkatmu…"
+],
+"pk_add": [
+"Add Face ID / fingerprint",
+"Face ID / Fingerabdruck hinzufügen",
+"Tambah Face ID / sidik jari"
+],
+"sign_out": [
+"Sign out",
+"Abmelden",
+"Keluar"
+],
+"off_title": [
+"Offline & install",
+"Offline & Installation",
+"Offline & pasang"
+],
+"off_sub": [
+"The app opens without internet. What you add waits on this phone and syncs later. The assistant and bank import need a connection.",
+"Die App öffnet ohne Internet. Neue Einträge warten auf diesem Handy und werden später synchronisiert. Assistent und Bankimport brauchen eine Verbindung.",
+"Aplikasi terbuka tanpa internet. Yang kamu tambahkan menunggu di HP ini dan tersinkron nanti. Asisten dan impor bank butuh koneksi."
+],
+"online": [
+"Online",
+"Online",
+"Online"
+],
+"offline": [
+"Offline",
+"Offline",
+"Offline"
+],
+"connection": [
+"Connection",
+"Verbindung",
+"Koneksi"
+],
+"installed": [
+"Installed",
+"Installiert",
+"Terpasang"
+],
+"installed_yes": [
+"Yes, on this device",
+"Ja, auf diesem Gerät",
+"Ya, di perangkat ini"
+],
+"installed_no": [
+"Not yet",
+"Noch nicht",
+"Belum"
+],
+"storage": [
+"Storage used",
+"Belegter Speicher",
+"Penyimpanan terpakai"
+],
+"waiting_sync": [
+"Waiting to sync",
+"Wartet auf Sync",
+"Menunggu sinkron"
+],
+"install_done": [
+"Installed",
+"Installiert",
+"Terpasang"
+],
+"install": [
+"Install on this phone",
+"Auf diesem Handy installieren",
+"Pasang di HP ini"
+],
+"home_screen": [
+"Put it on your Home Screen",
+"Auf den Home-Bildschirm legen",
+"Taruh di layar utama"
+],
+"ios1": [
+"1. Open this page in Safari",
+"1. Öffne diese Seite in Safari",
+"1. Buka halaman ini di Safari"
+],
+"ios2": [
+"2. Tap Share (the square with the arrow)",
+"2. Tippe auf Teilen (das Quadrat mit Pfeil)",
+"2. Ketuk Bagikan (kotak dengan panah)"
+],
+"ios3": [
+"3. Choose “Add to Home Screen”",
+"3. Wähle „Zum Home-Bildschirm“",
+"3. Pilih “Tambah ke Layar Utama”"
+],
+"and1": [
+"1. Open this page in Chrome",
+"1. Öffne diese Seite in Chrome",
+"1. Buka halaman ini di Chrome"
+],
+"and2": [
+"2. Tap the ⋮ menu",
+"2. Tippe auf das ⋮-Menü",
+"2. Ketuk menu ⋮"
+],
+"and3": [
+"3. Choose “Add to Home screen” or “Install app”",
+"3. Wähle „Zum Startbildschirm“ oder „App installieren“",
+"3. Pilih “Tambahkan ke layar utama” atau “Instal aplikasi”"
+],
+"sec_title": [
+"Security",
+"Sicherheit",
+"Keamanan"
+],
+"sec_sub": [
+"The PIN is kept on this phone only, as a secure hash.",
+"Die PIN bleibt nur auf diesem Handy, als sicherer Hash.",
+"PIN hanya disimpan di HP ini, sebagai hash yang aman."
+],
+"sec_net": [
+"Turning this on needs the internet.",
+"Zum Einschalten brauchst du Internet.",
+"Menyalakan ini butuh internet."
+],
+"sec_add_first": [
+"Add Face ID / fingerprint under Sign-in first.",
+"Füge zuerst unter Anmeldung Face ID / Fingerabdruck hinzu.",
+"Tambahkan dulu Face ID / sidik jari di bagian Masuk."
+],
+"pin": [
+"PIN lock",
+"PIN-Sperre",
+"Kunci PIN"
+],
+"pin_on": [
+"On · asked when the app opens",
+"An · wird beim Öffnen abgefragt",
+"Aktif · ditanya saat aplikasi dibuka"
+],
+"pin_off": [
+"Off · anyone holding this phone can open the app",
+"Aus · jeder mit diesem Handy kann die App öffnen",
+"Mati · siapa pun yang memegang HP ini bisa membuka aplikasi"
+],
+"face": [
+"Face ID / fingerprint",
+"Face ID / Fingerabdruck",
+"Face ID / sidik jari"
+],
+"face_sub": [
+"Unlock without typing the PIN (needs the internet)",
+"Entsperren ohne PIN-Eingabe (braucht Internet)",
+"Buka tanpa mengetik PIN (butuh internet)"
+],
+"relock": [
+"Lock again after leaving the app",
+"Nach Verlassen der App wieder sperren",
+"Kunci lagi setelah keluar dari aplikasi"
+],
+"right_away": [
+"Right away",
+"Sofort",
+"Langsung"
+],
+"min": [
+"{n} min",
+"{n} Min.",
+"{n} mnt"
+],
+"lock_now": [
+"Lock now",
+"Jetzt sperren",
+"Kunci sekarang"
+],
+"change_pin": [
+"Change PIN",
+"PIN ändern",
+"Ubah PIN"
+],
+"rem_title": [
+"Reminders",
+"Erinnerungen",
+"Pengingat"
+],
+"rem_sub": [
+"Sent to this phone, even when the app is closed.",
+"Kommen auf dieses Handy, auch wenn die App geschlossen ist.",
+"Dikirim ke HP ini, meski aplikasi tertutup."
+],
+"n_bills": [
+"Bills & recurring payments",
+"Rechnungen & wiederkehrende Zahlungen",
+"Tagihan & pembayaran rutin"
+],
+"n_bills_sub": [
+"The day before money goes out",
+"Am Tag bevor Geld abgeht",
+"Sehari sebelum uang keluar"
+],
+"n_tax": [
+"Tax deadlines",
+"Steuerfristen",
+"Tenggat pajak"
+],
+"n_tax_sub": [
+"3 days before",
+"3 Tage vorher",
+"3 hari sebelumnya"
+],
+"n_shifts": [
+"Shifts",
+"Schichten",
+"Shift"
+],
+"n_shifts_sub": [
+"2 hours before each shift",
+"2 Stunden vor jeder Schicht",
+"2 jam sebelum tiap shift"
+],
+"n_budget": [
+"Budget warnings",
+"Budget-Warnungen",
+"Peringatan anggaran"
+],
+"n_budget_sub": [
+"When a category passes {pct}%",
+"Wenn eine Kategorie {pct} % überschreitet",
+"Saat kategori melewati {pct}%"
+],
+"n_goals": [
+"Goals",
+"Ziele",
+"Target"
+],
+"n_goals_sub": [
+"A short nudge on Sunday evening",
+"Ein kurzer Anstoß am Sonntagabend",
+"Dorongan singkat Minggu malam"
+],
+"p_on": [
+"On",
+"An",
+"Aktif"
+],
+"p_off": [
+"Off",
+"Aus",
+"Mati"
+],
+"p_blocked": [
+"Blocked",
+"Blockiert",
+"Diblokir"
+],
+"p_unsupported": [
+"Not available",
+"Nicht verfügbar",
+"Tidak tersedia"
+],
+"p_enabled": [
+"Reminders are on",
+"Erinnerungen sind an",
+"Pengingat aktif"
+],
+"p_test_sent": [
+"Test sent · it arrives in a few seconds",
+"Test gesendet · kommt in wenigen Sekunden an",
+"Tes terkirim · tiba dalam beberapa detik"
+],
+"p_ios": [
+"iPhone: add the app to your Home Screen first (iOS 16.4 or newer), open it from there, then allow notifications.",
+"iPhone: Lege die App zuerst auf den Home-Bildschirm (iOS 16.4 oder neuer), öffne sie von dort und erlaube Mitteilungen.",
+"iPhone: tambahkan dulu aplikasi ke Layar Utama (iOS 16.4 atau lebih baru), buka dari sana, lalu izinkan notifikasi."
+],
+"p_allow": [
+"Allow notifications",
+"Mitteilungen erlauben",
+"Izinkan notifikasi"
+],
+"p_blocked_note": [
+"Notifications are blocked for this app. Turn them on in your phone settings, then come back.",
+"Mitteilungen sind für diese App blockiert. Schalte sie in den Handy-Einstellungen ein und komm zurück.",
+"Notifikasi diblokir untuk aplikasi ini. Nyalakan di pengaturan HP, lalu kembali."
+],
+"p_unsupported_note": [
+"This browser cannot show reminders. Use the installed app on your phone.",
+"Dieser Browser kann keine Erinnerungen anzeigen. Nutze die installierte App auf deinem Handy.",
+"Browser ini tidak bisa menampilkan pengingat. Pakai aplikasi yang terpasang di HP."
+],
+"p_test": [
+"Send a test reminder",
+"Test-Erinnerung senden",
+"Kirim pengingat tes"
+],
+"p_own": [
+"Each of you chooses your own reminders. Private items only go to their owner.",
+"Jede:r wählt eigene Erinnerungen. Private Einträge gehen nur an ihre Besitzer:innen.",
+"Masing-masing memilih pengingatnya sendiri. Item privat hanya dikirim ke pemiliknya."
+],
+"pe_unsupported": [
+"This browser cannot show reminders.",
+"Dieser Browser kann keine Erinnerungen anzeigen.",
+"Browser ini tidak bisa menampilkan pengingat."
+],
+"pe_denied": [
+"Notifications were not allowed.",
+"Mitteilungen wurden nicht erlaubt.",
+"Notifikasi tidak diizinkan."
+],
+"pe_reopen": [
+"Open the installed app once more, then try again.",
+"Öffne die installierte App noch einmal und versuche es erneut.",
+"Buka aplikasi terpasang sekali lagi, lalu coba lagi."
+],
+"pe_server": [
+"Could not reach the server.",
+"Server nicht erreichbar.",
+"Tidak bisa menghubungi server."
+],
+"pe_first": [
+"Allow notifications first.",
+"Erlaube zuerst Mitteilungen.",
+"Izinkan notifikasi dulu."
+],
+"pe_wait": [
+"One test per minute. Try again shortly.",
+"Ein Test pro Minute. Versuche es gleich noch einmal.",
+"Satu tes per menit. Coba lagi sebentar."
+],
+"pe_nosub": [
+"This phone is not set up for reminders yet.",
+"Dieses Handy ist noch nicht für Erinnerungen eingerichtet.",
+"HP ini belum disiapkan untuk pengingat."
+],
+"pe_test": [
+"Could not send the test.",
+"Test konnte nicht gesendet werden.",
+"Gagal mengirim tes."
+],
+"ib_title": [
+"Inbox",
+"Posteingang",
+"Kotak masuk"
+],
+"ib_sub": [
+"{name} reads your new Gmail every morning and sums it up on Home. Only you see it.",
+"{name} liest jeden Morgen deine neuen Gmail-Nachrichten und fasst sie auf Home zusammen. Nur du siehst das.",
+"{name} membaca Gmail barumu tiap pagi dan merangkumnya di Home. Hanya kamu yang melihatnya."
+],
+"ib_connected": [
+"Connected",
+"Verbunden",
+"Terhubung"
+],
+"ib_waiting": [
+"Waiting",
+"Wartet",
+"Menunggu"
+],
+"ib_last": [
+"Last digest: {when}",
+"Letzte Zusammenfassung: {when}",
+"Rangkuman terakhir: {when}"
+],
+"ib_lost": [
+"A key exists but the script has not sent mail yet. If you lost the script, make a new key below.",
+"Es gibt einen Schlüssel, aber das Skript hat noch keine Mail gesendet. Falls du es verloren hast, erstelle unten einen neuen Schlüssel.",
+"Kunci sudah ada tapi skrip belum mengirim email. Kalau skripnya hilang, buat kunci baru di bawah."
+],
+"ib_new_q": [
+"Make a new key? The script you set up before stops working until you paste the new one.",
+"Neuen Schlüssel erstellen? Dein bisheriges Skript funktioniert nicht mehr, bis du das neue einfügst.",
+"Buat kunci baru? Skrip lama berhenti bekerja sampai kamu menempel yang baru."
+],
+"ib_key_failed": [
+"Could not make a key: {why}. Please send a screenshot of this.",
+"Schlüssel konnte nicht erstellt werden: {why}. Bitte schick einen Screenshot davon.",
+"Gagal membuat kunci: {why}. Tolong kirim tangkapan layar ini."
+],
+"ib_no_answer": [
+"no answer",
+"keine Antwort",
+"tidak ada jawaban"
+],
+"ib_disc_q": [
+"Disconnect your Gmail? The script stops sending mail. Your old digests stay until you delete them.",
+"Gmail trennen? Das Skript sendet keine Mails mehr. Alte Zusammenfassungen bleiben, bis du sie löschst.",
+"Putuskan Gmail? Skrip berhenti mengirim email. Rangkuman lama tetap ada sampai kamu hapus."
+],
+"ib_disc_failed": [
+"Could not disconnect. Try again.",
+"Trennen fehlgeschlagen. Versuche es erneut.",
+"Gagal memutuskan. Coba lagi."
+],
+"ib_disc_done": [
+"Disconnected. You can also delete the project on script.google.com.",
+"Getrennt. Du kannst das Projekt auch auf script.google.com löschen.",
+"Terputus. Kamu juga bisa menghapus proyeknya di script.google.com."
+],
+"ib_copy_hand": [
+"Select the text and copy it by hand.",
+"Markiere den Text und kopiere ihn von Hand.",
+"Pilih teksnya dan salin secara manual."
+],
+"ib_s1": [
+"Copy the script below. It holds your personal key, so do not share it.",
+"Kopiere das Skript unten. Es enthält deinen persönlichen Schlüssel, teile es also nicht.",
+"Salin skrip di bawah. Isinya kunci pribadimu, jadi jangan dibagikan."
+],
+"ib_s2": [
+"On a laptop, open <a>script.google.com</a> with your own Google account. A new project opens.",
+"Öffne am Laptop <a>script.google.com</a> mit deinem Google-Konto. Ein neues Projekt öffnet sich.",
+"Di laptop, buka <a>script.google.com</a> dengan akun Google-mu. Proyek baru akan terbuka."
+],
+"ib_s3": [
+"Delete what is there, paste the script, and press Save (the disk icon).",
+"Lösche den Inhalt, füge das Skript ein und drücke Speichern (das Disketten-Symbol).",
+"Hapus isinya, tempel skrip, lalu tekan Simpan (ikon disk)."
+],
+"ib_s4": [
+"Above the code, choose <b>setup</b> and press <b>Run</b>.",
+"Wähle über dem Code <b>setup</b> und drücke <b>Ausführen</b>.",
+"Di atas kode, pilih <b>setup</b> lalu tekan <b>Run</b>."
+],
+"ib_s5": [
+"Google asks for access. Choose your account, then <b>Advanced → Go to project (unsafe)</b> and <b>Allow</b>. It says “unsafe” only because you wrote the script yourself instead of Google checking it.",
+"Google fragt nach Zugriff. Wähle dein Konto, dann <b>Erweitert → Zu Projekt (unsicher)</b> und <b>Zulassen</b>. „Unsicher“ steht dort nur, weil das Skript von dir ist und Google es nicht geprüft hat.",
+"Google meminta akses. Pilih akunmu, lalu <b>Advanced → Go to project (unsafe)</b> dan <b>Allow</b>. Tertulis “unsafe” hanya karena skrip ini milikmu sendiri dan tidak diperiksa Google."
+],
+"ib_s6": [
+"Done. Your first digest appears on Home within a minute, then every morning at about 06:00.",
+"Fertig. Deine erste Zusammenfassung erscheint in einer Minute auf Home, danach jeden Morgen gegen 06:00.",
+"Selesai. Rangkuman pertama muncul di Home dalam semenit, lalu tiap pagi sekitar 06:00."
+],
+"ib_script": [
+"Your inbox script",
+"Dein Posteingang-Skript",
+"Skrip kotak masukmu"
+],
+"ib_copied": [
+"Copied",
+"Kopiert",
+"Tersalin"
+],
+"ib_copy": [
+"Copy script",
+"Skript kopieren",
+"Salin skrip"
+],
+"ib_once": [
+"This script is shown once. If you lose it, make a new key.",
+"Dieses Skript wird nur einmal angezeigt. Wenn du es verlierst, erstelle einen neuen Schlüssel.",
+"Skrip ini hanya tampil sekali. Kalau hilang, buat kunci baru."
+],
+"ib_making": [
+"Making your key…",
+"Schlüssel wird erstellt…",
+"Membuat kuncimu…"
+],
+"ib_remake": [
+"Make a new key and script",
+"Neuen Schlüssel und Skript erstellen",
+"Buat kunci dan skrip baru"
+],
+"ib_connect": [
+"Connect my Gmail",
+"Mein Gmail verbinden",
+"Hubungkan Gmail-ku"
+],
+"lk_reset_q": [
+"Sign in again with your password or Face ID to reset the PIN on this phone?",
+"Mit Passwort oder Face ID neu anmelden, um die PIN auf diesem Handy zurückzusetzen?",
+"Masuk lagi dengan kata sandi atau Face ID untuk mereset PIN di HP ini?"
+],
+"lk_on": [
+"PIN lock is on",
+"PIN-Sperre ist an",
+"Kunci PIN aktif"
+],
+"lk_enter": [
+"Enter your PIN",
+"Gib deine PIN ein",
+"Masukkan PIN-mu"
+],
+"lk_locked": [
+"rideff Life is locked",
+"rideff Life ist gesperrt",
+"rideff Life terkunci"
+],
+"lk_choose": [
+"Choose a PIN",
+"Wähle eine PIN",
+"Pilih PIN"
+],
+"lk_digits": [
+"{n} digits, for this phone",
+"{n} Ziffern, für dieses Handy",
+"{n} angka, untuk HP ini"
+],
+"lk_again": [
+"Enter it once more",
+"Noch einmal eingeben",
+"Masukkan sekali lagi"
+],
+"lk_sure": [
+"To make sure it is right",
+"Damit sie sicher stimmt",
+"Untuk memastikan benar"
+],
+"lk_current": [
+"Current PIN",
+"Aktuelle PIN",
+"PIN saat ini"
+],
+"lk_before": [
+"Before you choose a new one",
+"Bevor du eine neue wählst",
+"Sebelum memilih yang baru"
+],
+"lk_turnoff": [
+"To turn the PIN lock off",
+"Um die PIN-Sperre auszuschalten",
+"Untuk mematikan kunci PIN"
+],
+"lk_mismatch": [
+"The PINs did not match. Try again.",
+"Die PINs stimmen nicht überein. Versuche es erneut.",
+"PIN tidak cocok. Coba lagi."
+],
+"lk_face_fail": [
+"Face ID did not work. Use your PIN.",
+"Face ID hat nicht geklappt. Nutze deine PIN.",
+"Face ID gagal. Pakai PIN-mu."
+],
+"lk_face_net": [
+"Face ID needs the internet. Use your PIN.",
+"Face ID braucht Internet. Nutze deine PIN.",
+"Face ID butuh internet. Pakai PIN-mu."
+],
+"lk_delete": [
+"Delete",
+"Löschen",
+"Hapus"
+],
+"lk_face": [
+"Unlock with Face ID or fingerprint",
+"Mit Face ID oder Fingerabdruck entsperren",
+"Buka dengan Face ID atau sidik jari"
+],
+"status_trial": [
+"Free until {date}",
+"Kostenlos bis {date}",
+"Gratis sampai {date}"
+],
+"status_trial_over": [
+"Free trial ended",
+"Testphase beendet",
+"Masa coba berakhir"
+],
+"status_active": [
+"Renews {date}",
+"Verlängert sich am {date}",
+"Diperpanjang {date}"
+],
+"status_past_due": [
+"Payment failed · update your card",
+"Zahlung fehlgeschlagen · Karte aktualisieren",
+"Pembayaran gagal · perbarui kartumu"
+],
+"status_cancelled": [
+"Cancelled",
+"Gekündigt",
+"Dibatalkan"
+],
+"voice_left": [
+"Voice: {used} of {total} min",
+"Sprache: {used} von {total} Min.",
+"Suara: {used} dari {total} mnt"
+],
+"voice_none": [
+"Voice is part of Life Plus",
+"Sprache gehört zu Life Plus",
+"Suara termasuk Life Plus"
+],
+"owner_only": [
+"Only the household's owner can change the plan.",
+"Nur der Haushaltsinhaber kann den Tarif ändern.",
+"Hanya pemilik rumah tangga yang bisa mengubah paket."
+],
+"seats_in_use": [
+"Remove people or open invites first: this plan has 1 seat.",
+"Entferne zuerst Personen oder offene Einladungen: Dieser Tarif hat 1 Platz.",
+"Hapus dulu orang atau undangan terbuka: paket ini punya 1 kursi."
+],
+"billing_off": [
+"Payments are not connected yet.",
+"Zahlungen sind noch nicht verbunden.",
+"Pembayaran belum terhubung."
+],
+"no_customer": [
+"Add a payment method first.",
+"Füge zuerst eine Zahlungsart hinzu.",
+"Tambahkan metode pembayaran dulu."
+],
+"billing_failed": [
+"Could not open billing. Try again.",
+"Abrechnung konnte nicht geöffnet werden. Versuche es erneut.",
+"Gagal membuka tagihan. Coba lagi."
+],
+"paid": [
+"Thanks. Your plan updates in a moment.",
+"Danke. Dein Tarif wird gleich aktualisiert.",
+"Terima kasih. Paketmu segera diperbarui."
+],
+"gate_map": [
+"Life Map",
+"Life Map",
+"Life Map"
+],
+"help_eyebrow": [
+"rideff Life · Help",
+"rideff Life · Hilfe",
+"rideff Life · Bantuan"
+],
+"help_all": [
+"All",
+"Alle",
+"Semua"
+],
+"help_start": [
+"Start",
+"Start",
+"Mulai"
+],
+"help_money": [
+"Money",
+"Geld",
+"Uang"
+],
+"help_sharing": [
+"Sharing",
+"Teilen",
+"Berbagi"
+],
+"help_plan": [
+"Plan",
+"Tarif",
+"Paket"
+],
+"help_privacy": [
+"Privacy",
+"Privatsphäre",
+"Privasi"
+],
+"help_none": [
+"Nothing found.",
+"Nichts gefunden.",
+"Tidak ditemukan."
+],
+"help_search": [
+"Search",
+"Suchen",
+"Cari"
+],
+"help_delete_q": [
+"How do I download or delete my data?",
+"Wie lade ich meine Daten herunter oder lösche sie?",
+"Bagaimana mengunduh atau menghapus dataku?"
+],
+"help_delete_a": [
+"Settings → Data & privacy. Export backup gives you a copy, and the delete button there removes everything you entered.",
+"Einstellungen → Daten & Privatsphäre. Backup exportieren gibt dir eine Kopie, und die Löschen-Taste dort entfernt alles, was du eingegeben hast.",
+"Pengaturan → Data & privasi. Ekspor cadangan memberimu salinan, dan tombol hapus di sana menghapus semua yang kamu masukkan."
+],
+"ib_privacy": [
+"New mail without Promotions and Social is sent to the AI to be summed up. The partner never sees your digest. Digests are deleted after 60 days.",
+"Neue Mails ohne Werbung und Soziale Netzwerke gehen zur Zusammenfassung an die KI. Dein:e Partner:in sieht deine Zusammenfassung nie. Sie werden nach 60 Tagen gelöscht.",
+"Email baru tanpa Promosi dan Sosial dikirim ke AI untuk dirangkum. Pasanganmu tidak pernah melihat rangkumanmu. Rangkuman dihapus setelah 60 hari."
+],
+"e_invest": [
+"Add savings or investments to see what you own in one place.",
+"Füge Ersparnisse oder Investments hinzu, um alles an einem Ort zu sehen.",
+"Tambahkan tabungan atau investasi untuk melihat semua milikmu di satu tempat."
+],
+"del_failed": [
+"Could not delete. Check your internet connection.",
+"Löschen fehlgeschlagen. Prüfe deine Internetverbindung.",
+"Gagal menghapus. Periksa koneksi internetmu."
+],
+"already_saved": [
+"That is already saved.",
+"Das ist schon gespeichert.",
+"Itu sudah tersimpan."
+]
+}

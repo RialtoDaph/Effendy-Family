@@ -1,14 +1,17 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useAppData } from "@/components/app-data";
 import { useMoney } from "@/components/money-data";
-import { FormSheet, type Field, type FormValues } from "@/components/sheet";
+import { FormSheet, useVisibilityField, type Field, type FormValues } from "@/components/sheet";
 import { useTime, type TimeTable } from "@/components/time-data";
 import { useToast } from "@/components/toast";
 import { iconFor } from "@/lib/icons";
-import { QUEUED, QUEUED_MSG } from "@/lib/offline-queue";
+import { QUEUED } from "@/lib/offline-queue";
 import { parseAmount } from "@/lib/money";
+import { supabase } from "@/lib/supabase";
 import { hm, weekStart } from "@/lib/time";
+import { useDates } from "@/lib/use-dates";
 
 export type TimeFormKind =
   | "event"
@@ -22,23 +25,17 @@ export type TimeFormKind =
   | "journal"
   | "idea"
   | "datenight"
-  | "career";
+  | "career"
+  | "wage";
 
-export const TIME_FORM_KINDS: TimeFormKind[] = ["event", "shift", "prio", "ygoal", "progress", "litem", "lmin", "gym", "journal", "idea", "datenight", "career"];
+export const TIME_FORM_KINDS: TimeFormKind[] = ["event", "shift", "prio", "ygoal", "progress", "litem", "lmin", "gym", "journal", "idea", "datenight", "career", "wage"];
 
-const VISIBILITY: Field = {
-  kind: "chips",
-  key: "visibility",
-  label: "Visible to",
-  options: [
-    { value: "family", label: "Family" },
-    { value: "private", label: "Only me" },
-  ],
-};
+export type GymType = "Strength" | "Cardio" | "Class" | "Yoga" | "Pilates" | "Swim" | "Bike" | "Walk";
 
-export const GYM_TYPES: { value: string; icon: string }[] = [
+export const GYM_TYPES: { value: GymType; icon: string }[] = [
   { value: "Strength", icon: "dumbbell" },
   { value: "Cardio", icon: "activity" },
+  { value: "Class", icon: "flower-2" },
   { value: "Yoga", icon: "flower-2" },
   { value: "Pilates", icon: "flower-2" },
   { value: "Swim", icon: "waves" },
@@ -53,7 +50,11 @@ const num = (v: unknown) => (String(v ?? "").trim() ? parseAmount(v) : NaN);
 const text = (v: unknown) => String(v ?? "").trim();
 
 export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id?: string; preset?: FormValues; onClose: () => void }) {
-  const { members, userId, settings } = useAppData();
+  const tt = useTranslations("time");
+  const tm = useTranslations("money");
+  const dates = useDates();
+  const VISIBILITY = useVisibilityField();
+  const { members, userId, settings, reload } = useAppData();
   const { today } = useMoney();
   const time = useTime();
   const toast = useToast();
@@ -61,8 +62,8 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
   const who: Field = {
     kind: "chips",
     key: "who",
-    label: "For",
-    options: [...members.map((m) => ({ value: m.id, label: m.display_name })), { value: "together", label: "Together" }],
+    label: tt("for"),
+    options: [...members.map((m) => ({ value: m.id, label: m.display_name })), { value: "together", label: tt("together") }],
   };
   const whoId = (v: unknown) => (v && v !== "together" ? String(v) : null);
   const whoValue = (v: string | null) => v ?? "together";
@@ -71,7 +72,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
   async function finish(table: TimeTable, values: Record<string, unknown>, rowId: string | undefined, msg: string) {
     const err = await time.save(table, values, rowId);
     if (err && err !== QUEUED) return err;
-    toast(err === QUEUED ? QUEUED_MSG : msg);
+    toast(err === QUEUED ? tm("queued") : msg);
     onClose();
   }
 
@@ -80,7 +81,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
     const err = await time.remove(table, rowId);
     if (err && err !== QUEUED) toast(err);
     else {
-      toast(err === QUEUED ? QUEUED_MSG : "Deleted");
+      toast(err === QUEUED ? tm("queued") : tm("deleted"));
       onClose();
     }
   }
@@ -102,7 +103,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
             note: e.note ?? "",
           }
         : {
-            title: shift ? "Bar shift" : "",
+            title: shift ? tt("bar_shift") : "",
             date: today.iso,
             start: shift ? "18:00" : "",
             end: shift ? "01:00" : "",
@@ -113,43 +114,43 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
           };
       const fields: Field[] = shift
         ? [
-            { kind: "date", key: "date", label: "Date", required: true },
-            { kind: "time", key: "start", label: "Starts", required: true },
-            { kind: "time", key: "end", label: "Ends (after midnight is fine)", required: true },
-            { kind: "text", key: "title", label: "Name", required: true },
-            { kind: "text", key: "note", label: "Note (optional)" },
-            { kind: "note", key: "n", label: "Reminder", text: "You get a reminder 2 hours before (Settings → Reminders → Bar shifts)." },
+            { kind: "date", key: "date", label: tm("date"), required: true },
+            { kind: "time", key: "start", label: tt("starts"), required: true },
+            { kind: "time", key: "end", label: tt("ends_midnight"), required: true },
+            { kind: "text", key: "title", label: tm("name"), required: true },
+            { kind: "text", key: "note", label: tm("note_optional") },
+            { kind: "note", key: "n", label: tt("reminder_label"), text: tt("shift_reminder_note") },
           ]
         : [
-            { kind: "text", key: "title", label: "What", placeholder: "e.g. Tax papers", required: true },
-            { kind: "date", key: "date", label: "Date", required: true },
-            { kind: "time", key: "start", label: "Starts (optional)" },
-            { kind: "time", key: "end", label: "Ends (optional)" },
+            { kind: "text", key: "title", label: tt("what"), placeholder: tt("ph_event"), required: true },
+            { kind: "date", key: "date", label: tm("date"), required: true },
+            { kind: "time", key: "start", label: tt("starts_optional") },
+            { kind: "time", key: "end", label: tt("ends_optional") },
             who,
             {
               kind: "chips",
               key: "remind",
-              label: "Remind me",
+              label: tt("remind_me"),
               options: [
-                { value: "", label: "No" },
-                { value: "15", label: "15 min before" },
-                { value: "60", label: "1 hour before" },
-                { value: "1440", label: "1 day before" },
+                { value: "", label: tt("no") },
+                { value: "15", label: tt("before_15") },
+                { value: "60", label: tt("before_60") },
+                { value: "1440", label: tt("before_1440") },
               ],
             },
             VISIBILITY,
-            { kind: "text", key: "note", label: "Note (optional)" },
+            { kind: "text", key: "note", label: tm("note_optional") },
           ];
       return (
         <FormSheet
-          title={e ? (shift ? "Edit shift" : "Edit event") : shift ? "Add bar shift" : "Add to the week"}
+          title={e ? (shift ? tt("edit_shift") : tt("edit_event")) : shift ? tt("add_shift") : tt("add_to_week")}
           editing={!!e}
           initial={initial}
           fields={fields}
           onClose={onClose}
-          onDelete={e ? () => del("events", e.id, `Delete “${e.title}” on ${e.date}?`) : undefined}
+          onDelete={e ? () => del("events", e.id, tm("delete", { name: `${e.title}, ${dates.day(e.date)}` })) : undefined}
           onSave={(v) => {
-            if (!shift && v.remind && !v.start) return "A reminder needs a start time.";
+            if (!shift && v.remind && !v.start) return tt("reminder_needs_start");
             return finish(
               "events",
               {
@@ -164,7 +165,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
                 note: text(v.note) || null,
               },
               e?.id,
-              e ? "Saved" : shift ? "Shift added" : "Added to the week",
+              e ? tm("saved") : shift ? tt("shift_added") : tt("added_to_week"),
             );
           }}
         />
@@ -175,12 +176,12 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
       const p = time.priorities.find((x) => x.id === id);
       return (
         <FormSheet
-          title={p ? "Edit priority" : "Add a priority"}
+          title={p ? tt("edit_priority") : tt("add_priority")}
           editing={!!p}
           initial={p ? { title: p.title, who: whoValue(p.who) } : { who: "together", ...preset }}
-          fields={[{ kind: "text", key: "title", label: "What matters this week", placeholder: "e.g. Send VAT pre-return", required: true }, who]}
+          fields={[{ kind: "text", key: "title", label: tt("what_matters"), placeholder: tt("ph_priority"), required: true }, who]}
           onClose={onClose}
-          onDelete={p ? () => del("week_priorities", p.id, `Delete “${p.title}”?`) : undefined}
+          onDelete={p ? () => del("week_priorities", p.id, tm("delete", { name: p.title })) : undefined}
           onSave={(v) =>
             finish(
               "week_priorities",
@@ -193,7 +194,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
                     sort: Number(preset?.sort ?? 0),
                   },
               p?.id,
-              p ? "Saved" : "Priority added",
+              p ? tm("saved") : tt("priority_added"),
             )
           }
         />
@@ -204,7 +205,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
       const g = time.yearlyGoals.find((x) => x.id === id);
       return (
         <FormSheet
-          title={g ? "Edit yearly goal" : "Add a yearly goal"}
+          title={g ? tt("edit_ygoal") : tt("add_ygoal")}
           editing={!!g}
           initial={
             g
@@ -212,22 +213,22 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
               : { icon: "target", who: userId, done: "0", visibility: vis("ygoals"), ...preset }
           }
           fields={[
-            { kind: "text", key: "name", label: "Goal", placeholder: "e.g. 30 ECTS this year", required: true },
-            { kind: "chips", key: "icon", label: "Icon", options: GOAL_ICONS.map((i) => ({ value: i, label: "", icon: iconFor(i) })) },
-            { kind: "number", key: "target", label: "Target number", placeholder: "e.g. 30", required: true },
-            { kind: "text", key: "unit", label: "Unit", placeholder: "e.g. ECTS, orders, sessions" },
-            { kind: "number", key: "done", label: "Done so far" },
-            { kind: "text", key: "step", label: "This week's step (optional)", placeholder: "e.g. 6 study hours" },
+            { kind: "text", key: "name", label: tt("goal"), placeholder: tt("ph_goal"), required: true },
+            { kind: "chips", key: "icon", label: tm("icon"), options: GOAL_ICONS.map((i) => ({ value: i, label: "", icon: iconFor(i) })) },
+            { kind: "number", key: "target", label: tt("target_number"), placeholder: "30", required: true },
+            { kind: "text", key: "unit", label: tt("unit"), placeholder: tt("ph_unit") },
+            { kind: "number", key: "done", label: tt("done_so_far") },
+            { kind: "text", key: "step", label: tt("week_step"), placeholder: tt("ph_step") },
             who,
             VISIBILITY,
           ]}
           onClose={onClose}
-          onDelete={g ? () => del("yearly_goals", g.id, `Delete “${g.name}” and its progress?`) : undefined}
+          onDelete={g ? () => del("yearly_goals", g.id, tt("delete_goal", { name: g.name })) : undefined}
           onSave={(v) => {
             const target = num(v.target);
             const done = num(v.done || "0");
-            if (!(target > 0)) return "The target must be a number above 0.";
-            if (!(done >= 0)) return "Done so far must be 0 or more.";
+            if (!(target > 0)) return tt("target_above_0");
+            if (!(done >= 0)) return tt("done_0_or_more");
             return finish(
               "yearly_goals",
               {
@@ -242,7 +243,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
                 ...(g ? {} : { year: today.y }),
               },
               g?.id,
-              g ? "Saved" : "Goal added",
+              g ? tm("saved") : tm("goal_added"),
             );
           }}
         />
@@ -254,18 +255,18 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
       if (!g) return null;
       return (
         <FormSheet
-          title={`Progress · ${g.name}`}
+          title={tt("progress_title", { name: g.name })}
           initial={{ amount: "1", date: today.iso }}
           fields={[
-            { kind: "number", key: "amount", label: `How much${g.unit ? ` (${g.unit})` : ""}`, required: true },
-            { kind: "date", key: "date", label: "Date", required: true },
-            { kind: "note", key: "n", label: "", text: "Use a minus to correct a mistake, e.g. -1." },
+            { kind: "number", key: "amount", label: g.unit ? tt("how_much_unit", { unit: g.unit }) : tt("how_much"), required: true },
+            { kind: "date", key: "date", label: tm("date"), required: true },
+            { kind: "note", key: "n", label: "", text: tt("minus_note") },
           ]}
           onClose={onClose}
           onSave={(v) => {
             const amount = num(v.amount);
-            if (!Number.isFinite(amount) || amount === 0) return "Enter a number (not 0).";
-            return finish("goal_progress", { goal_id: g.id, amount, date: v.date }, undefined, "Progress saved");
+            if (!Number.isFinite(amount) || amount === 0) return tt("enter_not_0");
+            return finish("goal_progress", { goal_id: g.id, amount, date: v.date }, undefined, tt("progress_saved"));
           }}
         />
       );
@@ -276,7 +277,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
       const tracks = [...new Set(time.learningItems.map((x) => x.track))];
       return (
         <FormSheet
-          title={it ? "Edit book or course" : "Add a book or course"}
+          title={it ? tt("edit_item") : tt("add_to_learn_title")}
           editing={!!it}
           initial={
             it
@@ -284,24 +285,24 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
               : { type: "course", who: userId, pct: "0", track: tracks[0] ?? "", visibility: vis("learning"), ...preset }
           }
           fields={[
-            { kind: "text", key: "title", label: "Title", placeholder: "e.g. The Psychology of Money", required: true },
-            { kind: "chips", key: "type", label: "Type", options: [{ value: "book", label: "Book" }, { value: "course", label: "Course" }, { value: "other", label: "Other" }] },
-            { kind: "text", key: "track", label: "Topic", placeholder: "e.g. Finance & investing", required: true },
+            { kind: "text", key: "title", label: tt("title"), placeholder: tt("ph_item"), required: true },
+            { kind: "chips", key: "type", label: tm("type"), options: [{ value: "book", label: tt("type_book") }, { value: "course", label: tt("type_course") }, { value: "other", label: tt("type_other") }] },
+            { kind: "text", key: "track", label: tt("topic"), placeholder: tt("ph_topic"), required: true },
             who,
-            { kind: "number", key: "pct", label: "Progress (%)" },
-            { kind: "text", key: "next", label: "Next (optional)", placeholder: "e.g. chapter 8" },
+            { kind: "number", key: "pct", label: tt("progress_pct") },
+            { kind: "text", key: "next", label: tt("next_optional"), placeholder: tt("ph_next") },
             VISIBILITY,
           ]}
           onClose={onClose}
-          onDelete={it ? () => del("learning_items", it.id, `Delete “${it.title}”?`) : undefined}
+          onDelete={it ? () => del("learning_items", it.id, tm("delete", { name: it.title })) : undefined}
           onSave={(v) => {
             const pct = Math.round(num(v.pct || "0"));
-            if (!(pct >= 0 && pct <= 100)) return "Progress must be between 0 and 100.";
+            if (!(pct >= 0 && pct <= 100)) return tt("progress_range");
             return finish(
               "learning_items",
               { title: text(v.title), type: v.type, track: text(v.track), who: whoId(v.who), pct, next: text(v.next) || null, visibility: v.visibility },
               it?.id,
-              it ? "Saved" : "Added",
+              it ? tm("saved") : tm("added"),
             );
           }}
         />
@@ -311,20 +312,20 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
     case "lmin":
       return (
         <FormSheet
-          title="Log learning time"
+          title={tt("log_learning")}
           initial={{ minutes: "30", date: today.iso, item: "", visibility: vis("learning"), ...preset }}
           fields={[
             {
               kind: "chips",
               key: "minutes",
-              label: "Minutes",
-              options: ["15", "30", "45", "60", "90", "120"].map((m) => ({ value: m, label: `${m} min` })),
+              label: tt("minutes"),
+              options: ["15", "30", "45", "60", "90", "120"].map((m) => ({ value: m, label: `${m} ${tt("min")}` })),
             },
-            { kind: "date", key: "date", label: "Date", required: true },
+            { kind: "date", key: "date", label: tm("date"), required: true },
             {
               kind: "chips",
               key: "item",
-              label: "On (optional)",
+              label: tt("on_optional"),
               options: [{ value: "", label: "—" }, ...time.learningItems.filter((i) => i.pct < 100).map((i) => ({ value: i.id, label: i.title }))],
             },
           ]}
@@ -334,7 +335,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
               "learning_minutes",
               { minutes: Number(v.minutes), date: v.date, item_id: v.item || null, visibility: v.visibility },
               undefined,
-              `${v.minutes} minutes logged`,
+              tt("minutes_logged", { n: Number(v.minutes) }),
             )
           }
         />
@@ -344,16 +345,16 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
       const s = time.gym.find((x) => x.id === id);
       return (
         <FormSheet
-          title={s ? "Edit gym session" : "Log a gym session"}
+          title={s ? tt("edit_session") : tt("log_session")}
           editing={!!s}
           initial={s ? { type: s.type, date: s.date, time: hm(s.time) } : { type: "Strength", date: today.iso, time: "", ...preset }}
           fields={[
-            { kind: "chips", key: "type", label: "Type", options: GYM_TYPES.map((t) => ({ value: t.value, label: t.value, icon: iconFor(t.icon) })) },
-            { kind: "date", key: "date", label: "Date", required: true },
-            { kind: "time", key: "time", label: "Time (optional)" },
+            { kind: "chips", key: "type", label: tm("type"), options: GYM_TYPES.map((t) => ({ value: t.value, label: tt(`gym_${t.value}`), icon: iconFor(t.icon) })) },
+            { kind: "date", key: "date", label: tm("date"), required: true },
+            { kind: "time", key: "time", label: tt("time_optional") },
           ]}
           onClose={onClose}
-          onDelete={s ? () => del("gym_sessions", s.id, "Delete this session?") : undefined}
+          onDelete={s ? () => del("gym_sessions", s.id, tt("delete_session")) : undefined}
           onSave={(v) =>
             finish(
               "gym_sessions",
@@ -365,7 +366,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
                 ...(s ? {} : { visibility: vis("gym") }),
               },
               s?.id,
-              s ? "Saved" : "Session logged",
+              s ? tm("saved") : tt("session_logged"),
             )
           }
         />
@@ -376,17 +377,16 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
       const j = time.journal.find((x) => x.id === id);
       return (
         <FormSheet
-          title={j ? "Edit journal note" : "Journal note"}
+          title={j ? tt("edit_journal") : tt("new_journal")}
           editing={!!j}
-          initial={j ? { text: j.text, date: j.date, visibility: j.visibility } : { date: today.iso, visibility: vis("journal", "private"), ...preset }}
+          initial={j ? { text: j.text, date: j.date } : { date: today.iso, ...preset }}
           fields={[
-            { kind: "textarea", key: "text", label: "Today", placeholder: "How was today?", required: true, rows: 7 },
-            { kind: "date", key: "date", label: "Date", required: true },
-            VISIBILITY,
+            { kind: "textarea", key: "text", label: tm("today"), placeholder: tt("how_was_today"), required: true, rows: 7 },
+            { kind: "date", key: "date", label: tm("date"), required: true },
           ]}
           onClose={onClose}
-          onDelete={j ? () => del("journal_entries", j.id, "Delete this note?") : undefined}
-          onSave={(v) => finish("journal_entries", { text: text(v.text), date: v.date, visibility: v.visibility }, j?.id, j ? "Saved" : "Saved to your journal")}
+          onDelete={j ? () => del("journal_entries", j.id, tt("delete_note")) : undefined}
+          onSave={(v) => finish("journal_entries", { text: text(v.text), date: v.date, visibility: "private" }, j?.id, j ? tm("saved") : tt("journal_saved"))}
         />
       );
     }
@@ -395,21 +395,21 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
       const d = time.dateIdeas.find((x) => x.id === id);
       return (
         <FormSheet
-          title={d ? "Edit idea" : "Add a date idea"}
+          title={d ? tt("edit_idea") : tt("add_idea")}
           editing={!!d}
           initial={d ? { name: d.name, short: d.short ?? "", cost: d.cost == null ? "" : String(d.cost), icon: d.icon } : { icon: "heart", ...preset }}
           fields={[
-            { kind: "text", key: "name", label: "Idea", placeholder: "e.g. Altmühltal sunset walk", required: true },
-            { kind: "text", key: "short", label: "Short note (optional)", placeholder: "e.g. Picnic on the Jura cliffs" },
-            { kind: "amount", key: "cost", label: "About how much (optional)", placeholder: "0" },
-            { kind: "chips", key: "icon", label: "Icon", options: IDEA_ICONS.map((i) => ({ value: i, label: "", icon: iconFor(i) })) },
+            { kind: "text", key: "name", label: tt("idea"), placeholder: tt("ph_idea"), required: true },
+            { kind: "text", key: "short", label: tt("short_note"), placeholder: tt("ph_short") },
+            { kind: "amount", key: "cost", label: tt("about_how_much"), placeholder: "0" },
+            { kind: "chips", key: "icon", label: tm("icon"), options: IDEA_ICONS.map((i) => ({ value: i, label: "", icon: iconFor(i) })) },
           ]}
           onClose={onClose}
-          onDelete={d ? () => del("date_ideas", d.id, `Delete “${d.name}”?`) : undefined}
+          onDelete={d ? () => del("date_ideas", d.id, tm("delete", { name: d.name })) : undefined}
           onSave={(v) => {
             const cost = text(v.cost) ? num(v.cost) : null;
-            if (cost != null && !(cost >= 0)) return "The cost must be a number.";
-            return finish("date_ideas", { name: text(v.name), short: text(v.short) || null, cost, icon: v.icon || "heart" }, d?.id, d ? "Saved" : "Idea added");
+            if (cost != null && !(cost >= 0)) return tt("cost_number");
+            return finish("date_ideas", { name: text(v.name), short: text(v.short) || null, cost, icon: v.icon || "heart" }, d?.id, d ? tm("saved") : tt("idea_added"));
           }}
         />
       );
@@ -420,7 +420,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
       const plans = [...new Set(time.careerSteps.map((x) => x.plan))];
       return (
         <FormSheet
-          title={c ? "Edit step" : "Add a step"}
+          title={c ? tt("edit_step") : tt("add_step")}
           editing={!!c}
           initial={
             c
@@ -428,23 +428,23 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
               : { plan: plans[0] ?? "", status: "next", visibility: vis("career"), ...preset }
           }
           fields={[
-            { kind: "text", key: "plan", label: "Plan", placeholder: "e.g. RIDEFF Studio", required: true },
-            { kind: "text", key: "title", label: "Step", placeholder: "e.g. Gewerbe registered", required: true },
-            { kind: "text", key: "timing", label: "When (optional)", placeholder: "e.g. July, in progress, 1 of 3" },
+            { kind: "text", key: "plan", label: tt("plan"), placeholder: tt("ph_plan"), required: true },
+            { kind: "text", key: "title", label: tt("step"), placeholder: tt("ph_career_step"), required: true },
+            { kind: "text", key: "timing", label: tt("when_optional"), placeholder: tt("ph_when") },
             {
               kind: "chips",
               key: "status",
-              label: "Status",
+              label: tm("status"),
               options: [
-                { value: "done", label: "Done" },
-                { value: "now", label: "Doing now" },
-                { value: "next", label: "Next" },
+                { value: "done", label: tm("done") },
+                { value: "now", label: tt("doing_now") },
+                { value: "next", label: tt("next") },
               ],
             },
             VISIBILITY,
           ]}
           onClose={onClose}
-          onDelete={c ? () => del("career_steps", c.id, `Delete “${c.title}”?`) : undefined}
+          onDelete={c ? () => del("career_steps", c.id, tm("delete", { name: c.title })) : undefined}
           onSave={(v) =>
             finish(
               "career_steps",
@@ -457,19 +457,41 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
                 ...(c ? {} : { sort: time.careerSteps.filter((x) => x.plan === text(v.plan)).length }),
               },
               c?.id,
-              c ? "Saved" : "Step added",
+              c ? tm("saved") : tt("step_added"),
             )
           }
         />
       );
     }
 
+    case "wage":
+      return (
+        <FormSheet
+          title={tt("wage_title")}
+          initial={{ wage: settings?.shift_wage == null ? "" : String(settings.shift_wage) }}
+          fields={[
+            { kind: "amount", key: "wage", label: tt("wage_label"), placeholder: "0", required: true },
+            { kind: "note", key: "n", label: "", text: tt("wage_note") },
+          ]}
+          onClose={onClose}
+          onSave={async (v) => {
+            const wage = num(v.wage);
+            if (!(wage >= 0)) return tt("cost_number");
+            const { error } = await supabase().from("member_settings").update({ shift_wage: wage }).eq("member_id", userId);
+            if (error) return tm("could_not_save", { message: error.message });
+            await reload();
+            toast(tm("saved"));
+            onClose();
+          }}
+        />
+      );
+
     case "datenight": {
       const d = time.dateNights.find((x) => x.id === id);
       const past = d ? d.date <= today.iso : false;
       return (
         <FormSheet
-          title={d ? (past ? "How was it?" : "Edit date night") : "Plan a date night"}
+          title={d ? (past ? tt("how_was_it") : tt("edit_date")) : tt("plan_date")}
           editing={!!d}
           initial={
             d
@@ -477,27 +499,27 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
               : { date: today.iso, start: "19:00", icon: "heart", rating: "", ...preset }
           }
           fields={[
-            { kind: "text", key: "name", label: "What", placeholder: "e.g. Trattoria + castle walk", required: true },
-            { kind: "date", key: "date", label: "Date", required: true },
-            ...(d ? [] : [{ kind: "time", key: "start", label: "Time (adds it to the week)" } as Field]),
-            { kind: "amount", key: "cost", label: "Cost (optional)", placeholder: "0" },
+            { kind: "text", key: "name", label: tt("what"), placeholder: tt("ph_date"), required: true },
+            { kind: "date", key: "date", label: tm("date"), required: true },
+            ...(d ? [] : [{ kind: "time", key: "start", label: tt("time_adds_week") } as Field]),
+            { kind: "amount", key: "cost", label: tt("cost_optional"), placeholder: "0" },
             ...(d && past
               ? [
                   {
                     kind: "chips",
                     key: "rating",
-                    label: "Rating",
+                    label: tt("rating"),
                     options: [{ value: "", label: "—" }, ...[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: "★".repeat(n) }))],
                   } as Field,
                 ]
               : []),
-            { kind: "text", key: "note", label: "Note (optional)" },
+            { kind: "text", key: "note", label: tm("note_optional") },
           ]}
           onClose={onClose}
-          onDelete={d ? () => del("date_nights", d.id, `Delete “${d.name}”?`) : undefined}
+          onDelete={d ? () => del("date_nights", d.id, tm("delete", { name: d.name })) : undefined}
           onSave={async (v) => {
             const cost = text(v.cost) ? num(v.cost) : null;
-            if (cost != null && !(cost >= 0)) return "The cost must be a number.";
+            if (cost != null && !(cost >= 0)) return tt("cost_number");
             const values: Record<string, unknown> = {
               name: text(v.name),
               date: v.date,
@@ -511,7 +533,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
               const eventId = crypto.randomUUID();
               const ev = await time.save("events", {
                 id: eventId,
-                title: `Date night: ${text(v.name)}`,
+                title: tt("date_event_title", { name: text(v.name) }),
                 date: v.date,
                 start_time: text(v.start) || null,
                 who: null,
@@ -520,7 +542,7 @@ export function TimeForm({ kind, id, preset, onClose }: { kind: TimeFormKind; id
               if (!ev || ev === QUEUED) values.event_id = eventId;
               if (preset?.idea_id) values.idea_id = preset.idea_id;
             }
-            return finish("date_nights", values, d?.id, d ? "Saved" : "Date night planned");
+            return finish("date_nights", values, d?.id, d ? tm("saved") : tt("date_planned"));
           }}
         />
       );

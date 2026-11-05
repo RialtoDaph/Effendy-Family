@@ -1,0 +1,952 @@
+{
+"tools": [
+"Tools",
+"Werkzeuge",
+"Alat"
+],
+"invest_career": [
+"Invest & career",
+"Investieren & Karriere",
+"Investasi & karier"
+],
+"today": [
+"Today",
+"Heute",
+"Hari ini"
+],
+"tomorrow": [
+"Tomorrow",
+"Morgen",
+"Besok"
+],
+"in_days": [
+"In {n} days",
+"In {n} Tagen",
+"{n} hari lagi"
+],
+"this_month": [
+"This month",
+"Diesen Monat",
+"Bulan ini"
+],
+"ongoing": [
+"Ongoing",
+"Laufend",
+"Berjalan"
+],
+"su_eyebrow": [
+"Setup & data",
+"Einrichtung & Daten",
+"Penyiapan & data"
+],
+"su_title": [
+"Put your real life in.",
+"Trag dein echtes Leben ein.",
+"Masukkan hidupmu yang sebenarnya."
+],
+"su_sub": [
+"Do this once, in any order. Everything stays editable: tap any row, amount or card to change it, or use the + button anywhere in the app.",
+"Mach das einmal, in beliebiger Reihenfolge. Alles bleibt änderbar: Tippe auf eine Zeile, einen Betrag oder eine Karte, oder nutze überall die +-Taste.",
+"Lakukan sekali, urutan bebas. Semua tetap bisa diubah: ketuk baris, jumlah, atau kartu mana pun, atau pakai tombol + di mana saja."
+],
+"su_done": [
+"{done} of {total} done",
+"{done} von {total} erledigt",
+"{done} dari {total} selesai"
+],
+"su_time": [
+"about 20 minutes in total",
+"insgesamt etwa 20 Minuten",
+"total sekitar 20 menit"
+],
+"su_add": [
+"+ Add",
+"+ Hinzufügen",
+"+ Tambah"
+],
+"su_open": [
+"Open →",
+"Öffnen →",
+"Buka →"
+],
+"su_tip": [
+"<b>Fastest start:</b> add your incomes, then rent, insurance and other monthly payments under Recurring. From then on the budget fills itself every month and you only add day-to-day spending.",
+"<b>Am schnellsten:</b> Trag deine Einkommen ein, dann Miete, Versicherungen und andere Monatszahlungen unter Wiederkehrend. Danach füllt sich das Budget jeden Monat selbst und du trägst nur noch Alltagsausgaben ein.",
+"<b>Cara tercepat:</b> tambahkan penghasilan, lalu sewa, asuransi, dan pembayaran bulanan lain di Rutin. Setelah itu anggaran terisi sendiri tiap bulan dan kamu cukup mencatat belanja harian."
+],
+"su_members": [
+"Family members",
+"Familienmitglieder",
+"Anggota keluarga"
+],
+"su_members_sub": [
+"{n, plural, one {# person} other {# people}} · invite under Settings",
+"{n, plural, one {# Person} other {# Personen}} · einladen unter Einstellungen",
+"{n} orang · undang di Pengaturan"
+],
+"su_income": [
+"Income sources",
+"Einkommensquellen",
+"Sumber penghasilan"
+],
+"su_income_sub": [
+"{n, plural, one {# source} other {# sources}} · {total} a month",
+"{n, plural, one {# Quelle} other {# Quellen}} · {total} im Monat",
+"{n} sumber · {total} per bulan"
+],
+"su_bank": [
+"Bank statements",
+"Kontoauszüge",
+"Rekening koran"
+],
+"su_bank_sub": [
+"Upload a CSV or PDF and transactions sort themselves",
+"Lade eine CSV oder PDF hoch, die Buchungen sortieren sich selbst",
+"Unggah CSV atau PDF dan transaksi tersortir sendiri"
+],
+"su_budget": [
+"Budget categories",
+"Budgetkategorien",
+"Kategori anggaran"
+],
+"su_budget_sub": [
+"{cats, plural, one {# category} other {# categories}} · {rec, plural, one {# recurring payment} other {# recurring payments}}",
+"{cats, plural, one {# Kategorie} other {# Kategorien}} · {rec, plural, one {# wiederkehrende Zahlung} other {# wiederkehrende Zahlungen}}",
+"{cats} kategori · {rec} pembayaran rutin"
+],
+"su_goals": [
+"Goals",
+"Ziele",
+"Target"
+],
+"su_goals_sub": [
+"{n, plural, one {# goal} other {# goals}} · shared and private",
+"{n, plural, one {# Ziel} other {# Ziele}} · geteilt und privat",
+"{n} target · bersama dan pribadi"
+],
+"su_assets": [
+"Savings & investments",
+"Ersparnisse & Investments",
+"Tabungan & investasi"
+],
+"su_assets_sub": [
+"{n, plural, one {# account} other {# accounts}} · update values once a month",
+"{n, plural, one {# Konto} other {# Konten}} · Werte einmal im Monat aktualisieren",
+"{n} akun · perbarui nilainya sebulan sekali"
+],
+"su_shifts": [
+"Shift schedule",
+"Schichtplan",
+"Jadwal shift"
+],
+"su_shifts_sub": [
+"Add your shifts by hand",
+"Trag deine Schichten von Hand ein",
+"Tambahkan shift secara manual"
+],
+"su_ygoals": [
+"Yearly goals",
+"Jahresziele",
+"Target tahunan"
+],
+"su_ygoals_sub": [
+"Each with a weekly step",
+"Jedes mit einem Wochenschritt",
+"Masing-masing dengan langkah mingguan"
+],
+"al_eyebrow": [
+"Alert center",
+"Hinweise",
+"Pusat peringatan"
+],
+"al_need": [
+"{n, plural, one {# thing needs you} other {# things need you}}",
+"{n, plural, one {# Sache braucht dich} other {# Sachen brauchen dich}}",
+"{n} hal butuh perhatianmu"
+],
+"al_calm": [
+"All calm",
+"Alles ruhig",
+"Semua tenang"
+],
+"al_sub": [
+"Built from your budget, bills and goals. Updates as you add data.",
+"Aus Budget, Rechnungen und Zielen. Aktualisiert sich mit deinen Daten.",
+"Dari anggaran, tagihan, dan targetmu. Diperbarui saat data bertambah."
+],
+"al_all": [
+"All",
+"Alle",
+"Semua"
+],
+"al_money": [
+"Money",
+"Geld",
+"Uang"
+],
+"al_goals": [
+"Goals",
+"Ziele",
+"Target"
+],
+"al_time": [
+"Time",
+"Zeit",
+"Waktu"
+],
+"al_urgent": [
+"Needs attention",
+"Braucht Aufmerksamkeit",
+"Perlu perhatian"
+],
+"al_soon": [
+"Coming up",
+"Demnächst",
+"Segera"
+],
+"al_info": [
+"Good to know",
+"Gut zu wissen",
+"Baik diketahui"
+],
+"al_dismiss": [
+"Dismiss",
+"Ausblenden",
+"Tutup"
+],
+"al_clear": [
+"All clear",
+"Alles klar",
+"Semua beres"
+],
+"al_clear_sub": [
+"Nothing needs attention right now.",
+"Gerade braucht nichts deine Aufmerksamkeit.",
+"Saat ini tidak ada yang perlu perhatian."
+],
+"al_restore": [
+"Show {n} dismissed again",
+"{n} ausgeblendete wieder zeigen",
+"Tampilkan lagi {n} yang ditutup"
+],
+"rp_title": [
+"Bug reports",
+"Fehlermeldungen",
+"Laporan bug"
+],
+"rp_sub": [
+"Tap the bug button above + on any screen to report a problem or an idea. Move cards with the arrows. Your household sees this board.",
+"Tippe auf jedem Bildschirm auf die Käfer-Taste über dem +, um ein Problem oder eine Idee zu melden. Verschiebe Karten mit den Pfeilen. Dein Haushalt sieht dieses Board.",
+"Ketuk tombol bug di atas + di layar mana pun untuk melaporkan masalah atau ide. Pindahkan kartu dengan panah. Rumah tanggamu melihat papan ini."
+],
+"rp_empty": [
+"No reports yet. When something looks wrong, tap the bug button and write one line.",
+"Noch keine Meldungen. Wenn etwas falsch aussieht, tippe auf die Käfer-Taste und schreib eine Zeile.",
+"Belum ada laporan. Kalau ada yang salah, ketuk tombol bug dan tulis satu baris."
+],
+"rp_open": [
+"{n} open",
+"{n} offen",
+"{n} terbuka"
+],
+"rp_nothing": [
+"Nothing here",
+"Hier ist nichts",
+"Tidak ada di sini"
+],
+"rp_move": [
+"Move to {to}",
+"Verschieben nach {to}",
+"Pindah ke {to}"
+],
+"rp_edit": [
+"Edit report",
+"Meldung bearbeiten",
+"Ubah laporan"
+],
+"rp_column": [
+"Column",
+"Spalte",
+"Kolom"
+],
+"rp_delete_q": [
+"Delete this report?",
+"Diese Meldung löschen?",
+"Hapus laporan ini?"
+],
+"rp_someone": [
+"Someone",
+"Jemand",
+"Seseorang"
+],
+"col_todo": [
+"To do",
+"Zu erledigen",
+"Akan dikerjakan"
+],
+"col_doing": [
+"Doing",
+"In Arbeit",
+"Dikerjakan"
+],
+"col_done": [
+"Done",
+"Erledigt",
+"Selesai"
+],
+"k_bug": [
+"Bug",
+"Fehler",
+"Bug"
+],
+"k_idea": [
+"Idea",
+"Idee",
+"Ide"
+],
+"k_other": [
+"Other",
+"Sonstiges",
+"Lainnya"
+],
+"fb_what": [
+"What is it?",
+"Was ist es?",
+"Apa ini?"
+],
+"fb_line": [
+"In one line",
+"In einer Zeile",
+"Dalam satu baris"
+],
+"fb_line_ph": [
+"e.g. Budget shows the wrong total",
+"z. B. Budget zeigt die falsche Summe",
+"mis. Anggaran menampilkan total yang salah"
+],
+"fb_details": [
+"Details (optional)",
+"Details (optional)",
+"Detail (opsional)"
+],
+"fb_details_ph": [
+"What did you tap, what did you expect, what happened?",
+"Was hast du getippt, was hast du erwartet, was ist passiert?",
+"Apa yang kamu ketuk, apa yang kamu harapkan, apa yang terjadi?"
+],
+"fb_title": [
+"Report a bug or idea",
+"Fehler oder Idee melden",
+"Laporkan bug atau ide"
+],
+"fb_sent": [
+"Sent with it",
+"Wird mitgeschickt",
+"Ikut terkirim"
+],
+"fb_sent_text": [
+"Screen {path} and your phone type, so it is easier to find.",
+"Bildschirm {path} und dein Handytyp, damit es leichter zu finden ist.",
+"Layar {path} dan jenis HP-mu, agar lebih mudah ditemukan."
+],
+"fb_thanks": [
+"Thanks, report saved. See it under Bug reports.",
+"Danke, Meldung gespeichert. Du findest sie unter Fehlermeldungen.",
+"Terima kasih, laporan tersimpan. Lihat di Laporan bug."
+],
+"wi_title": [
+"What if",
+"Was wäre wenn",
+"Bagaimana jika"
+],
+"wi_every": [
+"Every month, with these changes",
+"Jeden Monat, mit diesen Änderungen",
+"Tiap bulan, dengan perubahan ini"
+],
+"wi_year": [
+"{amount} a year · goes to <b>{target}</b>",
+"{amount} im Jahr · geht an <b>{target}</b>",
+"{amount} per tahun · masuk ke <b>{target}</b>"
+],
+"wi_invest_note": [
+" · investing {amount} a month",
+" · Investieren {amount} im Monat",
+" · investasi {amount} per bulan"
+],
+"wi_ten": [
+" · about {amount} after 10 years at {pct}%",
+" · etwa {amount} nach 10 Jahren bei {pct} %",
+" · sekitar {amount} setelah 10 tahun pada {pct}%"
+],
+"wi_change": [
+"Change something",
+"Etwas ändern",
+"Ubah sesuatu"
+],
+"wi_goes": [
+"Extra money goes to",
+"Extra-Geld geht an",
+"Uang lebih masuk ke"
+],
+"wi_etf": [
+"Investing (ETF)",
+"Investieren (ETF)",
+"Investasi (ETF)"
+],
+"wi_move": [
+"Move unplanned money to {target}",
+"Ungeplantes Geld verschieben nach {target}",
+"Pindahkan uang tak terencana ke {target}"
+],
+"wi_mo": [
+"{amount}/mo",
+"{amount}/Monat",
+"{amount}/bln"
+],
+"wi_nojob": [
+"{amount} a month has no job yet (income − budget − goal savings).",
+"{amount} im Monat haben noch keine Aufgabe (Einkommen − Budget − Sparziele).",
+"{amount} per bulan belum punya tugas (penghasilan − anggaran − tabungan target)."
+],
+"wi_planned": [
+"All income is already planned in the budget and goals.",
+"Alles Einkommen ist schon in Budget und Zielen verplant.",
+"Semua penghasilan sudah direncanakan di anggaran dan target."
+],
+"wi_studio": [
+"Business income change",
+"Änderung Geschäftseinkommen",
+"Perubahan penghasilan usaha"
+],
+"wi_after": [
+"After about {pct}% tax: {amount} a month",
+"Nach etwa {pct} % Steuern: {amount} im Monat",
+"Setelah pajak sekitar {pct}%: {amount} per bulan"
+],
+"wi_tax": [
+"Tax on extra income",
+"Steuer auf Zusatzeinkommen",
+"Pajak atas penghasilan tambahan"
+],
+"wi_invest": [
+"Change monthly investing (ETF)",
+"Monatliches Investieren ändern (ETF)",
+"Ubah investasi bulanan (ETF)"
+],
+"wi_counted": [
+"Already counted: the extra money above goes into investing.",
+"Schon eingerechnet: Das Extra-Geld oben geht ins Investieren.",
+"Sudah dihitung: uang lebih di atas masuk ke investasi."
+],
+"wi_taken": [
+"Taken from the extra money before it goes to {target}.",
+"Wird vom Extra-Geld abgezogen, bevor es an {target} geht.",
+"Diambil dari uang lebih sebelum masuk ke {target}."
+],
+"wi_return": [
+"Yearly return on investing",
+"Jährliche Rendite",
+"Imbal hasil tahunan"
+],
+"wi_return_hint": [
+"World ETFs have averaged roughly 5–7% a year over long periods. Not a promise.",
+"Welt-ETFs lagen langfristig im Schnitt bei etwa 5–7 % im Jahr. Kein Versprechen.",
+"ETF global rata-rata sekitar 5–7% per tahun dalam jangka panjang. Bukan janji."
+],
+"wi_stop": [
+"Stop one expense",
+"Eine Ausgabe stoppen",
+"Hentikan satu pengeluaran"
+],
+"wi_stop_empty": [
+"Add subscriptions or budget categories to try this.",
+"Füge Abos oder Budgetkategorien hinzu, um das zu testen.",
+"Tambahkan langganan atau kategori anggaran untuk mencoba ini."
+],
+"wi_budget": [
+" budget",
+" Budget",
+" anggaran"
+],
+"wi_dates": [
+"Goal dates",
+"Zieltermine",
+"Tanggal target"
+],
+"wi_nodate": [
+"no date yet",
+"noch kein Datum",
+"belum ada tanggal"
+],
+"wi_nodate2": [
+"no date",
+"kein Datum",
+"tanpa tanggal"
+],
+"wi_reached": [
+"reached",
+"erreicht",
+"tercapai"
+],
+"wi_sooner": [
+"{n, plural, one {# month sooner} other {# months sooner}}",
+"{n, plural, one {# Monat früher} other {# Monate früher}}",
+"{n} bulan lebih cepat"
+],
+"wi_later": [
+"{n, plural, one {# month later} other {# months later}}",
+"{n, plural, one {# Monat später} other {# Monate später}}",
+"{n} bulan lebih lambat"
+],
+"wi_hasdate": [
+"now has a date",
+"hat jetzt ein Datum",
+"kini punya tanggal"
+],
+"wi_goals_empty": [
+"Add goals with a target and a monthly amount to see their dates move.",
+"Füge Ziele mit Zielbetrag und Monatsrate hinzu, um ihre Termine zu sehen.",
+"Tambahkan target dengan jumlah dan setoran bulanan untuk melihat tanggalnya bergeser."
+],
+"wi_note": [
+"Nothing is changed in your budget. To keep a change, edit the goal or budget, or see the <a>10-year simulation</a>.",
+"An deinem Budget ändert sich nichts. Um etwas zu behalten, bearbeite das Ziel oder Budget, oder sieh dir die <a>10-Jahres-Simulation</a> an.",
+"Anggaranmu tidak berubah. Untuk menyimpan perubahan, ubah target atau anggaran, atau lihat <a>simulasi 10 tahun</a>."
+],
+"si_keep": [
+"Keep saving {amount} a month",
+"Weiter {amount} im Monat sparen",
+"Terus menabung {amount} per bulan"
+],
+"si_keep_sub": [
+"Your goals' monthly savings, invested like an ETF",
+"Die Monatsraten deiner Ziele, angelegt wie ein ETF",
+"Tabungan bulanan targetmu, diinvestasikan seperti ETF"
+],
+"si_idr": [
+"Include Rupiah assets",
+"Rupiah-Vermögen einbeziehen",
+"Sertakan aset Rupiah"
+],
+"si_idr_sub": [
+"Converted at your saved rate",
+"Zu deinem gespeicherten Kurs umgerechnet",
+"Dikonversi dengan kurs tersimpan"
+],
+"si_none": [
+"Add what you own under Invest → Overview (ETF, Tagesgeld, gold, Rupiah savings) to see the next ten years.",
+"Trag unter Investieren → Übersicht ein, was du besitzt (ETF, Tagesgeld, Gold, Rupiah-Ersparnisse), um die nächsten zehn Jahre zu sehen.",
+"Tambahkan milikmu di Investasi → Ringkasan (ETF, Tagesgeld, emas, tabungan Rupiah) untuk melihat sepuluh tahun ke depan."
+],
+"si_rates": [
+"ETF {etf}% · cash {cash}% · gold {gold}% a year",
+"ETF {etf} % · Bargeld {cash} % · Gold {gold} % im Jahr",
+"ETF {etf}% · kas {cash}% · emas {gold}% per tahun"
+],
+"si_byyear": [
+"Year by year",
+"Jahr für Jahr",
+"Tahun demi tahun"
+],
+"si_year": [
+"Year",
+"Jahr",
+"Tahun"
+],
+"si_own": [
+"What you own today",
+"Was du heute besitzt",
+"Milikmu hari ini"
+],
+"si_note": [
+"Simple yearly rates, no taxes or fees. It shows a range, not a forecast. Private items are not included.",
+"Einfache Jahresraten, ohne Steuern und Gebühren. Das zeigt eine Spanne, keine Prognose. Private Einträge sind nicht enthalten.",
+"Tingkat tahunan sederhana, tanpa pajak dan biaya. Ini rentang, bukan ramalan. Item privat tidak termasuk."
+],
+"sc_cautious": [
+"Bad years",
+"Schlechte Jahre",
+"Tahun buruk"
+],
+"sc_middle": [
+"Middle",
+"Mittel",
+"Sedang"
+],
+"sc_hopeful": [
+"Good years",
+"Gute Jahre",
+"Tahun baik"
+],
+"cl_etf": [
+"ETF & shares",
+"ETF & Aktien",
+"ETF & saham"
+],
+"cl_cash": [
+"Cash & Tagesgeld",
+"Bargeld & Tagesgeld",
+"Kas & Tagesgeld"
+],
+"cl_gold": [
+"Gold",
+"Gold",
+"Emas"
+],
+"cl_idr": [
+"Rupiah assets",
+"Rupiah-Vermögen",
+"Aset Rupiah"
+],
+"iv_worth": [
+"Family net worth",
+"Familienvermögen",
+"Kekayaan bersih keluarga"
+],
+"iv_sub": [
+"savings & investments minus debts",
+"Ersparnisse & Investments minus Schulden",
+"tabungan & investasi dikurangi utang"
+],
+"iv_assets": [
+"Savings & investments",
+"Ersparnisse & Investments",
+"Tabungan & investasi"
+],
+"iv_debts": [
+"Debts",
+"Schulden",
+"Utang"
+],
+"iv_idr": [
+"In Indonesia (IDR)",
+"In Indonesien (IDR)",
+"Di Indonesia (IDR)"
+],
+"iv_private": [
+"Your private savings ({amount}) are not in these numbers.",
+"Deine privaten Ersparnisse ({amount}) sind hier nicht enthalten.",
+"Tabungan pribadimu ({amount}) tidak termasuk di angka ini."
+],
+"iv_own": [
+"What you own",
+"Was du besitzt",
+"Milikmu"
+],
+"iv_add": [
+"+ Add savings or investment",
+"+ Ersparnis oder Investment",
+"+ Tambah tabungan atau investasi"
+],
+"iv_update": [
+"Update value",
+"Wert aktualisieren",
+"Perbarui nilai"
+],
+"iv_rate": [
+"Rupiah values converted at €1 = Rp {rate}",
+"Rupiah-Werte umgerechnet zu 1 € = Rp {rate}",
+"Nilai Rupiah dikonversi dengan €1 = Rp {rate}"
+],
+"iv_saved": [
+" (saved {date}).",
+" (gespeichert {date}).",
+" (disimpan {date})."
+],
+"iv_default": [
+" (default). Save today's rate under <a>To Indonesia</a>.",
+" (Standard). Speichere den heutigen Kurs unter <a>Nach Indonesien</a>.",
+" (bawaan). Simpan kurs hari ini di <a>Ke Indonesia</a>."
+],
+"ca_add": [
+"+ Add step",
+"+ Schritt hinzufügen",
+"+ Tambah langkah"
+],
+"ca_empty": [
+"Write down the stages of a plan, e.g. business plan → tax number → first clients. Tap a circle to move a step from Next to Doing now to Done.",
+"Schreib die Etappen eines Plans auf, z. B. Businessplan → Steuernummer → erste Kunden. Tippe auf einen Kreis, um einen Schritt von Als Nächstes über Läuft gerade zu Erledigt zu bewegen.",
+"Tulis tahapan rencana, mis. rencana bisnis → nomor pajak → klien pertama. Ketuk lingkaran untuk memindahkan langkah dari Berikutnya ke Sedang dikerjakan lalu Selesai."
+],
+"ca_of": [
+"{done} of {total}",
+"{done} von {total}",
+"{done} dari {total}"
+],
+"ca_done": [
+"Done",
+"Erledigt",
+"Selesai"
+],
+"ca_now": [
+"Doing now",
+"Läuft gerade",
+"Sedang dikerjakan"
+],
+"ca_next": [
+"Next",
+"Als Nächstes",
+"Berikutnya"
+],
+"ca_aria": [
+"{title}: {status}. Tap to change.",
+"{title}: {status}. Zum Ändern tippen.",
+"{title}: {status}. Ketuk untuk mengubah."
+],
+"ca_step": [
+"+ Step in {plan}",
+"+ Schritt in {plan}",
+"+ Langkah di {plan}"
+],
+"re_pdf": [
+"Save as PDF",
+"Als PDF speichern",
+"Simpan sebagai PDF"
+],
+"re_pdf_note": [
+"In the print window, choose “Save as PDF” and paper size A4. Private items are never in the report.",
+"Wähle im Druckfenster „Als PDF speichern“ und Papiergröße A4. Private Einträge sind nie im Bericht.",
+"Di jendela cetak, pilih “Simpan sebagai PDF” dan ukuran kertas A4. Item privat tidak pernah masuk laporan."
+],
+"re_eyebrow": [
+"{name} · Monthly report",
+"{name} · Monatsbericht",
+"{name} · Laporan bulanan"
+],
+"re_sofar": [
+"So far, up to {date}",
+"Bisher, bis {date}",
+"Sejauh ini, sampai {date}"
+],
+"re_whole": [
+"Whole month",
+"Ganzer Monat",
+"Sebulan penuh"
+],
+"re_family": [
+" · family view",
+" · Familienansicht",
+" · tampilan keluarga"
+],
+"re_in": [
+"Money in (booked)",
+"Einnahmen (gebucht)",
+"Uang masuk (tercatat)"
+],
+"re_out": [
+"Money out",
+"Ausgaben",
+"Uang keluar"
+],
+"re_left": [
+"Left over",
+"Übrig",
+"Sisa"
+],
+"re_planned": [
+"Planned income: <b>{planned} a month</b> (Budget → Incomes). Booked as money in: <b>{booked}</b>.",
+"Geplantes Einkommen: <b>{planned} im Monat</b> (Budget → Einkommen). Als Einnahme gebucht: <b>{booked}</b>.",
+"Penghasilan terencana: <b>{planned} per bulan</b> (Anggaran → Penghasilan). Tercatat sebagai uang masuk: <b>{booked}</b>."
+],
+"re_unbooked": [
+" {amount} is not booked yet, so “Left over” looks lower than it will be. Post income automatically under Money → Recurring.",
+" {amount} sind noch nicht gebucht, deshalb wirkt „Übrig“ niedriger als es sein wird. Buche Einkommen automatisch unter Geld → Wiederkehrend.",
+" {amount} belum tercatat, jadi “Sisa” terlihat lebih rendah. Catat penghasilan otomatis di Uang → Rutin."
+],
+"re_budget": [
+"Budget",
+"Budget",
+"Anggaran"
+],
+"re_flex": [
+"Flexible money",
+"Flexibles Geld",
+"Uang fleksibel"
+],
+"re_of": [
+"{a} of {b}",
+"{a} von {b}",
+"{a} dari {b}"
+],
+"re_where": [
+"Where the money went",
+"Wohin das Geld ging",
+"Ke mana uang pergi"
+],
+"re_nospend": [
+"No spending recorded.",
+"Keine Ausgaben erfasst.",
+"Tidak ada pengeluaran tercatat."
+],
+"re_subs": [
+"Subscriptions (active)",
+"Abos (aktiv)",
+"Langganan (aktif)"
+],
+"re_permonth": [
+"{amount} / month",
+"{amount} / Monat",
+"{amount} / bulan"
+],
+"re_savings": [
+"Savings & net worth",
+"Ersparnisse & Vermögen",
+"Tabungan & kekayaan bersih"
+],
+"re_net": [
+"Net worth",
+"Vermögen",
+"Kekayaan bersih"
+],
+"re_owned": [
+"Owned",
+"Besitz",
+"Dimiliki"
+],
+"re_debts": [
+"Debts left",
+"Restschulden",
+"Sisa utang"
+],
+"re_ef": [
+"Emergency fund",
+"Notgroschen",
+"Dana darurat"
+],
+"re_months": [
+"{a} of {b} months",
+"{a} von {b} Monaten",
+"{a} dari {b} bulan"
+],
+"re_biz": [
+"Business & transfers home",
+"Geschäft & Überweisungen nach Hause",
+"Usaha & kiriman ke rumah"
+],
+"re_business": [
+"Business",
+"Geschäft",
+"Usaha"
+],
+"re_inprofit": [
+"{rev} in · {profit} profit",
+"{rev} rein · {profit} Gewinn",
+"{rev} masuk · {profit} laba"
+],
+"re_nobiz": [
+"No business month entered yet.",
+"Noch kein Geschäftsmonat eingetragen.",
+"Belum ada bulan usaha."
+],
+"re_sent": [
+"Sent to Indonesia ({n}×)",
+"Nach Indonesien gesendet ({n}×)",
+"Dikirim ke Indonesia ({n}×)"
+],
+"re_last": [
+"{name}, last {n, plural, one {# month} other {# months}}",
+"{name}, letzte {n, plural, one {# Monat} other {# Monate}}",
+"{name}, {n} bulan terakhir"
+],
+"re_profit": [
+"{amount} profit / month",
+"{amount} Gewinn / Monat",
+"{amount} laba / bulan"
+],
+"re_goals": [
+"Goals this year",
+"Ziele dieses Jahr",
+"Target tahun ini"
+],
+"re_nogoals": [
+"No yearly goals yet.",
+"Noch keine Jahresziele.",
+"Belum ada target tahunan."
+],
+"re_time": [
+"Time & life",
+"Zeit & Leben",
+"Waktu & hidup"
+],
+"re_shifts": [
+"{name}: shifts",
+"{name}: Schichten",
+"{name}: shift"
+],
+"re_gym": [
+"{name}: gym",
+"{name}: Gym",
+"{name}: gym"
+],
+"re_learn": [
+"{name}: learning",
+"{name}: Lernen",
+"{name}: belajar"
+],
+"re_sessions": [
+"{n, plural, one {# session} other {# sessions}}",
+"{n, plural, one {# Einheit} other {# Einheiten}}",
+"{n} sesi"
+],
+"re_dates": [
+"Date nights",
+"Date Nights",
+"Malam berdua"
+],
+"re_footer": [
+"Made by rideff Life on {date}. Amounts in euro; Rupiah at the saved rate.",
+"Erstellt von rideff Life am {date}. Beträge in Euro; Rupiah zum gespeicherten Kurs.",
+"Dibuat oleh rideff Life pada {date}. Jumlah dalam euro; Rupiah dengan kurs tersimpan."
+],
+"st_over": [
+"Over",
+"Über Limit",
+"Lewat"
+],
+"st_near": [
+"Near limit",
+"Fast am Limit",
+"Mendekati batas"
+],
+"st_fast": [
+"Fast",
+"Schnell",
+"Cepat"
+],
+"st_paid": [
+"Paid",
+"Bezahlt",
+"Dibayar"
+],
+"st_notyet": [
+"Not yet",
+"Noch nicht",
+"Belum"
+],
+"st_ontrack": [
+"On track",
+"Im Plan",
+"Sesuai rencana"
+],
+"gs_ahead": [
+"Ahead",
+"Voraus",
+"Lebih cepat"
+],
+"gs_ontrack": [
+"On track",
+"Im Plan",
+"Sesuai rencana"
+],
+"gs_behind": [
+"Behind",
+"Zurück",
+"Tertinggal"
+],
+"gs_done": [
+"Done",
+"Erledigt",
+"Selesai"
+]
+}

@@ -1,4 +1,4 @@
-// What Rialna returns, shared by the server route and the app.
+// What Clopar returns, shared by the server route and the app.
 
 export const ACTIONS = ["none", "whatif", "budget", "debts", "subs", "remit", "tax", "invest", "sim", "week", "shifts", "ygoals", "import", "report", "setup"] as const;
 export type AskAction = (typeof ACTIONS)[number];
@@ -23,7 +23,7 @@ export const ACTION_LABEL: Record<AskAction, string> = {
   setup: "Open Setup",
 };
 
-const SHARED = `You are Rialna, the assistant inside RIDEFF LIFE, a private app for Rialto and Amnah Effendy, a couple living in Eichstätt, Germany (family roots in Indonesia).
+const SHARED = `You are Clopar, the assistant inside rideff Life, a private app for Rialto and Amnah Effendy, a couple living in Eichstätt, Germany (family roots in Indonesia).
 Use only the DATA message. It holds everything the asking person may see; items marked private_to belong to that person. Never guess about anything that is not in the data, and never speculate that hidden or private items exist.
 Money is in euro, written like €1,234 or €12.50 (Rupiah as Rp 1.500.000). Round sensibly.
 nums: up to 3 key numbers from the data that support the answer, each with a short label. Leave it empty if no number helps.

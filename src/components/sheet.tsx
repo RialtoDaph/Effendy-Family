@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
@@ -14,6 +15,7 @@ export function Sheet({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const t = useTranslations("copy");
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -41,7 +43,7 @@ export function Sheet({
           <h2 className="m-0 text-xl font-extrabold tracking-[-0.01em]">{title}</h2>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t("close")}
             className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full border-0 bg-soft2 text-ink"
           >
             <X size={16} strokeWidth={2.6} />
@@ -78,6 +80,21 @@ const inputCls =
   "h-[50px] rounded-[10px] border border-line bg-soft px-3.5 text-base text-ink outline-none focus:border-line2";
 
 /** The one generic form used everywhere. */
+/** "Visible to: Family / Only me", the same on every form. */
+export function useVisibilityField(): Field {
+  const tm = useTranslations("money");
+  return {
+    kind: "chips",
+    key: "visibility",
+    label: tm("visible_to"),
+    required: true,
+    options: [
+      { value: "family", label: tm("family") },
+      { value: "private", label: tm("only_me") },
+    ],
+  };
+}
+
 export function FormSheet({
   title,
   fields,
@@ -95,6 +112,7 @@ export function FormSheet({
   onDelete?: () => Promise<void> | void;
   onClose: () => void;
 }) {
+  const tm = useTranslations("money");
   const [values, setValues] = useState<FormValues>(initial ?? {});
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -105,7 +123,7 @@ export function FormSheet({
       (f) => "required" in f && f.required && !String(values[f.key] ?? "").trim(),
     );
     if (missing) {
-      setError(`Please fill in: ${missing.label}`);
+      setError(tm("please_fill_in", { label: missing.label }));
       return;
     }
     setBusy(true);
@@ -201,10 +219,10 @@ export function FormSheet({
             {f.kind === "file" && (
               <label className="flex min-h-[50px] cursor-pointer items-center gap-3 rounded-[10px] border border-dashed border-line2 bg-soft px-3.5 py-3">
                 <span className="rounded-full bg-card px-3 py-1.5 text-[13px] font-extrabold text-ink shadow-[0_1px_3px_rgba(0,0,0,.12)]">
-                  Choose file
+                  {tm("choose_file")}
                 </span>
                 <span className="min-w-0 flex-1 truncate text-[13px] text-mut">
-                  {values[f.key] instanceof File ? (values[f.key] as File).name : (f.current ?? "No file yet")}
+                  {values[f.key] instanceof File ? (values[f.key] as File).name : (f.current ?? tm("no_file_yet"))}
                 </span>
                 <input
                   type="file"
@@ -235,7 +253,7 @@ export function FormSheet({
               onClick={() => onDelete()}
               className="h-[50px] rounded-full border border-badbg bg-card px-[18px] text-sm font-extrabold text-bad"
             >
-              Delete
+              {tm("delete_5")}
             </button>
           )}
           <button
@@ -244,7 +262,7 @@ export function FormSheet({
             onClick={save}
             className="h-[50px] flex-1 rounded-full border-0 bg-acc text-[15px] font-extrabold text-onacc hover:bg-acc2 disabled:opacity-60"
           >
-            {busy ? "Saving…" : editing ? "Save changes" : "Save"}
+            {busy ? tm("saving") : editing ? tm("save_changes") : tm("save")}
           </button>
         </div>
       </div>

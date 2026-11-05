@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Design handoff (prototype runtime), not app code.
     "docs/**",
+    "design_handoff_rideff/**",
+    "public/rideff-particles.js",
+    "tests/e2e/stub.cjs",
   ]),
 ]);
 

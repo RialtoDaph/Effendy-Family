@@ -1,0 +1,347 @@
+{
+ "thinking": [
+  "Thinking…",
+  "Denkt nach…",
+  "Berpikir…"
+ ],
+ "listening": [
+  "Listening…",
+  "Hört zu…",
+  "Mendengarkan…"
+ ],
+ "looking": [
+  "{name} is looking at your numbers…",
+  "{name} schaut sich deine Zahlen an…",
+  "{name} sedang melihat angkamu…"
+ ],
+ "ask_name": [
+  "Ask {name}",
+  "{name} fragen",
+  "Tanya {name}"
+ ],
+ "ask_title": [
+  "Ask about your money.",
+  "Frag nach deinem Geld.",
+  "Tanya soal uangmu."
+ ],
+ "ask_sub": [
+  "Every answer uses only what you can see in the app.",
+  "Jede Antwort nutzt nur, was du in der App sehen kannst.",
+  "Setiap jawaban hanya memakai yang bisa kamu lihat di aplikasi."
+ ],
+ "hello": [
+  "Hi, I'm {name}. Ask me about your budget, your week or your goals. If something should be saved, I'll show you a card first.",
+  "Hallo, ich bin {name}. Frag mich zu Budget, Woche oder Zielen. Wenn etwas gespeichert werden soll, zeige ich dir zuerst eine Karte.",
+  "Hai, aku {name}. Tanyakan soal anggaran, minggu ini, atau tujuanmu. Kalau ada yang perlu disimpan, aku tunjukkan kartunya dulu."
+ ],
+ "ask_spend": [
+  "How much can we still spend this month?",
+  "Wie viel können wir diesen Monat noch ausgeben?",
+  "Berapa yang masih bisa kita belanjakan bulan ini?"
+ ],
+ "ask_laptop": [
+  "Can we afford a new laptop in March?",
+  "Können wir uns im März einen neuen Laptop leisten?",
+  "Apakah kita mampu beli laptop baru di bulan Maret?"
+ ],
+ "ask_subs": [
+  "Which subscriptions could we stop?",
+  "Welche Abos könnten wir kündigen?",
+  "Langganan mana yang bisa kita hentikan?"
+ ],
+ "ask_goals": [
+  "How are our goals doing?",
+  "Wie stehen unsere Ziele?",
+  "Bagaimana kemajuan tujuan kita?"
+ ],
+ "ask_placeholder": [
+  "Ask {name}…",
+  "{name} fragen…",
+  "Tanya {name}…"
+ ],
+ "needs_net": [
+  "{name} needs the internet",
+  "{name} braucht Internet",
+  "{name} perlu internet"
+ ],
+ "send": [
+  "Send",
+  "Senden",
+  "Kirim"
+ ],
+ "clear": [
+  "Clear chat",
+  "Chat löschen",
+  "Hapus obrolan"
+ ],
+ "clear_confirm": [
+  "Clear this chat?",
+  "Diesen Chat löschen?",
+  "Hapus obrolan ini?"
+ ],
+ "open": [
+  "Open",
+  "Öffnen",
+  "Buka"
+ ],
+ "mute": [
+  "Mute",
+  "Stumm",
+  "Bisukan"
+ ],
+ "unmute": [
+  "Turn sound on",
+  "Ton einschalten",
+  "Nyalakan suara"
+ ],
+ "voice_start": [
+  "Talk",
+  "Sprechen",
+  "Bicara"
+ ],
+ "voice_stop": [
+  "Stop talking",
+  "Gespräch beenden",
+  "Akhiri bicara"
+ ],
+ "ai_left": [
+  "{n, plural, one {# AI message} other {# AI messages}} left this month",
+  "Noch {n, plural, one {# KI-Nachricht} other {# KI-Nachrichten}} diesen Monat",
+  "Sisa {n} pesan AI bulan ini"
+ ],
+ "voice_left": [
+  "{n} voice minutes left this month",
+  "Noch {n} Sprachminuten diesen Monat",
+  "Sisa {n} menit suara bulan ini"
+ ],
+ "err_voice_quota": [
+  "This month's voice minutes are used up.",
+  "Die Sprachminuten dieses Monats sind aufgebraucht.",
+  "Menit suara bulan ini sudah habis."
+ ],
+ "err_ai_quota": [
+  "This month's AI messages are used up.",
+  "Die KI-Nachrichten dieses Monats sind aufgebraucht.",
+  "Pesan AI bulan ini sudah habis."
+ ],
+ "err_mic": [
+  "The microphone is off. Allow it in your browser, or type instead.",
+  "Das Mikrofon ist aus. Erlaube es im Browser oder tippe stattdessen.",
+  "Mikrofon mati. Izinkan di browser, atau ketik saja."
+ ],
+ "err_not_configured": [
+  "Voice for {name} isn't set up yet. You can type instead.",
+  "Sprache für {name} ist noch nicht eingerichtet. Du kannst stattdessen tippen.",
+  "Suara untuk {name} belum disiapkan. Kamu bisa mengetik."
+ ],
+ "err_failed": [
+  "{name} can't answer right now. Try again in a moment.",
+  "{name} kann gerade nicht antworten. Versuch es gleich noch einmal.",
+  "{name} belum bisa menjawab. Coba lagi sebentar."
+ ],
+ "card_transaction": [
+  "Save this booking?",
+  "Diese Buchung speichern?",
+  "Simpan transaksi ini?"
+ ],
+ "card_event": [
+  "Add to your calendar?",
+  "Zum Kalender hinzufügen?",
+  "Tambah ke kalender?"
+ ],
+ "card_goal": [
+  "Add this goal?",
+  "Dieses Ziel hinzufügen?",
+  "Tambah tujuan ini?"
+ ],
+ "card_remember": [
+  "Remember this?",
+  "Das merken?",
+  "Ingat ini?"
+ ],
+ "card_share": [
+  "Save this for both of you?",
+  "Für euch beide speichern?",
+  "Simpan untuk kalian berdua?"
+ ],
+ "card_forget": [
+  "Forget this?",
+  "Das vergessen?",
+  "Lupakan ini?"
+ ],
+ "card_saved": [
+  "Saved",
+  "Gespeichert",
+  "Tersimpan"
+ ],
+ "card_undone": [
+  "Taken back.",
+  "Zurückgenommen.",
+  "Dibatalkan."
+ ],
+ "card_dismissed": [
+  "Not saved.",
+  "Nicht gespeichert.",
+  "Tidak disimpan."
+ ],
+ "card_failed": [
+  "That didn't work. Try again.",
+  "Das hat nicht geklappt. Versuch es noch einmal.",
+  "Tidak berhasil. Coba lagi."
+ ],
+ "save": [
+  "Save",
+  "Speichern",
+  "Simpan"
+ ],
+ "edit": [
+  "Edit",
+  "Bearbeiten",
+  "Ubah"
+ ],
+ "undo": [
+  "Undo",
+  "Rückgängig",
+  "Urungkan"
+ ],
+ "only_you": [
+  "Only you",
+  "Nur du",
+  "Hanya kamu"
+ ],
+ "f_date": [
+  "Date",
+  "Datum",
+  "Tanggal"
+ ],
+ "f_category": [
+  "Category",
+  "Kategorie",
+  "Kategori"
+ ],
+ "f_monthly": [
+  "Per month",
+  "Pro Monat",
+  "Per bulan"
+ ],
+ "close": [
+  "Close",
+  "Schließen",
+  "Tutup"
+ ],
+ "type_to": [
+  "Type to {name}",
+  "An {name} schreiben",
+  "Ketik ke {name}"
+ ],
+ "type_instead": [
+  "Type instead",
+  "Stattdessen tippen",
+  "Ketik saja"
+ ],
+ "mem_title": [
+  "What {name} remembers",
+  "Was {name} sich merkt",
+  "Yang diingat {name}"
+ ],
+ "mem_sub": [
+  "Only you see your private memories. Shared ones are visible to everyone in your household.",
+  "Nur du siehst deine privaten Erinnerungen. Geteilte sieht dein ganzer Haushalt.",
+  "Hanya kamu yang melihat memori pribadimu. Memori bersama terlihat oleh seluruh rumah tangga."
+ ],
+ "mem_toggle": [
+  "Memory on or off",
+  "Erinnerung an oder aus",
+  "Memori nyala atau mati"
+ ],
+ "mem_off": [
+  "Memory is off. {name} still answers with your numbers, but forgets each conversation when it ends.",
+  "Die Erinnerung ist aus. {name} antwortet weiter mit deinen Zahlen, vergisst aber jedes Gespräch am Ende.",
+  "Memori mati. {name} tetap menjawab dengan angkamu, tapi melupakan setiap obrolan setelah selesai."
+ ],
+ "mem_private": [
+  "Private",
+  "Privat",
+  "Pribadi"
+ ],
+ "mem_shared": [
+  "Shared",
+  "Geteilt",
+  "Bersama"
+ ],
+ "mem_share_on": [
+  "Share memory with your household",
+  "Erinnerung mit dem Haushalt teilen",
+  "Bagikan memori ke rumah tangga"
+ ],
+ "mem_share_hint": [
+  "While this is off, your shared memories stay hidden from the others.",
+  "Solange das aus ist, bleiben deine geteilten Erinnerungen für die anderen verborgen.",
+  "Selama ini mati, memori bersamamu tetap tersembunyi dari yang lain."
+ ],
+ "mem_empty_private": [
+  "Nothing yet. Things you tell {name} that last will show up here.",
+  "Noch nichts. Was du {name} Bleibendes erzählst, erscheint hier.",
+  "Belum ada. Hal penting yang kamu ceritakan ke {name} akan muncul di sini."
+ ],
+ "mem_empty_shared": [
+  "No shared memories yet.",
+  "Noch keine geteilten Erinnerungen.",
+  "Belum ada memori bersama."
+ ],
+ "mem_share": [
+  "Share",
+  "Teilen",
+  "Bagikan"
+ ],
+ "mem_make_private": [
+  "Make private",
+  "Privat machen",
+  "Jadikan pribadi"
+ ],
+ "mem_forget": [
+  "Forget this",
+  "Das vergessen",
+  "Lupakan ini"
+ ],
+ "mem_forget_private": [
+  "Forget all my private memories",
+  "Alle meine privaten Erinnerungen vergessen",
+  "Lupakan semua memori pribadiku"
+ ],
+ "mem_forget_shared": [
+  "Forget my shared memories",
+  "Meine geteilten Erinnerungen vergessen",
+  "Lupakan memori bersamaku"
+ ],
+ "mem_confirm": [
+  "This can't be undone. Continue?",
+  "Das lässt sich nicht rückgängig machen. Fortfahren?",
+  "Ini tidak bisa dibatalkan. Lanjutkan?"
+ ],
+ "mem_from": [
+  "From {name}",
+  "Von {name}",
+  "Dari {name}"
+ ],
+ "mem_from_you": [
+  "From you",
+  "Von dir",
+  "Dari kamu"
+ ],
+ "mem_voice": [
+  "voice",
+  "Sprache",
+  "suara"
+ ],
+ "mem_chat": [
+  "chat",
+  "Chat",
+  "obrolan"
+ ],
+ "mem_manual": [
+  "added by hand",
+  "von Hand",
+  "ditambah manual"
+ ]
+}

@@ -1,40 +1,57 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useAppData } from "@/components/app-data";
+import { ScreenEmpty } from "@/components/empty-state";
 import { useFinance } from "@/components/finance-data";
 import { useMoneyForms } from "@/components/money-forms";
-import { EmptyNote, PrivateMark } from "@/components/ui";
+import { useLabel } from "@/components/nav-label";
+import { PrivateMark } from "@/components/ui";
 import { assetEur, rpFull } from "@/lib/finance";
 import { AppIcon } from "@/lib/icons";
-import { eur, shortDate } from "@/lib/money";
-import { ModuleTabs } from "./module-tabs";
+import { eur } from "@/lib/money";
+import { useDates } from "@/lib/use-dates";
+import { ModuleHeader, ModuleTabs } from "./module-tabs";
 import { PageHeader } from "./page-header";
 
 export function InvestScreen() {
-  const { assets, worth, rate, fxRate, fxDate } = useFinance();
+  const t = useTranslations();
+  const ts = useTranslations("tools");
+  const dates = useDates();
+  const label = useLabel();
+  const { assets, worth, rate, fxRate, fxDate, loaded } = useFinance();
   const { userId } = useAppData();
   const { openForm } = useMoneyForms();
   const family = assets.filter((a) => a.visibility === "family");
   const mine = assets.filter((a) => a.visibility === "private" && a.owner_id === userId);
   const idrTotal = family.filter((a) => a.orig_currency === "IDR").reduce((s, a) => s + assetEur(a, rate), 0);
 
+  if (loaded && !assets.length) {
+    return (
+      <>
+        <ModuleHeader module="invest" active="invest" />
+        <ScreenEmpty eyebrow={label("nav.overview")} title={t("settings.e_invest")} action={t("t.b_asset")} onAction={() => openForm("asset")} />
+      </>
+    );
+  }
+
   return (
     <>
       <div className="flex flex-col gap-3">
-        <PageHeader eyebrow="Invest & career" title="Overview" />
+        <PageHeader eyebrow={ts("invest_career")} title={label("nav.overview")} />
         <ModuleTabs module="invest" active="invest" />
       </div>
 
       <section className="rounded-[10px] bg-inv p-6 text-white">
-        <div className="font-mono text-[11px] font-bold uppercase tracking-[.16em] text-acc2">Family net worth</div>
+        <div className="font-mono text-[11px] font-bold uppercase tracking-[.16em] text-acc2">{ts("iv_worth")}</div>
         <div className="mt-2 text-[46px] font-black leading-none tracking-[-0.03em]">{eur(worth.net, 0)}</div>
-        <div className="mt-2 text-sm text-white/70">savings &amp; investments minus debts</div>
+        <div className="mt-2 text-sm text-white/70">{ts("iv_sub")}</div>
         <div className="mt-4 grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(130px,1fr))]">
           {[
-            ["Savings & investments", eur(worth.assets, 0)],
-            ["Debts", worth.debts ? `−${eur(worth.debts, 0)}` : "€0"],
-            ["In Indonesia (IDR)", eur(idrTotal, 0)],
+            [ts("iv_assets"), eur(worth.assets, 0)],
+            [ts("iv_debts"), worth.debts ? `−${eur(worth.debts, 0)}` : "€0"],
+            [ts("iv_idr"), eur(idrTotal, 0)],
           ].map(([k, v]) => (
             <div key={k} className="rounded-[10px] border border-white/10 bg-white/[.06] px-4 py-3">
               <div className="text-[11px] text-white/55">{k}</div>
@@ -44,18 +61,18 @@ export function InvestScreen() {
         </div>
         {mine.length > 0 && (
           <div className="mt-4 text-[12.5px] text-white/60">
-            Your private savings ({eur(mine.reduce((s, a) => s + assetEur(a, rate), 0), 0)}) are not in these numbers.
+            {ts("iv_private", { amount: eur(mine.reduce((s, a) => s + assetEur(a, rate), 0), 0) })}
           </div>
         )}
       </section>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="m-0 text-lg font-extrabold">What you own</h2>
+        <h2 className="m-0 text-lg font-extrabold">{ts("iv_own")}</h2>
         <button
           onClick={() => openForm("asset")}
           className="h-11 whitespace-nowrap rounded-full border-0 bg-inv px-[18px] text-[13.5px] font-extrabold text-white"
         >
-          + Add savings or investment
+          {ts("iv_add")}
         </button>
       </div>
 
@@ -82,25 +99,23 @@ export function InvestScreen() {
               onClick={() => openForm("asset", a.id)}
               className="mt-auto self-start min-h-10 rounded-full border-0 bg-tint px-3.5 text-[12.5px] font-extrabold text-acct"
             >
-              Update value
+              {ts("iv_update")}
             </button>
           </section>
         ))}
       </div>
-      {!assets.length && <EmptyNote>Add your Tagesgeld, ETF, gold or savings in Indonesia. Update the values once a month.</EmptyNote>}
-
+      
       <p className="m-0 text-[12.5px] text-mut2">
-        Rupiah values converted at €1 = Rp {rate.toLocaleString("id-ID")}
-        {fxRate ? ` (saved ${fxDate ? shortDate(fxDate) : ""})` : " (default — save today's rate under "}
-        {!fxRate && (
-          <>
-            <Link href="/remit" className="font-bold text-acct">
-              To Indonesia
-            </Link>
-            )
-          </>
-        )}
-        .
+        {ts("iv_rate", { rate: rate.toLocaleString("id-ID") })}
+        {fxRate
+          ? ts("iv_saved", { date: fxDate ? dates.short(fxDate) : "" })
+          : ts.rich("iv_default", {
+              a: (c) => (
+                <Link href="/remit" className="hit44 font-bold text-acct">
+                  {c}
+                </Link>
+              ),
+            })}
       </p>
     </>
   );

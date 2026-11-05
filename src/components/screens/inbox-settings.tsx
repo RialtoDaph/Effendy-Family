@@ -1,18 +1,23 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
+import { useAiName } from "@/components/app-data";
 import { useToast } from "@/components/toast";
 import { inboxScript } from "@/lib/inbox-script";
 import { supabase } from "@/lib/supabase";
 
 type Status = { created_at: string; last_used_at: string | null } | null;
 
-const when = (iso: string) =>
-  new Date(iso).toLocaleString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
+const when = (iso: string, locale: string) =>
+  new Date(iso).toLocaleString(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
 
 /** Settings → Inbox: make a key, copy the Apps Script, see when it last ran. */
 export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: PillLike }) {
+  const t = useTranslations("settings");
+  const locale = useLocale();
+  const aiName = useAiName();
   const toast = useToast();
   const [status, setStatus] = useState<Status | undefined>(undefined);
   const [script, setScript] = useState("");
@@ -31,13 +36,13 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
   }, [load]);
 
   async function makeKey() {
-    if (status && !confirm("Make a new key? The script you set up before stops working until you paste the new one.")) return;
+    if (status && !confirm(t("ib_new_q"))) return;
     setBusy(true);
     setError("");
     const { data, error } = await supabase().rpc("create_inbox_key");
     setBusy(false);
     if (error || typeof data !== "string") {
-      setError(!navigator.onLine ? "This needs the internet." : `Could not make a key: ${error?.message ?? "no answer"}. Please send a screenshot of this.`);
+      setError(!navigator.onLine ? t("needs_net") : t("ib_key_failed", { why: error?.message ?? t("ib_no_answer") }));
       return;
     }
     setScript(inboxScript(window.location.origin, data));
@@ -46,12 +51,12 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
   }
 
   async function disconnect() {
-    if (!confirm("Disconnect your Gmail? The script stops sending mail. Your old digests stay until you delete them.")) return;
+    if (!confirm(t("ib_disc_q"))) return;
     const { error } = await supabase().rpc("revoke_inbox_key");
-    if (error) return toast("Could not disconnect. Try again.");
+    if (error) return toast(t("ib_disc_failed"));
     setScript("");
     void load();
-    toast("Disconnected. You can also delete the project on script.google.com.");
+    toast(t("ib_disc_done"));
   }
 
   async function copy() {
@@ -59,21 +64,21 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
       await navigator.clipboard.writeText(script);
       setCopied(true);
     } catch {
-      toast("Select the text and copy it by hand.");
+      toast(t("ib_copy_hand"));
     }
   }
 
   const connected = !!status?.last_used_at;
   return (
     <Section
-      title="Inbox"
-      sub="Rialna reads your new Gmail every morning and sums it up on Home. Only you see it."
-      pill={<Pill tone={connected ? "ok" : "mut"}>{connected ? "Connected" : status ? "Waiting" : "Off"}</Pill>}
+      title={t("ib_title")}
+      sub={t("ib_sub", { name: aiName })}
+      pill={<Pill tone={connected ? "ok" : "mut"}>{connected ? t("ib_connected") : status ? t("ib_waiting") : t("p_off")}</Pill>}
     >
-      {status?.last_used_at && <div className="text-[13px] text-mut">Last digest: {when(status.last_used_at)}</div>}
+      {status?.last_used_at && <div className="text-[13px] text-mut">{t("ib_last", { when: when(status.last_used_at, locale) })}</div>}
       {status && !status.last_used_at && !script && (
         <div className="rounded-[10px] bg-soft p-3.5 text-[13px] leading-normal text-mut">
-          A key exists but the script has not sent mail yet. If you lost the script, make a new key below.
+          {t("ib_lost")}
         </div>
       )}
 
@@ -85,23 +90,20 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
       {script ? (
         <div className="flex flex-col gap-3">
           <ol className="m-0 flex list-decimal flex-col gap-1.5 pl-5 text-[13px] leading-normal text-ink">
-            <li>Copy the script below. It holds your personal key, so do not share it.</li>
+            <li>{t("ib_s1")}</li>
             <li>
-              On a laptop, open{" "}
-              <a href="https://script.google.com/home/projects/create" target="_blank" rel="noreferrer" className="font-bold underline">
-                script.google.com
-              </a>{" "}
-              with your own Google account. A new project opens.
+              {t.rich("ib_s2", {
+                a: (c) => (
+                  <a href="https://script.google.com/home/projects/create" target="_blank" rel="noreferrer" className="font-bold underline">
+                    {c}
+                  </a>
+                ),
+              })}
             </li>
-            <li>Delete what is there, paste the script, and press Save (the disk icon).</li>
-            <li>
-              Above the code, choose <b>setup</b> and press <b>Run</b>.
-            </li>
-            <li>
-              Google asks for access. Choose your account, then <b>Advanced → Go to project (unsafe)</b> and <b>Allow</b>. It says
-              &quot;unsafe&quot; only because you wrote the script yourself instead of Google checking it.
-            </li>
-            <li>Done. Your first digest appears on Home within a minute, then every morning at about 06:00.</li>
+            <li>{t("ib_s3")}</li>
+            <li>{t.rich("ib_s4", { b: (c) => <b>{c}</b> })}</li>
+            <li>{t.rich("ib_s5", { b: (c) => <b>{c}</b> })}</li>
+            <li>{t("ib_s6")}</li>
           </ol>
           <div className="relative">
             <textarea
@@ -109,16 +111,16 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
               value={script}
               rows={8}
               wrap="off"
-              aria-label="Your inbox script"
+              aria-label={t("ib_script")}
               onFocus={(e) => e.currentTarget.select()}
               className="w-full resize-y rounded-[10px] border border-line bg-soft p-3 font-mono text-[11.5px] leading-snug text-ink outline-none"
             />
           </div>
           <button onClick={copy} className="flex min-h-12 items-center justify-center gap-2 rounded-full border-0 bg-acc text-sm font-extrabold text-onacc">
             {copied ? <Check size={16} /> : <Copy size={16} />}
-            {copied ? "Copied" : "Copy script"}
+            {copied ? t("ib_copied") : t("ib_copy")}
           </button>
-          <div className="text-xs text-mut2">This script is shown once. If you lose it, make a new key.</div>
+          <div className="text-xs text-mut2">{t("ib_once")}</div>
         </div>
       ) : (
         <button
@@ -128,7 +130,7 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
             status ? "border border-line bg-card text-ink" : "border-0 bg-acc text-onacc"
           }`}
         >
-          {busy ? "Making your key…" : status ? "Make a new key and script" : "Connect my Gmail"}
+          {busy ? t("ib_making") : status ? t("ib_remake") : t("ib_connect")}
         </button>
       )}
       {status && (
@@ -137,8 +139,7 @@ export function InboxSection({ Section, Pill }: { Section: SectionLike; Pill: Pi
         </button>
       )}
       <div className="text-xs text-mut2">
-        New mail without Promotions and Social is sent to the AI to be summed up. The partner never sees your digest. Digests are deleted
-        after 60 days.
+        {t("ib_privacy")}
       </div>
     </Section>
   );

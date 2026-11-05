@@ -1,0 +1,1212 @@
+{
+"together": [
+"Together",
+"Gemeinsam",
+"Bersama"
+],
+"week": [
+"Week",
+"Woche",
+"Minggu"
+],
+"month": [
+"Month",
+"Monat",
+"Bulan"
+],
+"this_week": [
+"This week",
+"Diese Woche",
+"Minggu ini"
+],
+"past_week": [
+"Past week",
+"Vergangene Woche",
+"Minggu lalu"
+],
+"coming_week": [
+"Coming week",
+"Kommende Woche",
+"Minggu depan"
+],
+"previous_week": [
+"Previous week",
+"Vorherige Woche",
+"Minggu sebelumnya"
+],
+"next_week": [
+"Next week",
+"Nächste Woche",
+"Minggu berikutnya"
+],
+"this_month": [
+"This month",
+"Dieser Monat",
+"Bulan ini"
+],
+"past_month": [
+"Past month",
+"Vergangener Monat",
+"Bulan lalu"
+],
+"coming_month": [
+"Coming month",
+"Kommender Monat",
+"Bulan depan"
+],
+"previous_month": [
+"Previous month",
+"Vorheriger Monat",
+"Bulan sebelumnya"
+],
+"next_month": [
+"Next month",
+"Nächster Monat",
+"Bulan berikutnya"
+],
+"week_eyebrow": [
+"Week {n} · {range}",
+"Woche {n} · {range}",
+"Minggu {n} · {range}"
+],
+"three_priorities": [
+"3 priorities",
+"3 Prioritäten",
+"3 prioritas"
+],
+"priorities_empty": [
+"What are the three things that matter most this week? Tap + Add.",
+"Welche drei Dinge zählen diese Woche am meisten? Tippe auf + Hinzufügen.",
+"Tiga hal apa yang paling penting minggu ini? Ketuk + Tambah."
+],
+"mark_done": [
+"Mark “{title}” as done",
+"„{title}“ als erledigt markieren",
+"Tandai “{title}” selesai"
+],
+"mark_not_done": [
+"Mark “{title}” as not done",
+"„{title}“ als offen markieren",
+"Tandai “{title}” belum selesai"
+],
+"free_together": [
+"Free together this week",
+"Diese Woche gemeinsam frei",
+"Waktu luang bersama minggu ini"
+],
+"free_this_week": [
+"Free this week",
+"Diese Woche frei",
+"Waktu luang minggu ini"
+],
+"free_evening": [
+"{day} evening",
+"{day}abend",
+"{day} malam"
+],
+"no_free_evening": [
+"No free evening",
+"Kein freier Abend",
+"Tidak ada malam kosong"
+],
+"free_note": [
+"{shared, select, yes {{n, plural, =0 {Every evening left this week has something on for one of you.} one {That’s your only shared free evening left this week.} other {You have # shared free evenings left this week.}}} other {{n, plural, =0 {Every evening left this week has something on.} one {That’s your only free evening left this week.} other {You have # free evenings left this week.}}}}",
+"{shared, select, yes {{n, plural, =0 {An allen restlichen Abenden dieser Woche hat einer von euch etwas vor.} one {Das ist euer einziger gemeinsamer freier Abend diese Woche.} other {Ihr habt diese Woche noch # gemeinsame freie Abende.}}} other {{n, plural, =0 {An allen restlichen Abenden dieser Woche steht etwas an.} one {Das ist dein einziger freier Abend diese Woche.} other {Du hast diese Woche noch # freie Abende.}}}}",
+"{shared, select, yes {{n, plural, =0 {Setiap malam tersisa minggu ini ada agenda untuk salah satu dari kalian.} one {Itu satu-satunya malam kosong kalian berdua minggu ini.} other {Masih ada # malam kosong untuk kalian berdua minggu ini.}}} other {{n, plural, =0 {Setiap malam tersisa minggu ini ada agenda.} one {Itu satu-satunya malam kosongmu minggu ini.} other {Masih ada # malam kosong minggu ini.}}}}"
+],
+"shifts_this_week": [
+"Shifts this week",
+"Schichten diese Woche",
+"Shift minggu ini"
+],
+"shifts_hours": [
+"{n, plural, one {# shift} other {# shifts}} · {h} h",
+"{n, plural, one {# Schicht} other {# Schichten}} · {h} Std.",
+"{n, plural, other {# shift}} · {h} jam"
+],
+"study_this_week": [
+"Study this week",
+"Lernen diese Woche",
+"Belajar minggu ini"
+],
+"study_of": [
+"{done} of {goal} h",
+"{done} von {goal} Std.",
+"{done} dari {goal} jam"
+],
+"plan_the_date": [
+"Plan the date night →",
+"Date Night planen →",
+"Rencanakan date night →"
+],
+"the_week": [
+"The week",
+"Die Woche",
+"Minggu ini"
+],
+"add_to_day": [
+"Add to {day}",
+"Zu {day} hinzufügen",
+"Tambah ke {day}"
+],
+"free_day": [
+"Free",
+"Frei",
+"Kosong"
+],
+"all_day": [
+"All day",
+"Ganztägig",
+"Sepanjang hari"
+],
+"reminder": [
+"reminder",
+"Erinnerung",
+"pengingat"
+],
+"shift_square": [
+"Shift (square)",
+"Schicht (Quadrat)",
+"Shift (kotak)"
+],
+"day_summary": [
+"{day}: {plans, plural, one {# plan} other {# plans}}, {money, plural, =0 {no money dates} one {# money date} other {# money dates}}",
+"{day}: {plans, plural, one {# Plan} other {# Pläne}}, {money, plural, =0 {keine Geldtermine} one {# Geldtermin} other {# Geldtermine}}",
+"{day}: {plans, plural, other {# rencana}}, {money, plural, =0 {tanpa tanggal uang} other {# tanggal uang}}"
+],
+"n_more": [
+"+{n} more",
+"+{n} weitere",
+"+{n} lagi"
+],
+"bill_income_tax": [
+"Bill, income or tax",
+"Rechnung, Einkommen oder Steuer",
+"Tagihan, pemasukan, atau pajak"
+],
+"today_day": [
+"Today · {day}",
+"Heute · {day}",
+"Hari ini · {day}"
+],
+"tax_deadline": [
+"tax deadline",
+"Steuerfrist",
+"tenggat pajak"
+],
+"income": [
+"income",
+"Einkommen",
+"pemasukan"
+],
+"goes_out": [
+"goes out",
+"geht raus",
+"keluar"
+],
+"nothing_planned": [
+"Nothing planned. Tap + Add.",
+"Nichts geplant. Tippe auf + Hinzufügen.",
+"Belum ada rencana. Ketuk + Tambah."
+],
+"bar_shift": [
+"Bar shift",
+"Barschicht",
+"Shift bar"
+],
+"no_shifts_found": [
+"No shifts were found in that picture.",
+"Auf dem Bild wurden keine Schichten gefunden.",
+"Tidak ada shift yang ditemukan di gambar itu."
+],
+"n_hours": [
+"{h} hours",
+"{h} Stunden",
+"{h} jam"
+],
+"n_h": [
+"{h} h",
+"{h} Std.",
+"{h} jam"
+],
+"today_lower": [
+"today",
+"heute",
+"hari ini"
+],
+"tag_night": [
+"Night",
+"Nacht",
+"Malam"
+],
+"tag_sunday": [
+"Sunday",
+"Sonntag",
+"Minggu"
+],
+"clashes_with": [
+"Clashes with {titles}",
+"Kollidiert mit {titles}",
+"Bentrok dengan {titles}"
+],
+"shifts_in_month": [
+"Shifts in {month}",
+"Schichten im {month}",
+"Shift di {month}"
+],
+"hours_planned": [
+"Hours planned",
+"Geplante Stunden",
+"Jam terencana"
+],
+"after_midnight": [
+"{h} of them after midnight",
+"davon {h} nach Mitternacht",
+"{h} di antaranya lewat tengah malam"
+],
+"bonus_title": [
+"Tax-free night & Sunday bonus",
+"Steuerfreier Nacht- & Sonntagszuschlag",
+"Bonus malam & Minggu bebas pajak"
+],
+"bonus_note": [
+"Check it’s on your payslip",
+"Prüfe, ob er auf der Abrechnung steht",
+"Cek apakah ada di slip gajimu"
+],
+"set_wage": [
+"Add hourly wage",
+"Stundenlohn eintragen",
+"Isi upah per jam"
+],
+"no_shifts_week": [
+"No shifts left this week.",
+"Diese Woche keine Schichten mehr.",
+"Tidak ada shift lagi minggu ini."
+],
+"later": [
+"Later",
+"Später",
+"Nanti"
+],
+"next_week_plan": [
+"Next week’s plan",
+"Plan für nächste Woche",
+"Rencana minggu depan"
+],
+"next_week_note": [
+"Snap the roster or pick a screenshot. We read your shifts and you check each one before it is saved.",
+"Fotografiere den Dienstplan oder wähle einen Screenshot. Wir lesen deine Schichten, du prüfst jede vor dem Speichern.",
+"Foto jadwal atau pilih screenshot. Kami membaca shift-mu, lalu kamu cek satu per satu sebelum disimpan."
+],
+"reading_plan": [
+"Finding your shifts in the plan…",
+"Deine Schichten werden gesucht…",
+"Mencari shift-mu di jadwal…"
+],
+"photo_or_pdf": [
+"Photo or PDF of the schedule",
+"Foto oder PDF vom Plan",
+"Foto atau PDF jadwal"
+],
+"upload_plan": [
+"Upload plan →",
+"Plan hochladen →",
+"Unggah jadwal →"
+],
+"needs_internet": [
+"Reading needs the internet",
+"Lesen braucht Internet",
+"Membaca perlu internet"
+],
+"tap_to_untick": [
+"Tap to untick",
+"Tippen zum Abwählen",
+"Ketuk untuk batal pilih"
+],
+"already_saved": [
+"already saved",
+"schon gespeichert",
+"sudah tersimpan"
+],
+"ai_note": [
+"Note from the AI: {note}",
+"Hinweis der KI: {note}",
+"Catatan dari AI: {note}"
+],
+"add_n_shifts": [
+"Add {n, plural, one {# shift} other {# shifts}} to the calendar →",
+"{n, plural, one {# Schicht} other {# Schichten}} zum Kalender hinzufügen →",
+"Tambah {n, plural, other {# shift}} ke kalender →"
+],
+"n_shifts_added": [
+"{n, plural, one {# shift added.} other {# shifts added.}}",
+"{n, plural, one {# Schicht hinzugefügt.} other {# Schichten hinzugefügt.}}",
+"{n, plural, other {# shift ditambahkan.}}"
+],
+"free_evenings_list": [
+"Free evenings that week: <b>{days}</b>.",
+"Freie Abende in dieser Woche: <b>{days}</b>.",
+"Malam kosong minggu itu: <b>{days}</b>."
+],
+"no_free_evenings_next": [
+"No free evening that week.",
+"In dieser Woche kein freier Abend.",
+"Tidak ada malam kosong minggu itu."
+],
+"see_the_week": [
+"See the week →",
+"Woche ansehen →",
+"Lihat minggu ini →"
+],
+"upload_another": [
+"Upload another",
+"Weitere hochladen",
+"Unggah lagi"
+],
+"year_week": [
+"{year} · week {n} of 52",
+"{year} · Woche {n} von 52",
+"{year} · minggu {n} dari 52"
+],
+"goals_summary": [
+"{ok} on track or ahead · {behind} behind",
+"{ok} im Plan oder voraus · {behind} im Rückstand",
+"{ok} sesuai jalur atau lebih cepat · {behind} tertinggal"
+],
+"year_gone": [
+"{pct}% of the year is gone · {n, plural, one {# week} other {# weeks}} left",
+"{pct} % des Jahres sind vorbei · noch {n, plural, one {# Woche} other {# Wochen}}",
+"{pct}% tahun ini sudah lewat · sisa {n, plural, other {# minggu}}"
+],
+"squares_note": [
+"Each square is a week: black = step done, peach = partly, grey = missed. The line on the bar is where you’d be on an even pace.",
+"Jedes Quadrat ist eine Woche: schwarz = Schritt geschafft, pfirsich = teilweise, grau = verpasst. Der Strich auf dem Balken zeigt, wo du bei gleichmäßigem Tempo wärst.",
+"Tiap kotak satu minggu: hitam = langkah selesai, peach = sebagian, abu-abu = terlewat. Garis di bar menunjukkan posisimu bila temponya merata."
+],
+"status_ahead": [
+"Ahead",
+"Voraus",
+"Lebih cepat"
+],
+"status_ontrack": [
+"On track",
+"Im Plan",
+"Sesuai jalur"
+],
+"status_behind": [
+"Behind",
+"Im Rückstand",
+"Tertinggal"
+],
+"status_done": [
+"Done",
+"Erledigt",
+"Selesai"
+],
+"tip_done": [
+"Reached. Well done!",
+"Geschafft. Gut gemacht!",
+"Tercapai. Hebat!"
+],
+"tip_behind": [
+"To catch up: {rate} {unit} a week until 31 Dec.",
+"Zum Aufholen: {rate} {unit} pro Woche bis 31. Dez.",
+"Untuk mengejar: {rate} {unit} per minggu sampai 31 Des."
+],
+"tip_start": [
+"{rate} {unit} a week reaches it by 31 Dec.",
+"{rate} {unit} pro Woche reichen bis 31. Dez.",
+"{rate} {unit} per minggu tercapai pada 31 Des."
+],
+"tip_pace": [
+"At this pace about {byEnd} {unit} by 31 Dec. {rate} {unit} a week reaches {target}.",
+"Bei diesem Tempo etwa {byEnd} {unit} bis 31. Dez. Mit {rate} {unit} pro Woche erreichst du {target}.",
+"Dengan tempo ini sekitar {byEnd} {unit} pada 31 Des. {rate} {unit} per minggu mencapai {target}."
+],
+"tip_ahead": [
+"Ahead: it could be reached by {date}.",
+"Voraus: Es könnte bis {date} geschafft sein.",
+"Lebih cepat: bisa tercapai pada {date}."
+],
+"tip_on_pace": [
+"On pace: reached by {date}.",
+"Im Tempo: erreicht bis {date}.",
+"Sesuai tempo: tercapai pada {date}."
+],
+"weeks_of_progress": [
+"52 weeks of progress",
+"52 Wochen Fortschritt",
+"Progres 52 minggu"
+],
+"this_week_step": [
+"This week: {step}",
+"Diese Woche: {step}",
+"Minggu ini: {step}"
+],
+"add_progress": [
+"+ Add progress",
+"+ Fortschritt eintragen",
+"+ Tambah progres"
+],
+"edit_goal": [
+"Edit goal →",
+"Ziel bearbeiten →",
+"Ubah target →"
+],
+"minutes_logged": [
+"{n} minutes logged",
+"{n} Minuten eingetragen",
+"{n} menit dicatat"
+],
+"goal_min_week": [
+"Goal {n} min a week",
+"Ziel {n} Min. pro Woche",
+"Target {n} menit per minggu"
+],
+"min": [
+"min",
+"Min.",
+"menit"
+],
+"last_8_weeks": [
+"Last 8 weeks",
+"Letzte 8 Wochen",
+"8 minggu terakhir"
+],
+"log_25": [
+"+ Log 25 minutes",
+"+ 25 Minuten eintragen",
+"+ Catat 25 menit"
+],
+"log_other": [
+"Other",
+"Andere",
+"Lainnya"
+],
+"add_to_learn": [
+"+ Add to learn",
+"+ Zum Lernen hinzufügen",
+"+ Tambah bahan belajar"
+],
+"type_book": [
+"Book",
+"Buch",
+"Buku"
+],
+"type_course": [
+"Course",
+"Kurs",
+"Kursus"
+],
+"type_other": [
+"Other",
+"Sonstiges",
+"Lainnya"
+],
+"finished": [
+"finished",
+"fertig",
+"selesai"
+],
+"next_step": [
+"next: {next}",
+"als Nächstes: {next}",
+"berikutnya: {next}"
+],
+"just_started": [
+"just started",
+"gerade begonnen",
+"baru mulai"
+],
+"session_logged": [
+"Session logged",
+"Einheit eingetragen",
+"Sesi dicatat"
+],
+"log_session": [
+"Log a gym session",
+"Training eintragen",
+"Catat sesi gym"
+],
+"goal_times_week": [
+"Goal {n}× a week",
+"Ziel {n}× pro Woche",
+"Target {n}× per minggu"
+],
+"streak": [
+"{n, plural, one {#-week streak} other {#-week streak}}",
+"{n, plural, one {# Woche in Folge} other {# Wochen in Folge}}",
+"{n, plural, other {# minggu beruntun}}"
+],
+"of_this_week": [
+"/ {n} this week",
+"/ {n} diese Woche",
+"/ {n} minggu ini"
+],
+"gym_Strength": [
+"Strength",
+"Kraft",
+"Beban"
+],
+"gym_Cardio": [
+"Cardio",
+"Cardio",
+"Kardio"
+],
+"gym_Class": [
+"Class",
+"Kurs",
+"Kelas"
+],
+"gym_Yoga": [
+"Yoga",
+"Yoga",
+"Yoga"
+],
+"gym_Pilates": [
+"Pilates",
+"Pilates",
+"Pilates"
+],
+"gym_Swim": [
+"Swim",
+"Schwimmen",
+"Renang"
+],
+"gym_Bike": [
+"Bike",
+"Rad",
+"Sepeda"
+],
+"gym_Walk": [
+"Walk",
+"Gehen",
+"Jalan kaki"
+],
+"recent_sessions": [
+"Recent sessions",
+"Letzte Einheiten",
+"Sesi terakhir"
+],
+"log_plus": [
+"+ Log",
+"+ Eintragen",
+"+ Catat"
+],
+"membership_worth": [
+"Is the membership worth it?",
+"Lohnt sich die Mitgliedschaft?",
+"Apakah membership-nya worth it?"
+],
+"membership_note": [
+"per visit in {month}. {name}, {fee} a month, {n, plural, one {# visit} other {# visits}}.",
+"pro Besuch im {month}. {name}, {fee} im Monat, {n, plural, one {# Besuch} other {# Besuche}}.",
+"per kunjungan di {month}. {name}, {fee} per bulan, {n, plural, other {# kunjungan}}."
+],
+"next_date": [
+"Next date · {when}",
+"Nächstes Date · {when}",
+"Date berikutnya · {when}"
+],
+"budget": [
+"Budget",
+"Budget",
+"Budget"
+],
+"also_planned": [
+"Also planned",
+"Auch geplant",
+"Juga direncanakan"
+],
+"nothing_planned_yet": [
+"Nothing planned yet",
+"Noch nichts geplant",
+"Belum ada rencana"
+],
+"plan_friday": [
+"Plan Friday",
+"Freitag planen",
+"Rencanakan Jumat"
+],
+"year_so_far": [
+"{year} so far",
+"{year} bisher",
+"{year} sejauh ini"
+],
+"of_date_nights": [
+"/ {n} date nights",
+"/ {n} Date Nights",
+"/ {n} date night"
+],
+"date_nights_lower": [
+"date nights",
+"Date Nights",
+"date night"
+],
+"dates_pace": [
+"One a week until December gets you to {n}. Last 12 weeks:",
+"Eins pro Woche bis Dezember bringt dich auf {n}. Letzte 12 Wochen:",
+"Satu per minggu sampai Desember membawamu ke {n}. 12 minggu terakhir:"
+],
+"date_log": [
+"Date night log",
+"Date-Night-Log",
+"Catatan date night"
+],
+"log_date": [
+"+ Log date",
+"+ Date eintragen",
+"+ Catat date"
+],
+"rating_of": [
+"{n} of 5",
+"{n} von 5",
+"{n} dari 5"
+],
+"rate": [
+"Rate",
+"Bewerten",
+"Beri nilai"
+],
+"log_empty": [
+"Past date nights show up here, with how they were.",
+"Vergangene Date Nights erscheinen hier, mit eurer Bewertung.",
+"Date night yang sudah lewat muncul di sini, beserta penilaiannya."
+],
+"date_ideas": [
+"Date ideas",
+"Date-Ideen",
+"Ide date"
+],
+"tap_idea": [
+"Tap one to make it Friday’s plan.",
+"Tippe eins an, um es zum Freitagsplan zu machen.",
+"Ketuk satu untuk jadi rencana Jumat."
+],
+"edit_idea_name": [
+"Edit {name}",
+"{name} bearbeiten",
+"Ubah {name}"
+],
+"ideas_empty": [
+"Collect ideas you both like: a restaurant, a walk, a day trip.",
+"Sammelt Ideen, die euch beiden gefallen: ein Restaurant, ein Spaziergang, ein Tagesausflug.",
+"Kumpulkan ide yang kalian suka: restoran, jalan-jalan, atau perjalanan sehari."
+],
+"journal_saved": [
+"Saved · only you can read it",
+"Gespeichert · nur du kannst es lesen",
+"Tersimpan · hanya kamu yang bisa membacanya"
+],
+"journal_privacy_shared": [
+"Only you can read this. {names} can’t open your journal, and Clopar doesn’t read it.",
+"Nur du kannst das lesen. {names} kann dein Tagebuch nicht öffnen, und Clopar liest es nicht.",
+"Hanya kamu yang bisa membaca ini. {names} tidak bisa membuka jurnalmu, dan Clopar tidak membacanya."
+],
+"journal_privacy_solo": [
+"Only you can read this, and Clopar doesn’t read it.",
+"Nur du kannst das lesen, und Clopar liest es nicht.",
+"Hanya kamu yang bisa membaca ini, dan Clopar tidak membacanya."
+],
+"how_was_today": [
+"How was today?",
+"Wie war heute?",
+"Bagaimana hari ini?"
+],
+"journal_note": [
+"Journal note",
+"Tagebuchnotiz",
+"Catatan jurnal"
+],
+"save_note": [
+"Save note",
+"Notiz speichern",
+"Simpan catatan"
+],
+"edit": [
+"Edit",
+"Bearbeiten",
+"Ubah"
+],
+"for": [
+"For",
+"Für",
+"Untuk"
+],
+"starts": [
+"Starts",
+"Beginn",
+"Mulai"
+],
+"ends_midnight": [
+"Ends (after midnight is fine)",
+"Ende (nach Mitternacht ist okay)",
+"Selesai (lewat tengah malam boleh)"
+],
+"reminder_label": [
+"Reminder",
+"Erinnerung",
+"Pengingat"
+],
+"shift_reminder_note": [
+"You get a reminder 2 hours before (Settings → Reminders → Bar shifts).",
+"Du wirst 2 Stunden vorher erinnert (Einstellungen → Erinnerungen → Barschichten).",
+"Kamu diingatkan 2 jam sebelumnya (Pengaturan → Pengingat → Shift bar)."
+],
+"what": [
+"What",
+"Was",
+"Apa"
+],
+"ph_event": [
+"e.g. Tax papers",
+"z. B. Steuerunterlagen",
+"mis. Berkas pajak"
+],
+"starts_optional": [
+"Starts (optional)",
+"Beginn (optional)",
+"Mulai (opsional)"
+],
+"ends_optional": [
+"Ends (optional)",
+"Ende (optional)",
+"Selesai (opsional)"
+],
+"remind_me": [
+"Remind me",
+"Erinnere mich",
+"Ingatkan aku"
+],
+"no": [
+"No",
+"Nein",
+"Tidak"
+],
+"before_15": [
+"15 min before",
+"15 Min. vorher",
+"15 menit sebelumnya"
+],
+"before_60": [
+"1 hour before",
+"1 Stunde vorher",
+"1 jam sebelumnya"
+],
+"before_1440": [
+"1 day before",
+"1 Tag vorher",
+"1 hari sebelumnya"
+],
+"edit_shift": [
+"Edit shift",
+"Schicht bearbeiten",
+"Ubah shift"
+],
+"edit_event": [
+"Edit event",
+"Termin bearbeiten",
+"Ubah agenda"
+],
+"add_shift": [
+"Add bar shift",
+"Barschicht hinzufügen",
+"Tambah shift bar"
+],
+"add_to_week": [
+"Add to this week",
+"Zu dieser Woche hinzufügen",
+"Tambah ke minggu ini"
+],
+"reminder_needs_start": [
+"A reminder needs a start time.",
+"Eine Erinnerung braucht eine Startzeit.",
+"Pengingat perlu jam mulai."
+],
+"shift_added": [
+"Shift added",
+"Schicht hinzugefügt",
+"Shift ditambahkan"
+],
+"added_to_week": [
+"Added to the week",
+"Zur Woche hinzugefügt",
+"Ditambahkan ke minggu ini"
+],
+"edit_priority": [
+"Edit priority",
+"Priorität bearbeiten",
+"Ubah prioritas"
+],
+"add_priority": [
+"Add a priority",
+"Priorität hinzufügen",
+"Tambah prioritas"
+],
+"what_matters": [
+"What matters this week",
+"Was diese Woche zählt",
+"Yang penting minggu ini"
+],
+"ph_priority": [
+"e.g. Send VAT pre-return",
+"z. B. USt-Voranmeldung senden",
+"mis. Kirim laporan PPN"
+],
+"priority_added": [
+"Priority added",
+"Priorität hinzugefügt",
+"Prioritas ditambahkan"
+],
+"edit_ygoal": [
+"Edit yearly goal",
+"Jahresziel bearbeiten",
+"Ubah target tahunan"
+],
+"add_ygoal": [
+"Add yearly goal",
+"Jahresziel hinzufügen",
+"Tambah target tahunan"
+],
+"goal": [
+"Goal",
+"Ziel",
+"Target"
+],
+"ph_goal": [
+"e.g. Read 12 books",
+"z. B. 12 Bücher lesen",
+"mis. Baca 12 buku"
+],
+"target_number": [
+"Target number",
+"Zielzahl",
+"Angka target"
+],
+"unit": [
+"Unit",
+"Einheit",
+"Satuan"
+],
+"ph_unit": [
+"e.g. books",
+"z. B. Bücher",
+"mis. buku"
+],
+"done_so_far": [
+"Done so far",
+"Bisher geschafft",
+"Sudah tercapai"
+],
+"week_step": [
+"Weekly step",
+"Wochenschritt",
+"Langkah mingguan"
+],
+"ph_step": [
+"e.g. 30 pages",
+"z. B. 30 Seiten",
+"mis. 30 halaman"
+],
+"delete_goal": [
+"Delete “{name}” and its progress?",
+"„{name}“ und den Fortschritt löschen?",
+"Hapus “{name}” beserta progresnya?"
+],
+"target_above_0": [
+"The target must be a number above 0.",
+"Das Ziel muss eine Zahl über 0 sein.",
+"Target harus angka di atas 0."
+],
+"done_0_or_more": [
+"Done so far must be 0 or more.",
+"Bisher geschafft muss 0 oder mehr sein.",
+"Yang tercapai harus 0 atau lebih."
+],
+"progress_title": [
+"Progress · {name}",
+"Fortschritt · {name}",
+"Progres · {name}"
+],
+"how_much": [
+"How much",
+"Wie viel",
+"Berapa banyak"
+],
+"how_much_unit": [
+"How much ({unit})",
+"Wie viel ({unit})",
+"Berapa banyak ({unit})"
+],
+"minus_note": [
+"Use a minus to correct a mistake, e.g. -1.",
+"Mit einem Minus korrigierst du Fehler, z. B. -1.",
+"Pakai minus untuk memperbaiki salah catat, mis. -1."
+],
+"enter_not_0": [
+"Enter a number (not 0).",
+"Gib eine Zahl ein (nicht 0).",
+"Masukkan angka (bukan 0)."
+],
+"progress_saved": [
+"Progress saved",
+"Fortschritt gespeichert",
+"Progres tersimpan"
+],
+"edit_item": [
+"Edit",
+"Bearbeiten",
+"Ubah"
+],
+"add_to_learn_title": [
+"Add something to learn",
+"Etwas zum Lernen hinzufügen",
+"Tambah bahan belajar"
+],
+"title": [
+"Title",
+"Titel",
+"Judul"
+],
+"ph_item": [
+"e.g. $100M Offers",
+"z. B. $100M Offers",
+"mis. $100M Offers"
+],
+"topic": [
+"Track",
+"Bereich",
+"Jalur"
+],
+"ph_topic": [
+"e.g. Finance & investing",
+"z. B. Finanzen & Investieren",
+"mis. Keuangan & investasi"
+],
+"progress_pct": [
+"Progress (%)",
+"Fortschritt (%)",
+"Progres (%)"
+],
+"next_optional": [
+"Next step (optional)",
+"Nächster Schritt (optional)",
+"Langkah berikutnya (opsional)"
+],
+"ph_next": [
+"e.g. chapter 3",
+"z. B. Kapitel 3",
+"mis. bab 3"
+],
+"progress_range": [
+"Progress must be between 0 and 100.",
+"Der Fortschritt muss zwischen 0 und 100 liegen.",
+"Progres harus antara 0 dan 100."
+],
+"log_learning": [
+"Log learning time",
+"Lernzeit eintragen",
+"Catat waktu belajar"
+],
+"minutes": [
+"Minutes",
+"Minuten",
+"Menit"
+],
+"on_optional": [
+"On (optional)",
+"Woran (optional)",
+"Untuk (opsional)"
+],
+"edit_session": [
+"Edit gym session",
+"Training bearbeiten",
+"Ubah sesi gym"
+],
+"time_optional": [
+"Time (optional)",
+"Uhrzeit (optional)",
+"Jam (opsional)"
+],
+"delete_session": [
+"Delete this session?",
+"Diese Einheit löschen?",
+"Hapus sesi ini?"
+],
+"edit_journal": [
+"Edit journal entry",
+"Tagebucheintrag bearbeiten",
+"Ubah entri jurnal"
+],
+"new_journal": [
+"New journal entry",
+"Neuer Tagebucheintrag",
+"Entri jurnal baru"
+],
+"delete_note": [
+"Delete this note?",
+"Diese Notiz löschen?",
+"Hapus catatan ini?"
+],
+"edit_idea": [
+"Edit date idea",
+"Date-Idee bearbeiten",
+"Ubah ide date"
+],
+"add_idea": [
+"Add date idea",
+"Date-Idee hinzufügen",
+"Tambah ide date"
+],
+"idea": [
+"Your idea",
+"Deine Idee",
+"Idemu"
+],
+"ph_idea": [
+"e.g. Sunset walk",
+"z. B. Spaziergang bei Sonnenuntergang",
+"mis. Jalan sore"
+],
+"short_note": [
+"Short note (optional)",
+"Kurze Notiz (optional)",
+"Catatan singkat (opsional)"
+],
+"ph_short": [
+"e.g. Picnic by the river",
+"z. B. Picknick am Fluss",
+"mis. Piknik di tepi sungai"
+],
+"about_how_much": [
+"About how much (optional)",
+"Ungefähr wie viel (optional)",
+"Kira-kira berapa (opsional)"
+],
+"cost_number": [
+"Please enter a number.",
+"Bitte gib eine Zahl ein.",
+"Masukkan angka."
+],
+"idea_added": [
+"Idea added",
+"Idee hinzugefügt",
+"Ide ditambahkan"
+],
+"edit_step": [
+"Edit step",
+"Schritt bearbeiten",
+"Ubah langkah"
+],
+"add_step": [
+"Add a step",
+"Schritt hinzufügen",
+"Tambah langkah"
+],
+"plan": [
+"Plan",
+"Plan",
+"Rencana"
+],
+"ph_plan": [
+"e.g. My studio",
+"z. B. Mein Studio",
+"mis. Studioku"
+],
+"step": [
+"Step",
+"Schritt",
+"Langkah"
+],
+"ph_career_step": [
+"e.g. Gewerbe registered",
+"z. B. Gewerbe angemeldet",
+"mis. Gewerbe terdaftar"
+],
+"when_optional": [
+"When (optional)",
+"Wann (optional)",
+"Kapan (opsional)"
+],
+"ph_when": [
+"e.g. July, in progress, 1 of 3",
+"z. B. Juli, läuft, 1 von 3",
+"mis. Juli, berjalan, 1 dari 3"
+],
+"doing_now": [
+"Doing now",
+"Läuft gerade",
+"Sedang dikerjakan"
+],
+"next": [
+"Next",
+"Als Nächstes",
+"Berikutnya"
+],
+"step_added": [
+"Step added",
+"Schritt hinzugefügt",
+"Langkah ditambahkan"
+],
+"how_was_it": [
+"How was it?",
+"Wie war es?",
+"Bagaimana rasanya?"
+],
+"edit_date": [
+"Edit date night",
+"Date Night bearbeiten",
+"Ubah date night"
+],
+"plan_date": [
+"Log a date night",
+"Date Night eintragen",
+"Catat date night"
+],
+"ph_date": [
+"e.g. Dinner and a walk",
+"z. B. Essen und Spaziergang",
+"mis. Makan malam dan jalan-jalan"
+],
+"time_adds_week": [
+"Time (adds it to the week)",
+"Uhrzeit (kommt in die Woche)",
+"Jam (masuk ke minggu ini)"
+],
+"cost_optional": [
+"Cost (optional)",
+"Kosten (optional)",
+"Biaya (opsional)"
+],
+"rating": [
+"Rating",
+"Bewertung",
+"Nilai"
+],
+"date_event_title": [
+"Date night: {name}",
+"Date Night: {name}",
+"Date night: {name}"
+],
+"date_planned": [
+"Date night saved",
+"Date Night gespeichert",
+"Date night tersimpan"
+],
+"wage_title": [
+"Your hourly wage",
+"Dein Stundenlohn",
+"Upah per jammu"
+],
+"wage_label": [
+"Gross wage per hour",
+"Bruttolohn pro Stunde",
+"Upah kotor per jam"
+],
+"wage_note": [
+"Used only for the bonus estimate: 25% at night, 40% from midnight to 04:00, 50% on Sundays (§3b EStG). Only you can see it. This is an estimate, not tax advice.",
+"Nur für die Schätzung des Zuschlags: 25 % nachts, 40 % von 0 bis 4 Uhr, 50 % sonntags (§3b EStG). Nur du siehst ihn. Das ist eine Schätzung, keine Steuerberatung.",
+"Hanya untuk perkiraan bonus: 25% malam hari, 40% dari tengah malam sampai 04:00, 50% hari Minggu (§3b EStG). Hanya kamu yang melihatnya. Ini perkiraan, bukan saran pajak."
+]
+}

@@ -2,20 +2,24 @@
 
 import { ChevronDown, ExternalLink, Mail, X } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useAppData } from "@/components/app-data";
 import { useMoney } from "@/components/money-data";
 import { useMoneyForms } from "@/components/money-forms";
 import { gmailLink, senderName, type InboxDigest, type InboxItem } from "@/lib/inbox";
-import { eur, shortDate } from "@/lib/money";
+import { eur } from "@/lib/money";
 import { supabase } from "@/lib/supabase";
 import { addDays } from "@/lib/time";
+import { useDates } from "@/lib/use-dates";
 
-const ACTION_LABEL = { event: "Add to calendar", recurring: "Add as monthly payment", tax: "Add tax deadline" } as const;
+const ACTION_LABEL = { event: "inbox_event", recurring: "inbox_recurring", tax: "inbox_tax" } as const;
 const cacheKey = (userId: string) => `ef-inbox-${userId}`;
 
 /** Home: today's Gmail digest of the person signed in (never the partner's). */
 export function InboxCard() {
+  const t = useTranslations("home");
+  const dates = useDates();
   const { userId } = useAppData();
   const { today } = useMoney();
   const [digest, setDigest] = useState<InboxDigest | null>(null);
@@ -59,22 +63,22 @@ export function InboxCard() {
   const important = digest.items.filter((i) => i.group === "important");
   const dated = digest.items.filter((i) => i.group === "dated");
   const rest = digest.items.filter((i) => i.group === "rest");
-  const dayLabel = digest.day === today.iso ? "this morning" : shortDate(digest.day);
+  const dayLabel = digest.day === today.iso ? t("inbox_morning") : dates.short(digest.day);
 
   return (
-    <section className="flex flex-col gap-3 rounded-[10px] border border-line bg-card p-5">
+    <section className="flex flex-col gap-3 rounded-[18px] border border-line bg-card p-5">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="m-0 flex items-center gap-2 text-lg font-extrabold tracking-[-0.01em]">
-          <Mail size={18} strokeWidth={2.2} /> Inbox
+          <Mail size={18} strokeWidth={2.2} /> {t("inbox")}
         </h2>
         <div className="flex items-center gap-2">
           <span className="font-mono text-xs text-mut">
-            {digest.mail_count} new · {dayLabel}
+            {t("inbox_new", { n: digest.mail_count, when: dayLabel })}
           </span>
           <button
             onClick={dismiss}
-            aria-label="Hide until tomorrow's digest"
-            title="Hide until tomorrow's digest"
+            aria-label={t("inbox_hide")}
+            title={t("inbox_hide")}
             className="-mr-2 flex h-9 w-9 items-center justify-center rounded-full border-0 bg-transparent text-mut hover:bg-soft2 hover:text-ink"
           >
             <X size={17} strokeWidth={2.4} />
@@ -83,8 +87,8 @@ export function InboxCard() {
       </div>
       <p className="m-0 text-[14.5px] leading-normal text-ink">{digest.summary}</p>
 
-      {important.length > 0 && <Group title="Needs you" items={important} account={digest.account} />}
-      {dated.length > 0 && <Group title="Has a date" items={dated} account={digest.account} />}
+      {important.length > 0 && <Group title={t("inbox_needs")} items={important} account={digest.account} />}
+      {dated.length > 0 && <Group title={t("inbox_dated")} items={dated} account={digest.account} />}
 
       {rest.length > 0 && (
         <div className="border-t border-line pt-2.5">
@@ -93,7 +97,7 @@ export function InboxCard() {
             aria-expanded={showRest}
             className="flex min-h-10 w-full items-center justify-between border-0 bg-transparent p-0 text-left text-[13px] font-bold text-mut"
           >
-            {rest.length} other {rest.length === 1 ? "email" : "emails"}, nothing to do
+            {t("inbox_rest", { n: rest.length })}
             <ChevronDown size={16} className={showRest ? "rotate-180" : ""} />
           </button>
           {showRest && (
@@ -111,9 +115,9 @@ export function InboxCard() {
         </div>
       )}
       <div className="text-xs text-mut2">
-        Only you see this.{" "}
+        {t("only_you_inbox")}{" "}
         <Link href="/settings" className="underline">
-          Inbox settings
+          {t("inbox_settings")}
         </Link>
       </div>
     </section>
@@ -121,6 +125,8 @@ export function InboxCard() {
 }
 
 function Group({ title, items, account }: { title: string; items: InboxItem[]; account: string | null }) {
+  const t = useTranslations("home");
+  const dates = useDates();
   const { openForm } = useMoneyForms();
   function act(i: InboxItem) {
     const a = i.action;
@@ -146,13 +152,13 @@ function Group({ title, items, account }: { title: string; items: InboxItem[]; a
               rel="noreferrer"
               className="flex min-h-9 items-center gap-1.5 rounded-full border border-line bg-card px-3 text-[12px] font-bold text-ink"
             >
-              <ExternalLink size={13} /> Open in Gmail
+              <ExternalLink size={13} /> {t("inbox_gmail")}
             </a>
             {i.action.kind !== "none" && (
               <button onClick={() => act(i)} className="min-h-9 rounded-full border-0 bg-tint px-3 text-[12px] font-extrabold text-acct">
-                {ACTION_LABEL[i.action.kind]}
+                {t(ACTION_LABEL[i.action.kind])}
                 {i.action.kind === "recurring" && i.action.amount ? ` · ${eur(i.action.amount)}` : ""}
-                {i.action.kind !== "recurring" && i.action.date ? ` · ${shortDate(i.action.date)}` : ""}
+                {i.action.kind !== "recurring" && i.action.date ? ` · ${dates.short(i.action.date)}` : ""}
               </button>
             )}
           </div>
